@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools>=65.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "socrates-nexus"
+version = "0.1.0"
+description = "Universal LLM client for production - works with Claude, GPT-4, Gemini, Llama, and any LLM"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Socrates Nexus Contributors"}
+]
+keywords = [
+    "llm",
+    "ai",
+    "claude",
+    "gpt-4",
+    "gemini",
+    "ollama",
+    "llama",
+    "production",
+    "multi-llm",
+    "universal-client",
+    "retry",
+    "streaming",
+    "async",
+    "token-tracking"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+requires-python = ">=3.8"
+
+dependencies = [
+    "pydantic>=2.0.0",
+]
+
+[project.optional-dependencies]
+anthropic = ["anthropic>=0.40.0"]
+openai = ["openai>=1.0.0"]
+google = ["google-generativeai>=0.3.0"]
+ollama = ["ollama>=0.0.8"]
+huggingface = ["huggingface-hub>=0.17.0"]
+all = [
+    "anthropic>=0.40.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
+    "ollama>=0.0.8",
+    "huggingface-hub>=0.17.0",
+]
+async = ["asyncio>=3.4.3"]
+dev = [
+    "pytest>=7.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0",
+    "black>=23.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Nireus79/socrates-nexus"
+Documentation = "https://github.com/Nireus79/socrates-nexus/tree/main/docs"
+Repository = "https://github.com/Nireus79/socrates-nexus"
+"Source Code" = "https://github.com/Nireus79/socrates-nexus"
+"Bug Tracker" = "https://github.com/Nireus79/socrates-nexus/issues"
+Changelog = "https://github.com/Nireus79/socrates-nexus/releases"
+
+[tool.setuptools]
+packages = ["socrates_nexus"]
+
+[tool.setuptools.package-dir]
+"" = "src"
+
+[tool.setuptools.package-data]
+socrates_nexus = ["py.typed"]
+
+[tool.black]
+line-length = 100
+target-version = ['py38', 'py39', 'py310', 'py311', 'py312']
+
+[tool.ruff]
+line-length = 100
+target-version = "py38"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "--strict-markers --tb=short -v"
+markers = [
+    "unit: Unit tests (no external dependencies)",
+    "integration: Integration tests (require API keys)",
+    "slow: Tests that take >1 second",
+    "requires_api: Tests requiring valid API keys",
+]
+
+[tool.coverage.run]
+source = ["socrates_nexus"]
+branch = true
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__init__.py",
+]
