@@ -17,7 +17,9 @@ except ImportError:
     HAS_LANGCHAIN = False
     # Create dummy base classes for type checking
     class LLM:  # type: ignore
-        pass
+        def __init__(self, **kwargs):  # type: ignore
+            for key, value in kwargs.items():
+                setattr(self, key, value)
     class CallbackManagerForLLMRun:  # type: ignore
         pass
 

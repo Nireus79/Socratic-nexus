@@ -64,11 +64,14 @@ class TestSocratesNexusLLMCall:
 
             mock_response = ChatResponse(
                 content="Test response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
                     provider="anthropic",
                     model="claude-opus",
                     input_tokens=10,
                     output_tokens=20,
+                    total_tokens=30,
                 ),
             )
             mock_client.chat.return_value = mock_response
@@ -86,8 +89,10 @@ class TestSocratesNexusLLMCall:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10
+                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10, total_tokens=15
                 ),
             )
 
@@ -103,8 +108,10 @@ class TestSocratesNexusLLMCall:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10
+                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10, total_tokens=15
                 ),
             )
 
@@ -126,8 +133,10 @@ class TestSocratesNexusLLMCall:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="openai",
+                model="gpt-4",
                 usage=TokenUsage(
-                    provider="openai", model="gpt-4", input_tokens=5, output_tokens=10
+                    provider="openai", model="gpt-4", input_tokens=5, output_tokens=10, total_tokens=15
                 ),
             )
 
@@ -299,8 +308,10 @@ class TestSocratesNexusLLMCallbackManager:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10
+                    provider="anthropic", model="claude-opus", input_tokens=5, output_tokens=10, total_tokens=15
                 ),
             )
 
@@ -351,8 +362,10 @@ class TestSocratesNexusLLMEdgeCases:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=0, output_tokens=5
+                    provider="anthropic", model="claude-opus", input_tokens=0, output_tokens=5, total_tokens=5
                 ),
             )
 
@@ -369,8 +382,10 @@ class TestSocratesNexusLLMEdgeCases:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=5000, output_tokens=5
+                    provider="anthropic", model="claude-opus", input_tokens=5000, output_tokens=5, total_tokens=5005
                 ),
             )
 
@@ -387,8 +402,10 @@ class TestSocratesNexusLLMEdgeCases:
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
                 content="Response",
+                provider="anthropic",
+                model="claude-opus",
                 usage=TokenUsage(
-                    provider="anthropic", model="claude-opus", input_tokens=10, output_tokens=5
+                    provider="anthropic", model="claude-opus", input_tokens=10, output_tokens=5, total_tokens=15
                 ),
             )
 
