@@ -47,11 +47,18 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+# Providers
 anthropic = ["anthropic>=0.40.0"]
 openai = ["openai>=1.0.0"]
 google = ["google-generativeai>=0.3.0"]
 ollama = ["ollama>=0.0.8"]
 huggingface = ["huggingface-hub>=0.17.0"]
+
+# Integrations
+openclaw = []
+langchain = ["langchain>=0.1.0"]
+
+# All providers
 all = [
     "anthropic>=0.40.0",
     "openai>=1.0.0",
@@ -59,6 +66,22 @@ all = [
     "ollama>=0.0.8",
     "huggingface-hub>=0.17.0",
 ]
+
+# All integrations
+integrations = [
+    "langchain>=0.1.0",
+]
+
+# Everything
+full = [
+    "anthropic>=0.40.0",
+    "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
+    "ollama>=0.0.8",
+    "huggingface-hub>=0.17.0",
+    "langchain>=0.1.0",
+]
+
 async = ["asyncio>=3.4.3"]
 dev = [
     "pytest>=7.0",
