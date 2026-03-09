@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: pip install black
       - name: Check formatting with black
-        run: black --check --target-version py311 src/ tests/
+        run: black --check src/ tests/
 
   type-check:
     runs-on: ubuntu-latest
