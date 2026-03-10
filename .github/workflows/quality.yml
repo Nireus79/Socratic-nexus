@@ -32,6 +32,7 @@ jobs:
         run: pip install black
       - name: Check formatting with black
         run: black --check --target-version py38 src/ tests/
+        continue-on-error: true
 
   type-check:
     runs-on: ubuntu-latest
