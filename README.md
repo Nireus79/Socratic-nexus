@@ -508,6 +508,16 @@ ollama serve  # Starts on http://localhost:11434
 # No API key needed!
 ```
 
+## Support Development
+
+If you find this package useful, consider supporting development:
+
+- [Become a Sponsor](https://github.com/sponsors/Nireus79) - Get early access to new features
+- [Star on GitHub](https://github.com/Nireus79/socrates-nexus) - Shows your appreciation
+- [Report Issues](https://github.com/Nireus79/socrates-nexus/issues) - Help improve the package
+
+Your support helps fund development of the entire Socratic ecosystem.
+
 ## Examples
 
 See the `examples/` directory for complete, runnable examples:
