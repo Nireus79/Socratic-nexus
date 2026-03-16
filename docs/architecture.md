@@ -1,643 +1,174 @@
-# Architecture & Design
-
-Technical architecture of Socrates Nexus.
+# Socrates Nexus - Architecture & System Design
 
 ## System Overview
 
-```
-┌─────────────────────────────────────────────────────┐
-│         User Application Layer                       │
-│  (LLMClient / AsyncLLMClient)                       │
-└────────────┬────────────────────────────────────────┘
-             │
-             ▼
-┌─────────────────────────────────────────────────────┐
-│         Unified Interface Layer                      │
-│  • Configuration (LLMConfig)                        │
-│  • Response Models (ChatResponse, TokenUsage)       │
-│  • Error Handling (Exception Hierarchy)             │
-└────────────┬────────────────────────────────────────┘
-             │
-      ┌──────┴──────┐
-      │             │
-      ▼             ▼
-┌──────────────┐ ┌──────────────────┐
-│ Sync Client  │ │ Async Client     │
-│              │ │                  │
-│ • Retry      │ │ • Async retry    │
-│ • Cache      │ │ • Concurrent     │
-│ • Stream     │ │ • Parallel       │
-└──────┬───────┘ └────────┬─────────┘
-       │                  │
-       └──────────┬───────┘
-                  │
-       ┌──────────▼──────────┐
-       │ Provider Factory    │
-       │                    │
-       │ • Provider Map     │
-       │ • Aliases          │
-       └──────────┬──────────┘
-                  │
-  ┌───────────────┼───────────────┬───────────┐
-  │               │               │           │
-  ▼               ▼               ▼           ▼
-┌─────────┐ ┌──────────┐ ┌─────────┐ ┌─────────┐
-│Anthropic│ │OpenAI    │ │Google   │ │Ollama   │
-│Provider │ │Provider  │ │Provider │ │Provider │
-└─────────┘ └──────────┘ └─────────┘ └─────────┘
-  │               │           │          │
-  └───────────────┼───────────┴──────────┘
-                  │
-        ┌─────────▼─────────┐
-        │ External APIs     │
-        │                  │
-        │ • Anthropic API  │
-        │ • OpenAI API     │
-        │ • Google API     │
-        │ • Ollama Server  │
-        └──────────────────┘
-```
+Socrates Nexus is a universal LLM client providing a unified interface across multiple LLM providers (Anthropic Claude, OpenAI GPT, Google Gemini, Ollama). Architecture emphasizes production-readiness with automatic retries, token tracking, streaming, and multi-provider fallback.
 
----
+## Core Components
 
-## Component Architecture
+### 1. LLMClient (Synchronous)
+Main synchronous interface implementing retry logic, token tracking, and caching.
 
-### 1. **Client Layer** (entry point)
+**Key Methods**:
+- `chat(message, **kwargs)` - Single turn conversation
+- `stream(message, on_chunk=None)` - Streaming response  
+- `get_usage_stats()` - Cumulative token usage tracking
+- `add_usage_callback()` - Register tracking callbacks
 
-**Files:** `client.py`, `async_client.py`
+### 2. AsyncLLMClient (Asynchronous)
+Non-blocking async version for concurrent requests.
 
-**Responsibilities:**
-- Accept user requests
-- Provider selection via factory
-- Manage configuration
-- Coordinate retry/caching
-- Track usage stats
-- Provide streaming interface
+**Key Methods**:
+- `async chat(message, **kwargs)`
+- `async stream(message, on_chunk=None)`
+- Same configuration and tracking as sync client
 
-**Design Pattern:** Factory Pattern
-```python
-class LLMClient:
-    def __init__(self, provider: str, model: str, api_key: str, ...):
-        self.config = LLMConfig(...)
-        self.provider = self._create_provider()
-        self.cache = TTLCache() if config.cache_responses else None
+### 3. Provider System
+Extensible provider pattern with concrete implementations.
 
-    def _create_provider(self) -> BaseProvider:
-        return PROVIDER_MAP[self.config.provider](self.config)
-```
+**BaseProvider Interface**:
+- `chat()` - Send message to LLM
+- `stream()` - Stream response chunks
+- `extract_usage()` - Extract token counts
+- `calculate_cost()` - Calculate request cost
 
-### 2. **Provider Abstraction Layer** (provider flexibility)
+**Providers**:
+- AnthropicProvider: Claude 3 variants
+- OpenAIProvider: GPT-4, GPT-3.5-turbo
+- GoogleProvider: Gemini 1.5 Pro/Flash
+- OllamaProvider: Local LLMs
 
-**Files:** `providers/base.py`
+### 4. Retry System
+Automatic retry with exponential backoff for transient failures.
 
-**Abstract Base Class:**
-```python
-class BaseProvider(ABC):
-    @abstractmethod
-    def chat(self, message: str) -> ChatResponse: pass
-
-    @abstractmethod
-    def stream(self, message: str, on_chunk: Callable) -> ChatResponse: pass
-
-    def calculate_cost(self, tokens) -> float: pass
-    def add_usage_callback(self, callback: Callable): pass
-```
-
-**Implementations:**
-- `providers/anthropic.py` - Claude
-- `providers/openai.py` - GPT
-- `providers/google.py` - Gemini
-- `providers/ollama.py` - Local models
-
-### 3. **Model Layer** (data structures)
-
-**File:** `models.py`
-
-**Key Models:**
-- `LLMConfig` - Configuration
-- `ChatResponse` - API response
-- `TokenUsage` - Token + cost tracking
-- `UsageStats` - Cumulative stats
-- `PROVIDER_PRICING` - Cost data
-
-### 4. **Error Handling Layer** (unified errors)
-
-**File:** `exceptions.py`
-
-**Exception Hierarchy:**
-```
-Exception
-└── LLMError (base)
-    ├── RateLimitError
-    ├── AuthenticationError
-    │   └── InvalidAPIKeyError
-    ├── TimeoutError
-    ├── ContextLengthExceededError
-    ├── ModelNotFoundError
-    └── ProviderError
-```
-
-**Design:** Provider-specific errors map to unified exceptions
-
-### 5. **Resilience Layer** (robustness)
-
-**Files:** `retry.py`, `streaming.py`
-
-**Retry Logic:**
+**Features**:
+- Configurable retry attempts (default: 3)
 - Exponential backoff with jitter
-- Configurable attempts
-- Rate limit aware (Retry-After header)
+- Retryable: 429, timeouts, 5xx
+- Non-retryable: 401, 400, 404
 
-**Streaming Support:**
-- Error-safe callback invocation
-- Chunk accumulation
-- Progress tracking
+**Backoff Schedule** (2.0x factor):
+- Attempt 1: Immediate
+- Attempt 2: 1s wait
+- Attempt 3: 2s wait
+- Attempt 4: 4s wait
 
-### 6. **Utility Layer** (cross-cutting)
+### 5. Token Tracking & Caching
+Track costs and cache responses to reduce API calls.
 
-**Files:** `utils/cache.py`
+**TokenUsage**:
+- input_tokens, output_tokens, total_tokens
+- cost_usd (calculated per provider pricing)
 
-**TTL Cache:**
-- Thread-safe caching
-- Hit/miss statistics
-- TTL-based expiration
+**Caching**:
+- TTL-based (default: 300s)
+- Cache key from message hash + model
+- In-memory storage
 
----
+### 6. Streaming System
+Real-time response streaming with chunk callbacks.
 
-## Data Flow
+**StreamHandler**:
+- Process provider streaming responses
+- Accumulate chunks while calling callback
+- Track partial token counts
+- Return final usage info
 
-### Chat Request Flow
+## Data Models
 
-```
-User calls: client.chat("Hello")
-    │
-    ├─ Check cache (if enabled)
-    │  └─ Return cached response if hit
-    │
-    ├─ Provider.chat() with retry
-    │  ├─ Attempt 1
-    │  │  └─ If fails, calculate backoff
-    │  ├─ Attempt 2 (wait backoff time)
-    │  │  └─ If fails, calculate backoff
-    │  └─ Attempt 3 (wait backoff time)
-    │
-    ├─ Extract response + usage
-    │  ├─ Input tokens
-    │  ├─ Output tokens
-    │  └─ Calculate cost
-    │
-    ├─ Call usage callbacks
-    │  ├─ Per-callback error handling
-    │  └─ Continue even if callback fails
-    │
-    ├─ Cache response (if enabled)
-    │
-    ├─ Update usage stats
-    │  ├─ Total requests
-    │  ├─ Total tokens
-    │  ├─ Total cost
-    │  ├─ Per-provider breakdown
-    │  └─ Per-model breakdown
-    │
-    └─ Return ChatResponse
-```
-
-### Error Recovery Flow
-
-```
-Provider call fails with error
-    │
-    ├─ Identify error type
-    │  ├─ Map to exception class
-    │  └─ Extract retry info
-    │
-    ├─ Should retry?
-    │  ├─ RateLimitError → Yes (with Retry-After)
-    │  ├─ TimeoutError → Yes
-    │  ├─ AuthenticationError → No (fail immediately)
-    │  ├─ ContextLengthExceededError → No
-    │  └─ Other errors → Configurable
-    │
-    ├─ Calculate backoff
-    │  ├─ delay = base_delay * (exponential_base ** attempt)
-    │  ├─ delay = min(delay, max_delay)
-    │  ├─ Add jitter: delay * (0.5 + random * 0.5)
-    │  └─ Sleep(delay)
-    │
-    └─ Retry or raise exception
-```
-
----
-
-## Design Patterns Used
-
-### 1. **Factory Pattern** (provider selection)
-
+### LLMConfig
 ```python
-PROVIDER_MAP = {
-    "anthropic": AnthropicProvider,
-    "claude": AnthropicProvider,  # alias
-    "openai": OpenAIProvider,
-    "gpt": OpenAIProvider,  # alias
-    # ...
-}
-
-def _create_provider(self) -> BaseProvider:
-    provider_class = PROVIDER_MAP[self.config.provider]
-    return provider_class(self.config)
+@dataclass
+class LLMConfig:
+    provider: str                    # Provider name
+    model: str                       # Model identifier
+    api_key: Optional[str]           # API key/env var
+    base_url: Optional[str]          # Custom endpoint
+    temperature: float = 0.7
+    max_tokens: Optional[int] = None
+    retry_attempts: int = 3
+    retry_backoff_factor: float = 2.0
+    request_timeout: int = 60
+    cache_responses: bool = True
+    cache_ttl: int = 300
 ```
 
-**Benefits:**
-- Easy provider addition
-- Runtime provider selection
-- Alias support
-
-### 2. **Strategy Pattern** (retry logic)
-
+### Response
 ```python
-@retry_with_backoff(config=RetryConfig(...))
-def make_api_call():
-    pass
+@dataclass
+class Response:
+    content: str
+    stop_reason: str
+    usage: TokenUsage
+    model: str
+    provider: str
+    timestamp: datetime
 ```
 
-**Benefits:**
-- Configurable retry behavior
-- Separate retry logic from core logic
-- Reusable across providers
+## Error Hierarchy
 
-### 3. **Observer Pattern** (token tracking)
+- NexusError (base)
+  - RateLimitError (429)
+  - AuthenticationError (401)
+  - InvalidAPIKeyError
+  - TimeoutError
+  - ContextLengthExceededError
+  - ModelNotFoundError
+  - ProviderError
+  - ConfigurationError
 
-```python
-def add_usage_callback(callback: Callable):
-    self._usage_callbacks.append(callback)
+## Request Flow
 
-def _notify_usage(usage: TokenUsage):
-    for callback in self._usage_callbacks:
-        try:
-            callback(usage)
-        except Exception:
-            pass  # Don't break on callback error
-```
+1. Client receives message
+2. Check cache (if enabled)
+3. Get provider instance
+4. Retry loop (0 to retry_attempts):
+   - Call provider.chat() with timeout
+   - Extract tokens and calculate cost
+   - Update cache and invoke callbacks
+   - Return Response on success
+   - On retryable error: backoff and retry
+   - On non-retryable error: raise exception immediately
 
-**Benefits:**
-- Decoupled tracking
-- Multiple tracking strategies
-- Error isolation
-
-### 4. **Decorator Pattern** (caching)
-
-```python
-@TTLCache(ttl_minutes=5)
-def expensive_operation():
-    pass
-```
-
-**Benefits:**
-- Transparent caching
-- Easy enable/disable
-- Can work with any function
-
-### 5. **Adapter Pattern** (provider abstraction)
-
-```python
-class AnthropicProvider(BaseProvider):
-    """Adapts Anthropic SDK to BaseProvider interface"""
-
-    def chat(self, message: str) -> ChatResponse:
-        # Convert Anthropic response to ChatResponse
-        anthropic_response = self.client.messages.create(...)
-        return ChatResponse(...)
-```
-
-**Benefits:**
-- Unified interface across providers
-- Provider-specific logic isolated
-- Easy provider addition
-
----
-
-## Configuration Management
-
-### Configuration Hierarchy
+## Multi-Provider Fallback
 
 ```
-1. Explicit Parameters (highest priority)
-   LLMClient(provider="anthropic", api_key="...")
-
-2. Environment Variables
-   ANTHROPIC_API_KEY
-   OPENAI_API_KEY
-   GOOGLE_API_KEY
-
-3. Default Values (lowest priority)
-   temperature=0.7
-   retry_attempts=3
+Primary (e.g., Claude)
+├─ Success → Return
+└─ Error → Retry with backoff
+   └─ Exhausted → Fallback (e.g., GPT-4)
+      ├─ Success → Return
+      └─ Error → Fallback (e.g., Gemini)
 ```
 
-### Configuration Validation
+## Integration Points
 
-```
-LLMConfig creation
-    │
-    ├─ Validate required fields
-    │  ├─ provider (required)
-    │  └─ model (required)
-    │
-    ├─ Validate value ranges
-    │  ├─ temperature: 0.0 - 2.0
-    │  ├─ retry_attempts: > 0
-    │  └─ timeout: > 0
-    │
-    ├─ Resolve aliases
-    │  ├─ "claude" → "anthropic"
-    │  ├─ "gpt" → "openai"
-    │  └─ "local" → "ollama"
-    │
-    └─ Return validated config
-```
+- **Openclaw**: NexusLLMSkill wrapper
+- **LangChain**: SocratesNexusLLM base class
 
----
+## Design Patterns
 
-## Error Handling Strategy
+1. **Provider Pattern** - Extensible provider system
+2. **Decorator Pattern** - Retry/streaming/tracking wrappers
+3. **Configuration Pattern** - Centralized LLMConfig
+4. **Strategy Pattern** - Retry/caching/fallback strategies
 
-### Error Classification
+## Performance
 
-```
-API Errors
-├── Retriable (auto-retry)
-│   ├── RateLimitError (429)
-│   ├── TimeoutError
-│   └── Server errors (5xx)
-│
-├── Non-retriable (fail immediately)
-│   ├── AuthenticationError (401/403)
-│   ├── InvalidAPIKeyError
-│   ├── ContextLengthExceededError
-│   └── ModelNotFoundError
-│
-└── Provider-specific
-    ├── Map to unified exceptions
-    └── Extract useful context
-```
-
-### Error Context
-
-```python
-class LLMError(Exception):
-    message: str           # Human-readable
-    error_code: str        # Machine-readable
-    context: Dict          # Provider-specific details
-
-    # RateLimitError also includes:
-    retry_after: Optional[int]  # Seconds to wait
-```
-
----
-
-## Cost Calculation
-
-### Per-Request Calculation
-
-```
-Input token cost = (input_tokens / 1,000,000) × input_price_per_1M
-Output token cost = (output_tokens / 1,000,000) × output_price_per_1M
-Total cost = Input token cost + Output token cost
-```
-
-### Cumulative Statistics
-
-```python
-UsageStats:
-    total_requests: int
-    total_input_tokens: int
-    total_output_tokens: int
-    total_cost_usd: float
-    by_provider: Dict[str, ProviderStats]
-    by_model: Dict[str, ModelStats]
-```
-
-### Pricing Data Structure
-
-```python
-PROVIDER_PRICING = {
-    "anthropic": {
-        "claude-opus": {
-            "input": 15.00,    # per million tokens
-            "output": 75.00,   # per million tokens
-        },
-        "claude-haiku": {
-            "input": 0.80,
-            "output": 4.00,
-        },
-    },
-    "openai": {...},
-    "google": {...},
-    "ollama": {
-        "llama2": {
-            "input": 0.0,      # Local models are free
-            "output": 0.0,
-        },
-    },
-}
-```
-
----
+- Response time: <100ms (cache) to seconds (API)
+- Token tracking: O(1)
+- Retry overhead: exponential backoff (1s, 2s, 4s)
+- Cache hit: ~100x faster than API
 
 ## Extensibility
 
-### Adding a New Provider
+Add providers by implementing BaseProvider:
+- `chat(messages, **kwargs)`
+- `stream(messages, **kwargs)`
+- `extract_usage(response)`
+- `calculate_cost(input_tokens, output_tokens)`
 
-**Step 1:** Create provider class
-
-```python
-# socrates_nexus/providers/new_provider.py
-
-from .base import BaseProvider
-
-class NewProvider(BaseProvider):
-    def chat(self, message: str) -> ChatResponse:
-        # Implementation
-        pass
-
-    def stream(self, message: str, on_chunk: Callable) -> ChatResponse:
-        # Implementation
-        pass
-```
-
-**Step 2:** Register provider
-
-```python
-# socrates_nexus/client.py
-
-PROVIDER_MAP = {
-    # ... existing providers
-    "new_provider": NewProvider,
-}
-```
-
-**Step 3:** Add pricing
-
-```python
-# socrates_nexus/models.py
-
-PROVIDER_PRICING = {
-    # ... existing
-    "new_provider": {
-        "model-name": {
-            "input": 1.00,
-            "output": 2.00,
-        },
-    },
-}
-```
-
-**Step 4:** Add tests
-
-```python
-# tests/test_new_provider.py
-
-def test_new_provider_chat():
-    pass
-```
-
----
-
-## Performance Considerations
-
-### Memory Usage
-
-- **Lightweight:** ~1MB base overhead
-- **Per request:** Token cache + response buffer
-- **Streaming:** O(1) memory (chunks processed)
-- **Cache:** Configurable TTL, auto-cleanup
-
-### Latency
-
-- **Import:** ~50ms (minimal dependencies)
-- **First request:** ~100ms overhead (client creation)
-- **Subsequent:** ~0ms overhead (cached client)
-- **Retry:** Exponential backoff (configurable)
-
-### Throughput
-
-- **Sync:** Sequential requests
-- **Async:** Concurrent requests via `asyncio.gather()`
-- **Streaming:** No buffering of full response
-
----
-
-## Security Considerations
-
-### API Key Management
-
-- Keys passed directly to provider SDKs
-- Never logged or cached
-- Environment variables recommended
-- Optional key encryption (user responsibility)
-
-### Data Privacy
-
-- Responses not persisted by Socrates Nexus
-- Cache is memory-only (not persistent)
-- No telemetry or tracking
-- User owns all data sent to providers
-
-### Input Validation
-
-- User input passed as-is to providers
-- No content filtering
-- No injection prevention (trust provider)
-- Rate limiting per provider
-
----
-
-## Testing Strategy
-
-### Unit Tests (73 tests)
-
-```
-✅ Models: TokenUsage, ChatResponse, LLMConfig
-✅ Exceptions: Error hierarchy, context
-✅ Retry: Exponential backoff calculation
-✅ Clients: Initialization, configuration
-✅ Async: AsyncLLMClient functionality
-✅ Cache: TTL cache behavior
-```
-
-### Integration Tests (optional)
-
-```
-✅ Real API calls per provider
-✅ Streaming with callbacks
-✅ Error handling with real errors
-✅ Token tracking accuracy
-✅ Cost calculation verification
-```
-
-### Mocking Strategy
-
-- Mock provider responses
-- Mock API errors
-- Don't mock retry logic (test the logic)
-- Don't mock real API calls in unit tests
-
----
-
-## Deployment Considerations
-
-### Installation
-
-```bash
-pip install socrates-nexus[all]
-```
-
-### Configuration
-
-```python
-# Environment variables
-ANTHROPIC_API_KEY=...
-OPENAI_API_KEY=...
-GOOGLE_API_KEY=...
-
-# Or runtime config
-config = LLMConfig(
-    provider="anthropic",
-    model="claude-opus",
-    api_key="...",
-    cache_responses=True,
-    retry_attempts=5,
-)
-```
-
-### Monitoring
-
-```python
-# Track costs
-stats = client.get_usage_stats()
-print(f"Total cost: ${stats.total_cost_usd}")
-
-# Custom callbacks
-client.add_usage_callback(log_to_monitoring_system)
-
-# Error tracking
-try:
-    client.chat(message)
-except LLMError as e:
-    report_to_error_tracking(e)
-```
-
----
-
-## Summary
-
-**Socrates Nexus Architecture:**
-
-1. **Modular** - Separate concerns (client, providers, models, errors)
-2. **Extensible** - Easy to add providers
-3. **Robust** - Automatic retry, error handling
-4. **Efficient** - Caching, async support
-5. **Observable** - Token tracking, callbacks
-6. **Secure** - No data persistence
-7. **Production-Ready** - 18 months real-world tested patterns
-
-The architecture prioritizes simplicity, reliability, and ease of use while maintaining flexibility for advanced use cases.
+Custom integrations via:
+- Subclassing LLMClient
+- Overriding _make_request()
+- Using callbacks
