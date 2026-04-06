@@ -31,7 +31,7 @@ jobs:
       - name: Install dependencies
         run: pip install black
       - name: Check formatting with black
-        run: black --check --target-version py38 src/ tests/
+        run: black --check --target-version py39 src/ tests/
         continue-on-error: true
 
   type-check:
