@@ -1,6 +1,5 @@
 """Tests for API documentation generation module."""
 
-import pytest
 from socrates_nexus.documentation import (
     ParameterDoc,
     EndpointDoc,

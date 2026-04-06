@@ -318,7 +318,7 @@ class TestResponseCache:
         cache = ResponseCache(ttl_minutes=1)
         cache.set("none_key", None)
         # Note: None values may behave differently depending on implementation
-        result = cache.get("none_key")
+        cache.get("none_key")
         # Result may be None due to implementation details
 
     def test_response_cache_numeric_values(self):
