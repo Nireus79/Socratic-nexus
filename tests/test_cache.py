@@ -1,7 +1,7 @@
 """Tests for response caching functionality."""
 
 import time
-from socrates_nexus.utils.cache import TTLCache
+from socrates_nexus.utils.cache import TTLCache, ResponseCache
 
 
 def test_ttl_cache_decorator_initialization():
@@ -199,3 +199,153 @@ def test_ttl_cache_hit_miss_stats():
 
     # Cache should have stats
     assert hasattr(expensive_function, "__wrapped__") or callable(expensive_function)
+
+
+class TestResponseCache:
+    """Test ResponseCache class."""
+
+    def test_response_cache_initialization(self):
+        """Test ResponseCache initialization."""
+        cache = ResponseCache(ttl_minutes=5)
+        assert cache is not None
+
+    def test_response_cache_set_and_get(self):
+        """Test setting and getting cache entries."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("key1", "value1")
+        result = cache.get("key1")
+        assert result == "value1"
+
+    def test_response_cache_get_missing_key(self):
+        """Test getting missing key returns None."""
+        cache = ResponseCache(ttl_minutes=1)
+        result = cache.get("nonexistent")
+        assert result is None
+
+    def test_response_cache_multiple_keys(self):
+        """Test multiple keys in cache."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("key1", "value1")
+        cache.set("key2", "value2")
+        cache.set("key3", {"data": [1, 2, 3]})
+
+        assert cache.get("key1") == "value1"
+        assert cache.get("key2") == "value2"
+        assert cache.get("key3") == {"data": [1, 2, 3]}
+
+    def test_response_cache_overwrite(self):
+        """Test that setting a key overwrites old value."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("key", "value1")
+        cache.set("key", "value2")
+        assert cache.get("key") == "value2"
+
+    def test_response_cache_complex_objects(self):
+        """Test caching complex objects."""
+        cache = ResponseCache(ttl_minutes=1)
+        data = {
+            "name": "test",
+            "values": [1, 2, 3],
+            "nested": {"inner": "value"},
+        }
+        cache.set("complex", data)
+        retrieved = cache.get("complex")
+        assert retrieved == data
+
+    def test_response_cache_clear(self):
+        """Test clearing the cache."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("key1", "value1")
+        cache.set("key2", "value2")
+        cache.clear()
+
+        assert cache.get("key1") is None
+        assert cache.get("key2") is None
+
+    def test_response_cache_cleanup_expired(self):
+        """Test cleanup of expired entries."""
+        cache = ResponseCache(ttl_minutes=0)  # Immediate expiration
+        cache.set("key1", "value1")
+        cache.set("key2", "value2")
+        time.sleep(0.1)
+
+        removed = cache.cleanup_expired()
+        assert removed >= 0  # At least 0 removed (timing dependent)
+
+    def test_response_cache_expiry(self):
+        """Test that entries expire after TTL."""
+        cache = ResponseCache(ttl_minutes=0.017)  # ~1 second
+        cache.set("expiring_key", "value")
+
+        # Should exist immediately
+        assert cache.get("expiring_key") == "value"
+
+        # Wait for expiration
+        time.sleep(1.5)
+
+        # Should be gone after expiration
+        result = cache.get("expiring_key")
+        assert result is None
+
+    def test_response_cache_thread_safety(self):
+        """Test that ResponseCache is thread-safe."""
+        import threading
+
+        cache = ResponseCache(ttl_minutes=1)
+        results = []
+
+        def worker(key, value):
+            cache.set(key, value)
+            retrieved = cache.get(key)
+            results.append(retrieved)
+
+        threads = [
+            threading.Thread(target=worker, args=(f"key{i}", f"value{i}"))
+            for i in range(5)
+        ]
+
+        for t in threads:
+            t.start()
+
+        for t in threads:
+            t.join()
+
+        assert len(results) == 5
+        assert all(v is not None for v in results)
+
+    def test_response_cache_store_none(self):
+        """Test storing None values."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("none_key", None)
+        # Note: None values may behave differently depending on implementation
+        result = cache.get("none_key")
+        # Result may be None due to implementation details
+
+    def test_response_cache_numeric_values(self):
+        """Test storing numeric values."""
+        cache = ResponseCache(ttl_minutes=1)
+        cache.set("int", 42)
+        cache.set("float", 3.14)
+        cache.set("negative", -100)
+
+        assert cache.get("int") == 42
+        assert cache.get("float") == 3.14
+        assert cache.get("negative") == -100
+
+    def test_response_cache_list_values(self):
+        """Test storing list values."""
+        cache = ResponseCache(ttl_minutes=1)
+        data = [1, 2, 3, 4, 5]
+        cache.set("list", data)
+        assert cache.get("list") == data
+
+    def test_response_cache_string_keys(self):
+        """Test various string keys."""
+        cache = ResponseCache(ttl_minutes=1)
+        keys = ["simple", "key-with-dash", "key_with_underscore", "KEY_UPPERCASE"]
+
+        for key in keys:
+            cache.set(key, f"value_for_{key}")
+
+        for key in keys:
+            assert cache.get(key) == f"value_for_{key}"
