@@ -29,6 +29,11 @@ from .performance import (
     OptimizationResult,
     PerformanceMetrics,
 )
+from .deduplication import (
+    RequestDeduplicator,
+    RequestBatcher,
+    CachedResponse,
+)
 from .models import ChatResponse, TokenUsage, LLMConfig, ImageContent, TextContent
 from .exceptions import (
     LLMError,
@@ -67,6 +72,10 @@ __all__ = [
     "ModelOptimizationConfig",
     "PerformanceMetrics",
     "OptimizationResult",
+    # Request Deduplication & Batching
+    "RequestDeduplicator",
+    "RequestBatcher",
+    "CachedResponse",
     # Exceptions
     "LLMError",
     "NexusError",
