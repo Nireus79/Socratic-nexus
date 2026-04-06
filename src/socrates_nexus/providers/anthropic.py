@@ -1,7 +1,10 @@
 """Anthropic Claude provider for Socrates Nexus."""
 
+import logging
 import time
 from typing import Callable
+
+logger = logging.getLogger(__name__)
 
 from ..models import LLMConfig, ChatResponse
 from ..retry import retry_with_backoff
@@ -42,11 +45,13 @@ class AnthropicProvider(BaseProvider):
                 import anthropic
 
                 self._client = anthropic.Anthropic(api_key=self.config.api_key)
-            except ImportError:
+            except ImportError as e:
+                logger.error(f"anthropic package not installed: {e}")
                 raise ProviderError(
                     "anthropic package is required. Install with: pip install 'socrates-nexus[anthropic]'"
                 )
             except Exception as e:
+                logger.error(f"Failed to initialize Anthropic client: {e}", exc_info=True)
                 raise AuthenticationError(f"Failed to initialize Anthropic client: {str(e)}")
 
         return self._client
@@ -59,11 +64,13 @@ class AnthropicProvider(BaseProvider):
                 import anthropic
 
                 self._async_client = anthropic.AsyncAnthropic(api_key=self.config.api_key)
-            except ImportError:
+            except ImportError as e:
+                logger.error(f"anthropic package not installed: {e}")
                 raise ProviderError(
                     "anthropic package is required. Install with: pip install 'socrates-nexus[anthropic]'"
                 )
             except Exception as e:
+                logger.error(f"Failed to initialize async Anthropic client: {e}", exc_info=True)
                 raise AuthenticationError(f"Failed to initialize async Anthropic client: {str(e)}")
 
         return self._async_client
