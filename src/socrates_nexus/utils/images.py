@@ -77,7 +77,7 @@ def load_image_from_url(url: str, timeout: int = 10) -> bytes:
         requests.Timeout: If download times out
     """
     try:
-        import requests
+        import requests  # type: ignore[import-untyped]
 
         response = requests.get(url, timeout=timeout)
         response.raise_for_status()

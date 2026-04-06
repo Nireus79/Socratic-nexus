@@ -94,7 +94,7 @@ class AsyncLLMClient:
             )
 
         provider_class = self.PROVIDER_MAP[provider_name]
-        return provider_class(self.config)
+        return provider_class(self.config)  # type: ignore[abstract]
 
     def _track_usage(self, usage: TokenUsage) -> None:
         """

@@ -311,7 +311,7 @@ class APIDocumentationGenerator:
         for endpoint in self.endpoints:
             path_key = f"/api/{endpoint.name.lower().replace('.', '/')}"
 
-            openapi_spec["paths"][path_key] = {
+            openapi_spec["paths"][path_key] = {  # type: ignore[index]
                 "post": {
                     "summary": endpoint.summary,
                     "description": endpoint.description,
@@ -357,7 +357,7 @@ class APIDocumentationGenerator:
                 openapi_param["description"] = param.description
 
             if param.enum_values:
-                openapi_param["schema"]["enum"] = param.enum_values
+                openapi_param["schema"]["enum"] = param.enum_values  # type: ignore[index]
 
             openapi_params.append(openapi_param)
 

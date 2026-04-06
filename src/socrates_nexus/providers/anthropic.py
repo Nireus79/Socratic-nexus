@@ -2,7 +2,7 @@
 
 import logging
 import time
-from typing import Callable
+from typing import Callable, NoReturn
 
 from ..models import LLMConfig, ChatResponse
 from ..retry import retry_with_backoff
@@ -149,7 +149,7 @@ class AnthropicProvider(BaseProvider):
             return chat_response
 
         except Exception as e:
-            self._handle_anthropic_error(e, "chat")  # type: ignore[no-untyped-call]
+            self._handle_anthropic_error(e, "chat")
 
     async def achat(self, message: str, **kwargs) -> ChatResponse:
         """
@@ -330,7 +330,7 @@ class AnthropicProvider(BaseProvider):
         except Exception as e:
             self._handle_anthropic_error(e, "astream")
 
-    def _handle_anthropic_error(self, error: Exception, operation: str) -> None:
+    def _handle_anthropic_error(self, error: Exception, operation: str) -> NoReturn:
         """
         Convert Anthropic SDK errors to Nexus exceptions.
 

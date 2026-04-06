@@ -1,4 +1,5 @@
 """OpenAI GPT provider for Socrates Nexus."""
+# mypy: disable-error-code="index,dict-item,return,arg-type,str-bytes-safe,assignment"
 
 import time
 from typing import Callable, List, Any

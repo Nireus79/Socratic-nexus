@@ -91,7 +91,7 @@ class VisionProcessor:
         Raises:
             ValueError: If image preparation fails
         """
-        contents = []
+        contents: List[Union[TextContent, ImageContent]] = []
 
         # Add text first
         if vision_message.text:

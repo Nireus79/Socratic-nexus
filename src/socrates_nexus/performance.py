@@ -189,7 +189,7 @@ class InferenceOptimizer:
 
     def _generate_recommendations(self) -> List[str]:
         """Generate optimization recommendations."""
-        recommendations = []
+        recommendations: List[str] = []
 
         if not self.metrics:
             return recommendations

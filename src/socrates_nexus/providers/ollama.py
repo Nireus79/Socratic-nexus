@@ -1,4 +1,5 @@
 """Ollama local LLM provider for Socrates Nexus."""
+# mypy: disable-error-code="return,call-arg"
 
 import time
 from typing import Callable

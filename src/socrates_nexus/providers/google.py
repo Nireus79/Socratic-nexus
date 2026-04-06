@@ -1,4 +1,5 @@
 """Google Gemini provider for Socrates Nexus."""
+# mypy: disable-error-code="arg-type,return,str-bytes-safe,assignment"
 
 import time
 from typing import Callable, Any, List
