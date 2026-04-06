@@ -41,5 +41,5 @@ jobs:
       run: |
         echo "✅ Published to PyPI" >> $GITHUB_STEP_SUMMARY
         echo "" >> $GITHUB_STEP_SUMMARY
-        echo "**PyPI Package:** https://pypi.org/project/socrates-nexus/" >> $GITHUB_STEP_SUMMARY
+        echo "**PyPI Package:** https://pypi.org/project/socratic-nexus/" >> $GITHUB_STEP_SUMMARY
       continue-on-error: true
