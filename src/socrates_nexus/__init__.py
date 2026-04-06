@@ -21,6 +21,14 @@ from .documentation import (
     EndpointDoc,
     ParameterDoc,
 )
+from .performance import (
+    CostOptimizer,
+    InferenceOptimizer,
+    LatencyOptimizer,
+    ModelOptimizationConfig,
+    OptimizationResult,
+    PerformanceMetrics,
+)
 from .models import ChatResponse, TokenUsage, LLMConfig, ImageContent, TextContent
 from .exceptions import (
     LLMError,
@@ -52,6 +60,13 @@ __all__ = [
     "APIDocumentationGenerator",
     "EndpointDoc",
     "ParameterDoc",
+    # Performance Optimization
+    "InferenceOptimizer",
+    "LatencyOptimizer",
+    "CostOptimizer",
+    "ModelOptimizationConfig",
+    "PerformanceMetrics",
+    "OptimizationResult",
     # Exceptions
     "LLMError",
     "NexusError",
