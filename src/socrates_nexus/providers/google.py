@@ -96,9 +96,7 @@ class GoogleProvider(BaseProvider):
                     contents.append(img)
 
                 except Exception as e:
-                    raise ProviderError(
-                        f"Failed to process image '{image_source}': {str(e)}"
-                    )
+                    raise ProviderError(f"Failed to process image '{image_source}': {str(e)}")
 
         return contents
 

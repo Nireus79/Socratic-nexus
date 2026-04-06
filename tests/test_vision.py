@@ -140,9 +140,7 @@ class TestVisionCapabilities:
     def test_is_vision_model_google(self):
         """Test checking vision capability for Google models."""
         assert VisionCapabilities.is_vision_model("google", "gemini-pro-vision")
-        assert VisionCapabilities.is_vision_model(
-            "google", "gemini-1.5-pro-vision"
-        )
+        assert VisionCapabilities.is_vision_model("google", "gemini-1.5-pro-vision")
         assert not VisionCapabilities.is_vision_model("google", "gemini-pro")
 
     def test_is_vision_model_unknown_provider(self):

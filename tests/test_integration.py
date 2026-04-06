@@ -14,7 +14,6 @@ import os
 import pytest
 from socrates_nexus import LLMClient, AsyncLLMClient
 
-
 pytestmark = pytest.mark.requires_api
 
 

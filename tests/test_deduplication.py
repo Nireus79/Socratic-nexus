@@ -74,14 +74,10 @@ class TestRequestDeduplicator:
         dedup = RequestDeduplicator()
 
         hash1 = dedup._hash_request(
-            "gpt-4",
-            [{"role": "user", "content": "Hello"}],
-            temperature=0.7
+            "gpt-4", [{"role": "user", "content": "Hello"}], temperature=0.7
         )
         hash2 = dedup._hash_request(
-            "gpt-4",
-            [{"role": "user", "content": "World"}],
-            temperature=0.7
+            "gpt-4", [{"role": "user", "content": "World"}], temperature=0.7
         )
 
         assert hash1 != hash2

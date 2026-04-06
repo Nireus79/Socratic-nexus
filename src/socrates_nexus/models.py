@@ -4,7 +4,6 @@ from typing import Optional, Dict, Any, List, Union, Literal
 from dataclasses import dataclass, field
 from datetime import datetime
 
-
 # Provider pricing: cost per 1,000,000 tokens (millions)
 PROVIDER_PRICING = {
     "anthropic": {

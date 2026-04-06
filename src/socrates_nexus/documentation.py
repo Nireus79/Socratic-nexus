@@ -194,9 +194,7 @@ class APIDocumentationGenerator:
                 continue
 
             type_annotation = (
-                param.annotation.__name__
-                if param.annotation != inspect.Parameter.empty
-                else "Any"
+                param.annotation.__name__ if param.annotation != inspect.Parameter.empty else "Any"
             )
 
             param_doc = ParameterDoc(
@@ -325,9 +323,7 @@ class APIDocumentationGenerator:
                                 "application/json": {
                                     "schema": {
                                         "type": "object",
-                                        "properties": {
-                                            "result": {"type": endpoint.return_type}
-                                        },
+                                        "properties": {"result": {"type": endpoint.return_type}},
                                     }
                                 }
                             },

@@ -29,9 +29,7 @@ class VisionProcessor:
     """Processes images for vision models."""
 
     @staticmethod
-    def prepare_image(
-        source: Union[str, bytes], detail: Optional[str] = None
-    ) -> ImageContent:
+    def prepare_image(source: Union[str, bytes], detail: Optional[str] = None) -> ImageContent:
         """
         Prepare image for sending to vision model.
 
@@ -57,9 +55,7 @@ class VisionProcessor:
 
         if is_image_url(source):
             # URL - use directly
-            return ImageContent(
-                type="image", source=source, media_type="image/jpeg", detail=detail
-            )
+            return ImageContent(type="image", source=source, media_type="image/jpeg", detail=detail)
 
         if is_image_path(source):
             # File path - validate and encode

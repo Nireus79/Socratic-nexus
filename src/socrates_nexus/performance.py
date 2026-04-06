@@ -281,9 +281,11 @@ class CostOptimizer:
         return {
             "total_tokens": self.total_tokens_processed,
             "total_cost_usd": total_cost,
-            "cost_per_token": (total_cost / self.total_tokens_processed * 1_000_000)
-            if self.total_tokens_processed > 0
-            else 0,
+            "cost_per_token": (
+                (total_cost / self.total_tokens_processed * 1_000_000)
+                if self.total_tokens_processed > 0
+                else 0
+            ),
             "pricing_per_1m": self.pricing_per_1m_tokens,
         }
 

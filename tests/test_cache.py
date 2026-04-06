@@ -299,10 +299,7 @@ class TestResponseCache:
             retrieved = cache.get(key)
             results.append(retrieved)
 
-        threads = [
-            threading.Thread(target=worker, args=(f"key{i}", f"value{i}"))
-            for i in range(5)
-        ]
+        threads = [threading.Thread(target=worker, args=(f"key{i}", f"value{i}")) for i in range(5)]
 
         for t in threads:
             t.start()

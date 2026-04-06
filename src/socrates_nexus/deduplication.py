@@ -80,11 +80,7 @@ class RequestDeduplicator:
 
     async def _cleanup_expired(self) -> None:
         """Remove expired entries from cache."""
-        expired_keys = [
-            key
-            for key, entry in self._cache.items()
-            if entry.is_expired()
-        ]
+        expired_keys = [key for key, entry in self._cache.items() if entry.is_expired()]
 
         for key in expired_keys:
             del self._cache[key]
@@ -210,11 +206,7 @@ class RequestDeduplicator:
         """
         async with self._lock:
             cutoff_time = datetime.utcnow() - timedelta(seconds=max_age_seconds)
-            old_keys = [
-                key
-                for key, entry in self._cache.items()
-                if entry.created_at < cutoff_time
-            ]
+            old_keys = [key for key, entry in self._cache.items() if entry.created_at < cutoff_time]
 
             for key in old_keys:
                 del self._cache[key]
@@ -254,9 +246,7 @@ class RequestDeduplicator:
                 {
                     "hash": key[:16],
                     "hits": entry.hit_count,
-                    "age_minutes": (
-                        (datetime.utcnow() - entry.created_at).total_seconds() / 60
-                    ),
+                    "age_minutes": ((datetime.utcnow() - entry.created_at).total_seconds() / 60),
                     "expired": entry.is_expired(),
                 }
                 for key, entry in sorted_entries[:10]
