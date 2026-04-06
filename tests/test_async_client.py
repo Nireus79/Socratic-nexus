@@ -177,3 +177,40 @@ async def test_async_client_cache_disabled():
     )
     client = AsyncLLMClient(config=config)
     assert client._cache is None
+
+
+@pytest.mark.asyncio
+async def test_async_client_alias_providers():
+    """Test that alias providers work (claude, gpt, gemini, local)."""
+    # Test claude alias for anthropic
+    client1 = AsyncLLMClient(provider="claude", model="claude-opus", api_key="test")
+    assert client1.config.provider == "claude"
+
+    # Test gpt alias for openai
+    client2 = AsyncLLMClient(provider="gpt", model="gpt-4", api_key="test")
+    assert client2.config.provider == "gpt"
+
+    # Test gemini alias for google
+    client3 = AsyncLLMClient(provider="gemini", model="gemini-pro", api_key="test")
+    assert client3.config.provider == "gemini"
+
+    # Test local alias for ollama
+    client4 = AsyncLLMClient(provider="local", model="llama2", api_key="test")
+    assert client4.config.provider == "local"
+
+
+@pytest.mark.asyncio
+async def test_async_client_custom_config():
+    """Test AsyncLLMClient with custom configuration."""
+    config = LLMConfig(
+        provider="anthropic",
+        model="claude-opus",
+        api_key="test-key",
+        temperature=0.5,
+        max_tokens=1000,
+        timeout=60,
+    )
+    client = AsyncLLMClient(config=config)
+    assert client.config.temperature == 0.5
+    assert client.config.max_tokens == 1000
+    assert client.config.timeout == 60
