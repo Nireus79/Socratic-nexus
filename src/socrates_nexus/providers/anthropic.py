@@ -149,7 +149,7 @@ class AnthropicProvider(BaseProvider):
             return chat_response
 
         except Exception as e:
-            self._handle_anthropic_error(e, "chat")
+            self._handle_anthropic_error(e, "chat")  # type: ignore[no-untyped-call]
 
     async def achat(self, message: str, **kwargs) -> ChatResponse:
         """

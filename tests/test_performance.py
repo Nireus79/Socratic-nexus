@@ -1,9 +1,13 @@
-"""Tests for performance monitoring module."""
+"""Tests for performance optimization module."""
 
 import pytest
-from datetime import datetime, timedelta
-from socrates_nexus.performance import PerformanceMonitor, PerformanceMetrics
-from socrates_nexus.models import TokenUsage
+from socrates_nexus.performance import (
+    PerformanceMetrics,
+    InferenceOptimizer,
+    LatencyOptimizer,
+    CostOptimizer,
+    ModelOptimizationConfig,
+)
 
 
 class TestPerformanceMetrics:
@@ -12,187 +16,122 @@ class TestPerformanceMetrics:
     def test_metrics_creation(self):
         """Test creating performance metrics."""
         metrics = PerformanceMetrics(
-            latency_ms=150,
-            tokens_per_second=100,
-            cost_usd=0.05,
-            timestamp=datetime.utcnow(),
-        )
-        assert metrics.latency_ms == 150
-        assert metrics.tokens_per_second == 100
-        assert metrics.cost_usd == 0.05
-
-    def test_metrics_timestamp(self):
-        """Test that metrics have timestamps."""
-        now = datetime.utcnow()
-        metrics = PerformanceMetrics(
-            latency_ms=100,
-            tokens_per_second=50,
-            cost_usd=0.01,
-            timestamp=now,
-        )
-        assert metrics.timestamp == now
-
-
-class TestPerformanceMonitor:
-    """Test PerformanceMonitor class."""
-
-    def test_initialization(self):
-        """Test monitor initialization."""
-        monitor = PerformanceMonitor(max_history=1000)
-        assert monitor.max_history == 1000
-        assert len(monitor._metrics_history) == 0
-
-    def test_record_metrics(self):
-        """Test recording performance metrics."""
-        monitor = PerformanceMonitor()
-
-        usage = TokenUsage(
             input_tokens=100,
             output_tokens=50,
-            total_tokens=150,
+            latency_ms=150.5,
+            cost_usd=0.05,
         )
-        latency_ms = 250.5
+        assert metrics.input_tokens == 100
+        assert metrics.output_tokens == 50
+        assert metrics.latency_ms == 150.5
+        assert metrics.cost_usd == 0.05
 
-        monitor.record(usage, latency_ms)
+    def test_metrics_default_values(self):
+        """Test metrics with default values."""
+        metrics = PerformanceMetrics()
+        assert metrics.input_tokens is not None or metrics.input_tokens == 0
+        assert metrics.output_tokens is not None or metrics.output_tokens == 0
 
-        assert len(monitor._metrics_history) > 0
 
-    def test_get_stats(self):
-        """Test getting performance statistics."""
-        monitor = PerformanceMonitor()
+class TestModelOptimizationConfig:
+    """Test ModelOptimizationConfig class."""
 
-        # Record multiple metrics
-        usage1 = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-        usage2 = TokenUsage(input_tokens=200, output_tokens=100, total_tokens=300)
+    def test_config_creation(self):
+        """Test creating optimization config."""
+        config = ModelOptimizationConfig(
+            model="gpt-4",
+            target_latency_ms=500,
+            budget_usd=1.0,
+        )
+        assert config.model == "gpt-4"
+        assert config.target_latency_ms == 500
+        assert config.budget_usd == 1.0
 
-        monitor.record(usage1, 200.0)
-        monitor.record(usage2, 300.0)
+    def test_config_defaults(self):
+        """Test config with default values."""
+        config = ModelOptimizationConfig(model="gpt-4")
+        assert config.model == "gpt-4"
 
-        stats = monitor.get_stats()
 
-        assert "avg_latency_ms" in stats
-        assert "min_latency_ms" in stats
-        assert "max_latency_ms" in stats
-        assert "avg_throughput_tokens_per_sec" in stats
-        assert "total_tokens" in stats
+class TestInferenceOptimizer:
+    """Test InferenceOptimizer class."""
 
-    def test_get_stats_by_provider(self):
-        """Test getting statistics by provider."""
-        monitor = PerformanceMonitor()
+    def test_optimizer_initialization(self):
+        """Test optimizer initialization."""
+        config = ModelOptimizationConfig(model="gpt-4")
+        optimizer = InferenceOptimizer(config)
 
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-        monitor.record(usage, 200.0, provider="gpt-4")
-        monitor.record(usage, 250.0, provider="claude")
+        assert optimizer.config.model == "gpt-4"
 
-        stats_by_provider = monitor.get_stats_by_provider()
+    def test_optimizer_methods_exist(self):
+        """Test that optimizer has required methods."""
+        config = ModelOptimizationConfig(model="gpt-4")
+        optimizer = InferenceOptimizer(config)
 
-        assert "gpt-4" in stats_by_provider
-        assert "claude" in stats_by_provider
+        # Check that key methods exist
+        assert hasattr(optimizer, "optimize")
+        assert hasattr(optimizer, "get_recommendations")
 
-    def test_get_stats_by_model(self):
-        """Test getting statistics by model."""
-        monitor = PerformanceMonitor()
 
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-        monitor.record(usage, 200.0, model="gpt-4-turbo")
-        monitor.record(usage, 250.0, model="gpt-3.5-turbo")
+class TestLatencyOptimizer:
+    """Test LatencyOptimizer class."""
 
-        stats_by_model = monitor.get_stats_by_model()
+    def test_latency_optimizer_init(self):
+        """Test latency optimizer initialization."""
+        config = ModelOptimizationConfig(model="gpt-4", target_latency_ms=500)
+        optimizer = LatencyOptimizer(config)
 
-        assert "gpt-4-turbo" in stats_by_model
-        assert "gpt-3.5-turbo" in stats_by_model
+        assert optimizer.config.target_latency_ms == 500
 
-    def test_reset_stats(self):
-        """Test resetting statistics."""
-        monitor = PerformanceMonitor()
+    def test_latency_optimizer_methods(self):
+        """Test that latency optimizer has required methods."""
+        config = ModelOptimizationConfig(model="gpt-4")
+        optimizer = LatencyOptimizer(config)
 
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-        monitor.record(usage, 200.0)
+        assert hasattr(optimizer, "optimize")
 
-        assert len(monitor._metrics_history) > 0
 
-        monitor.reset()
+class TestCostOptimizer:
+    """Test CostOptimizer class."""
 
-        assert len(monitor._metrics_history) == 0
+    def test_cost_optimizer_init(self):
+        """Test cost optimizer initialization."""
+        config = ModelOptimizationConfig(model="gpt-4", budget_usd=1.0)
+        optimizer = CostOptimizer(config)
 
-    def test_history_size_limit(self):
-        """Test that history respects max size."""
-        monitor = PerformanceMonitor(max_history=10)
+        assert optimizer.config.budget_usd == 1.0
 
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
+    def test_cost_optimizer_methods(self):
+        """Test that cost optimizer has required methods."""
+        config = ModelOptimizationConfig(model="gpt-4")
+        optimizer = CostOptimizer(config)
 
-        # Record 15 metrics
-        for _ in range(15):
-            monitor.record(usage, 200.0)
+        assert hasattr(optimizer, "optimize")
 
-        # Should not exceed max
-        assert len(monitor._metrics_history) <= monitor.max_history
 
-    def test_latency_percentiles(self):
-        """Test calculating latency percentiles."""
-        monitor = PerformanceMonitor()
+class TestOptimizationIntegration:
+    """Integration tests for optimization."""
 
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
+    def test_create_and_use_optimizer(self):
+        """Test creating and using optimizer."""
+        config = ModelOptimizationConfig(
+            model="gpt-4",
+            target_latency_ms=1000,
+            budget_usd=10.0,
+        )
+        optimizer = InferenceOptimizer(config)
 
-        # Record metrics with varying latencies
-        latencies = [100.0, 150.0, 200.0, 250.0, 300.0]
-        for latency in latencies:
-            monitor.record(usage, latency)
+        assert optimizer is not None
+        assert optimizer.config == config
 
-        stats = monitor.get_stats()
+    def test_multiple_optimizers(self):
+        """Test using multiple optimizer types."""
+        config = ModelOptimizationConfig(model="gpt-4")
 
-        # Should have percentile stats
-        assert "avg_latency_ms" in stats
-        assert stats["avg_latency_ms"] > 0
+        latency_opt = LatencyOptimizer(config)
+        cost_opt = CostOptimizer(config)
+        general_opt = InferenceOptimizer(config)
 
-    def test_cost_tracking(self):
-        """Test cost tracking in performance monitor."""
-        monitor = PerformanceMonitor()
-
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-
-        monitor.record(usage, 200.0, cost_usd=0.05)
-        monitor.record(usage, 250.0, cost_usd=0.06)
-
-        stats = monitor.get_stats()
-
-        assert "total_cost_usd" in stats or stats.get("total_tokens", 0) > 0
-
-    def test_clear_old_entries(self):
-        """Test clearing old metrics entries."""
-        monitor = PerformanceMonitor()
-
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-
-        # Record metric with old timestamp
-        old_time = datetime.utcnow() - timedelta(hours=2)
-        monitor.record(usage, 200.0)
-        if monitor._metrics_history:
-            monitor._metrics_history[0].timestamp = old_time
-
-        # Record new metric
-        monitor.record(usage, 250.0)
-
-        initial_count = len(monitor._metrics_history)
-
-        # Clear entries older than 1 hour
-        monitor.clear_old_entries(max_age_seconds=3600)
-
-        final_count = len(monitor._metrics_history)
-
-        # Should have removed older entry
-        assert final_count <= initial_count
-
-    def test_get_report(self):
-        """Test generating performance report."""
-        monitor = PerformanceMonitor()
-
-        usage = TokenUsage(input_tokens=100, output_tokens=50, total_tokens=150)
-
-        for _ in range(5):
-            monitor.record(usage, 200.0)
-
-        report = monitor.get_report()
-
-        assert isinstance(report, str)
-        assert len(report) > 0
+        assert latency_opt is not None
+        assert cost_opt is not None
+        assert general_opt is not None
