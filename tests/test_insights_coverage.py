@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 from socrates_nexus.insights import Insight, InsightExtractor, InsightAnalyzer
 from socrates_nexus.exceptions import InvalidRequestError
-from socrates_nexus.models import ChatResponse, TextContent
+from socrates_nexus.models import ChatResponse, TokenUsage
 
 
 class TestInsight:
@@ -74,11 +74,19 @@ class TestInsightExtractor:
 
     def test_extract_insights_valid_response(self, extractor, mock_client):
         """Test extracting insights from valid JSON response."""
+        mock_usage = TokenUsage(
+            input_tokens=100,
+            output_tokens=50,
+            total_tokens=150,
+            cost_usd=0.001,
+        )
         mock_response = ChatResponse(
-            content=[TextContent(text=json.dumps([
+            content=json.dumps([
                 {"text": "insight1", "category": "concept", "confidence": 0.9, "source": "test"}
-            ]))],
-            raw_response="test"
+            ]),
+            provider="anthropic",
+            model="claude-opus",
+            usage=mock_usage,
         )
         mock_client.chat.return_value = mock_response
 
@@ -87,9 +95,17 @@ class TestInsightExtractor:
 
     def test_extract_insights_invalid_json(self, extractor, mock_client):
         """Test handling of invalid JSON in response."""
+        mock_usage = TokenUsage(
+            input_tokens=50,
+            output_tokens=25,
+            total_tokens=75,
+            cost_usd=0.0005,
+        )
         mock_response = ChatResponse(
-            content=[TextContent(text="not json")],
-            raw_response="test"
+            content="not json",
+            provider="anthropic",
+            model="claude-opus",
+            usage=mock_usage,
         )
         mock_client.chat.return_value = mock_response
 
@@ -103,12 +119,20 @@ class TestInsightExtractor:
 
     def test_extract_insights_with_max_limit(self, extractor, mock_client):
         """Test limiting number of insights."""
+        mock_usage = TokenUsage(
+            input_tokens=100,
+            output_tokens=50,
+            total_tokens=150,
+            cost_usd=0.001,
+        )
         mock_response = ChatResponse(
-            content=[TextContent(text=json.dumps([
+            content=json.dumps([
                 {"text": f"insight{i}", "category": "c", "confidence": 0.8, "source": "t"}
                 for i in range(5)
-            ]))],
-            raw_response="test"
+            ]),
+            provider="anthropic",
+            model="claude-opus",
+            usage=mock_usage,
         )
         mock_client.chat.return_value = mock_response
 

@@ -8,7 +8,7 @@ from socrates_nexus.question_generator import (
     QuestionLevel, QuestionType, QuestionConfig, SocraticQuestion, QuestionGenerator
 )
 from socrates_nexus.exceptions import InvalidRequestError
-from socrates_nexus.models import ChatResponse, TextContent
+from socrates_nexus.models import ChatResponse, TokenUsage
 
 
 class TestQuestionLevel:
@@ -131,13 +131,21 @@ class TestQuestionGenerator:
 
     def test_generate_question_valid(self, generator, mock_client, sample_config):
         """Test generating a question."""
+        mock_usage = TokenUsage(
+            input_tokens=100,
+            output_tokens=50,
+            total_tokens=150,
+            cost_usd=0.001,
+        )
         mock_response = ChatResponse(
-            content=[TextContent(text=json.dumps({
+            content=json.dumps({
                 "question_text": "Why does recursion work?",
                 "cognitive_level": "analyze",
                 "question_type": "probing",
-            }))],
-            raw_response="test"
+            }),
+            provider="anthropic",
+            model="claude-opus",
+            usage=mock_usage,
         )
         mock_client.chat.return_value = mock_response
 
@@ -146,13 +154,21 @@ class TestQuestionGenerator:
 
     def test_generate_question_with_response(self, generator, mock_client, sample_config):
         """Test generating follow-up question based on student response."""
+        mock_usage = TokenUsage(
+            input_tokens=100,
+            output_tokens=50,
+            total_tokens=150,
+            cost_usd=0.001,
+        )
         mock_response = ChatResponse(
-            content=[TextContent(text=json.dumps({
+            content=json.dumps({
                 "question_text": "Follow-up question",
                 "cognitive_level": "apply",
                 "question_type": "guiding",
-            }))],
-            raw_response="test"
+            }),
+            provider="anthropic",
+            model="claude-opus",
+            usage=mock_usage,
         )
         mock_client.chat.return_value = mock_response
 
