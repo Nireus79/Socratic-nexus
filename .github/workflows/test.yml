@@ -30,7 +30,7 @@ jobs:
 
     - name: Run tests with pytest
       run: |
-        pytest tests/ -v --cov=socrates_nexus --cov-report=xml --cov-report=term-missing --cov-fail-under=70 -m "not requires_api"
+        pytest tests/ -v --cov=socratic_nexus --cov-report=xml --cov-report=term-missing --cov-fail-under=70 -m "not requires_api"
 
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v3
