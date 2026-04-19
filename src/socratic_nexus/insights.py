@@ -103,7 +103,8 @@ class InsightExtractor:
         self, response: ChatResponse, min_confidence: float
     ) -> List[Insight]:
         try:
-            content = response.content[0].text if response.content else ""
+            content_item = response.content[0] if response.content else None
+            content = content_item.text if content_item and hasattr(content_item, "text") else ""
             try:
                 data = json.loads(content)
             except (json.JSONDecodeError, ValueError, TypeError):
@@ -170,7 +171,7 @@ class InsightAnalyzer:
 
     def _identify_patterns(self, insights: List[Insight]) -> List[InsightPattern]:
         patterns = []
-        categories = {}
+        categories: dict[str, list[str]] = {}
         for insight in insights:
             if insight.category not in categories:
                 categories[insight.category] = []
