@@ -12,7 +12,7 @@ Set environment variables:
 
 import os
 import pytest
-from socrates_nexus import LLMClient, AsyncLLMClient
+from socratic_nexus import LLMClient, AsyncLLMClient
 
 pytestmark = pytest.mark.requires_api
 
@@ -133,7 +133,7 @@ def test_cost_calculation(anthropic_client):
 
 def test_error_handling_invalid_api_key():
     """Test error handling with invalid API key."""
-    from socrates_nexus.exceptions import LLMError
+    from socratic_nexus.exceptions import LLMError
 
     client = LLMClient(
         provider="anthropic",

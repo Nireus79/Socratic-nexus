@@ -1,12 +1,12 @@
 """Tests for vision model support."""
 
 import pytest
-from socrates_nexus.vision import (
+from socratic_nexus.vision import (
     VisionMessage,
     VisionProcessor,
     VisionCapabilities,
 )
-from socrates_nexus.models import ImageContent, TextContent
+from socratic_nexus.models import ImageContent, TextContent
 
 
 class TestVisionMessage:

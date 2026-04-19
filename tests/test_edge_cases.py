@@ -2,9 +2,9 @@
 
 import pytest
 from unittest.mock import patch
-from socrates_nexus.models import LLMConfig, ChatResponse, TokenUsage
-from socrates_nexus.client import LLMClient
-from socrates_nexus.exceptions import (
+from socratic_nexus.models import LLMConfig, ChatResponse, TokenUsage
+from socratic_nexus.client import LLMClient
+from socratic_nexus.exceptions import (
     ProviderError,
     RateLimitError,
     AuthenticationError,
@@ -77,7 +77,7 @@ class TestConfigurationValidation:
 class TestMessageValidation:
     """Test message validation and edge cases."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_empty_message(self, mock_chat):
         """Test sending an empty message."""
         mock_chat.return_value = ChatResponse(
@@ -90,7 +90,7 @@ class TestMessageValidation:
         response = client.chat("")
         assert response.content == "Response"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_very_long_message(self, mock_chat):
         """Test sending a very long message."""
         mock_chat.return_value = ChatResponse(
@@ -104,7 +104,7 @@ class TestMessageValidation:
         response = client.chat(long_message)
         assert response.content == "OK"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_unicode_message(self, mock_chat):
         """Test sending unicode characters."""
         mock_chat.return_value = ChatResponse(
@@ -117,7 +117,7 @@ class TestMessageValidation:
         response = client.chat("你好世界 🌍 مرحبا")
         assert response.content == "OK"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_message_with_special_characters(self, mock_chat):
         """Test message with special characters."""
         mock_chat.return_value = ChatResponse(
@@ -134,7 +134,7 @@ class TestMessageValidation:
 class TestNetworkAndTimeout:
     """Test network failure scenarios."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_connection_timeout(self, mock_chat):
         """Test handling connection timeout."""
         from socket import timeout
@@ -145,7 +145,7 @@ class TestNetworkAndTimeout:
         with pytest.raises(timeout):
             client.chat("Hello")
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_connection_refused(self, mock_chat):
         """Test handling connection refused."""
         from socket import error as socket_error
@@ -156,7 +156,7 @@ class TestNetworkAndTimeout:
         with pytest.raises(socket_error):
             client.chat("Hello")
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_dns_resolution_failure(self, mock_chat):
         """Test handling DNS resolution failure."""
         mock_chat.side_effect = Exception("Name or service not known")
@@ -169,7 +169,7 @@ class TestNetworkAndTimeout:
 class TestMalformedResponses:
     """Test handling of malformed responses."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_response_with_none_content(self, mock_chat):
         """Test handling response with None content."""
         mock_chat.return_value = ChatResponse(
@@ -182,7 +182,7 @@ class TestMalformedResponses:
         response = client.chat("Hello")
         assert response.content is None
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_response_with_empty_content(self, mock_chat):
         """Test handling response with empty content."""
         mock_chat.return_value = ChatResponse(
@@ -195,7 +195,7 @@ class TestMalformedResponses:
         response = client.chat("Hello")
         assert response.content == ""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_response_with_missing_usage(self, mock_chat):
         """Test handling response with None usage."""
         mock_chat.return_value = ChatResponse(
@@ -209,7 +209,7 @@ class TestMalformedResponses:
 class TestErrorScenarios:
     """Test various error scenarios."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_rate_limit_error(self, mock_chat):
         """Test handling rate limit error."""
         mock_chat.side_effect = RateLimitError("Rate limit exceeded")
@@ -217,7 +217,7 @@ class TestErrorScenarios:
         with pytest.raises(RateLimitError):
             client.chat("Hello")
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_authentication_error(self, mock_chat):
         """Test handling authentication error."""
         mock_chat.side_effect = AuthenticationError("Invalid API key")
@@ -225,7 +225,7 @@ class TestErrorScenarios:
         with pytest.raises(AuthenticationError):
             client.chat("Hello")
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_provider_error(self, mock_chat):
         """Test handling generic provider error."""
         mock_chat.side_effect = ProviderError("Provider error")
@@ -233,7 +233,7 @@ class TestErrorScenarios:
         with pytest.raises(ProviderError):
             client.chat("Hello")
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_generic_exception(self, mock_chat):
         """Test handling generic exception."""
         mock_chat.side_effect = RuntimeError("Unknown error")
@@ -312,7 +312,7 @@ class TestCacheEdgeCases:
         client = LLMClient(config=config)
         assert client._cache is None
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_cache_key_collision_detection(self, mock_chat):
         """Test that same message always produces same cache key."""
         mock_chat.return_value = ChatResponse(
@@ -354,7 +354,7 @@ class TestProviderSelection:
 class TestConcurrentRequests:
     """Test handling of concurrent requests (thread safety)."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_multiple_sequential_requests(self, mock_chat):
         """Test multiple sequential requests."""
         responses = [
@@ -374,7 +374,7 @@ class TestConcurrentRequests:
         assert len(results) == 5
         assert all(isinstance(r, ChatResponse) for r in results)
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_request_after_error(self, mock_chat):
         """Test that client recovers after error."""
         mock_chat.side_effect = [
@@ -399,7 +399,7 @@ class TestConcurrentRequests:
 class TestParameterEdgeCases:
     """Test edge cases in parameter passing."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_all_parameters(self, mock_chat):
         """Test chat with all possible parameters."""
         mock_chat.return_value = ChatResponse(
@@ -415,7 +415,7 @@ class TestParameterEdgeCases:
         )
         assert response.content == "OK"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_no_optional_parameters(self, mock_chat):
         """Test chat with no optional parameters."""
         mock_chat.return_value = ChatResponse(

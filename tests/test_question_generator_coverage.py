@@ -4,11 +4,11 @@ import pytest
 from unittest.mock import Mock
 import json
 
-from socrates_nexus.question_generator import (
+from socratic_nexus.question_generator import (
     QuestionLevel, QuestionType, QuestionConfig, SocraticQuestion, QuestionGenerator
 )
-from socrates_nexus.exceptions import InvalidRequestError
-from socrates_nexus.models import ChatResponse, TokenUsage
+from socratic_nexus.exceptions import InvalidRequestError
+from socratic_nexus.models import ChatResponse, TokenUsage
 
 
 class TestQuestionLevel:

@@ -2,7 +2,7 @@
 
 from unittest.mock import patch
 
-from socrates_nexus.models import (
+from socratic_nexus.models import (
     ChatResponse,
     TokenUsage,
     ImageContent,
@@ -12,8 +12,8 @@ from socrates_nexus.models import (
     FunctionCall,
     ToolCall,
 )
-from socrates_nexus.client import LLMClient
-from socrates_nexus.utils.images import (
+from socratic_nexus.client import LLMClient
+from socratic_nexus.utils.images import (
     detect_media_type,
     validate_image_format,
     is_image_url,
@@ -117,7 +117,7 @@ class TestTextContent:
 class TestVisionSupport:
     """Test vision model support."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_image_url(self, mock_chat):
         """Test chat with image URL."""
         mock_chat.return_value = ChatResponse(
@@ -134,7 +134,7 @@ class TestVisionSupport:
 
         assert response.content == "The image shows a cat"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_multiple_images(self, mock_chat):
         """Test chat with multiple images."""
         mock_chat.return_value = ChatResponse(
@@ -153,7 +153,7 @@ class TestVisionSupport:
 
         assert response.content == "Comparison complete"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_mixed_content(self, mock_chat):
         """Test chat with mixed text and image content."""
         mock_chat.return_value = ChatResponse(
@@ -210,7 +210,7 @@ class TestFunctionCalling:
         assert tool_call.id == "call_123"
         assert tool_call.function.name == "get_weather"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_tools(self, mock_chat):
         """Test chat with function calling."""
         tool_call = ToolCall(
@@ -244,7 +244,7 @@ class TestFunctionCalling:
         assert len(response.tool_calls) == 1
         assert response.tool_calls[0].function.name == "get_weather"
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_multiple_tools(self, mock_chat):
         """Test chat with multiple tools available."""
         mock_chat.return_value = ChatResponse(
@@ -278,7 +278,7 @@ class TestFunctionCalling:
 
         assert response.tool_calls is not None
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_tool_choice_auto(self, mock_chat):
         """Test tool_choice=auto mode."""
         mock_chat.return_value = ChatResponse(
@@ -299,7 +299,7 @@ class TestFunctionCalling:
 
         assert response is not None
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_tool_choice_none(self, mock_chat):
         """Test tool_choice=none mode (no tool use)."""
         mock_chat.return_value = ChatResponse(
@@ -324,7 +324,7 @@ class TestFunctionCalling:
 class TestVisionAndFunctionsCombined:
     """Test vision and function calling together."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_vision_with_tool_use(self, mock_chat):
         """Test combining vision and function calling."""
         tool_call = ToolCall(

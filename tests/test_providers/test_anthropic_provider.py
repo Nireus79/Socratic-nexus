@@ -13,9 +13,9 @@ Comprehensive tests for AnthropicProvider implementation covering:
 import pytest
 from unittest.mock import Mock, patch, AsyncMock, MagicMock
 
-from socrates_nexus.models import LLMConfig, ChatResponse, TokenUsage
-from socrates_nexus.providers.anthropic import AnthropicProvider
-from socrates_nexus.exceptions import (
+from socratic_nexus.models import LLMConfig, ChatResponse, TokenUsage
+from socratic_nexus.providers.anthropic import AnthropicProvider
+from socratic_nexus.exceptions import (
     RateLimitError,
     AuthenticationError,
     InvalidRequestError,
@@ -362,7 +362,7 @@ class TestAnthropicChat:
     @patch("anthropic.Anthropic")
     def test_chat_context_length_exceeded_error(self, mock_anthropic_class):
         """Test chat handles context length exceeded error."""
-        from socrates_nexus.exceptions import ContextLengthExceededError
+        from socratic_nexus.exceptions import ContextLengthExceededError
 
         mock_client = Mock()
         mock_client.messages.create.side_effect = Exception("context_length_exceeded")

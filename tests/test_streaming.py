@@ -3,7 +3,7 @@
 import pytest
 from unittest.mock import Mock, AsyncMock
 
-from socrates_nexus.streaming import StreamHandler, StreamBuffer, AsyncStreamHandler
+from socratic_nexus.streaming import StreamHandler, StreamBuffer, AsyncStreamHandler
 
 
 class TestStreamHandler:

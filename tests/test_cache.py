@@ -1,7 +1,7 @@
 """Tests for response caching functionality."""
 
 import time
-from socrates_nexus.utils.cache import TTLCache, ResponseCache
+from socratic_nexus.utils.cache import TTLCache, ResponseCache
 
 
 def test_ttl_cache_decorator_initialization():

@@ -3,7 +3,7 @@
 import pytest
 import os
 from unittest.mock import MagicMock
-from socrates_nexus.models import TokenUsage, ChatResponse
+from socratic_nexus.models import TokenUsage, ChatResponse
 
 
 @pytest.fixture

@@ -1,6 +1,6 @@
 """Tests for retry logic and exponential backoff."""
 
-from socrates_nexus.retry import RetryConfig, exponential_backoff
+from socratic_nexus.retry import RetryConfig, exponential_backoff
 
 
 def test_retry_config_defaults():

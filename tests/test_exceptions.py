@@ -1,6 +1,6 @@
 """Tests for exception hierarchy and error handling."""
 
-from socrates_nexus.exceptions import (
+from socratic_nexus.exceptions import (
     LLMError,
     RateLimitError,
     AuthenticationError,

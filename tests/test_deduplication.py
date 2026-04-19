@@ -3,7 +3,7 @@
 import asyncio
 import pytest
 from datetime import datetime, timedelta
-from socrates_nexus.deduplication import RequestDeduplicator, CachedResponse, RequestBatcher
+from socratic_nexus.deduplication import RequestDeduplicator, CachedResponse, RequestBatcher
 
 
 class TestCachedResponse:

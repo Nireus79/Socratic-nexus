@@ -11,9 +11,9 @@ import pytest
 from unittest.mock import Mock
 import hashlib
 
-from socrates_nexus.models import LLMConfig, TokenUsage, PROVIDER_PRICING
-from socrates_nexus.providers.base import BaseProvider
-from socrates_nexus.exceptions import ProviderError
+from socratic_nexus.models import LLMConfig, TokenUsage, PROVIDER_PRICING
+from socratic_nexus.providers.base import BaseProvider
+from socratic_nexus.exceptions import ProviderError
 
 
 class ConcreteProvider(BaseProvider):

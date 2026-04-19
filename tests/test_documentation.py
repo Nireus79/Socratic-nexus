@@ -1,6 +1,6 @@
 """Tests for API documentation generation module."""
 
-from socrates_nexus.documentation import (
+from socratic_nexus.documentation import (
     ParameterDoc,
     EndpointDoc,
     APIDocumentation,

@@ -2,8 +2,8 @@
 
 import pytest
 import asyncio
-from socrates_nexus import AsyncLLMClient, LLMConfig
-from socrates_nexus.exceptions import ConfigurationError
+from socratic_nexus import AsyncLLMClient, LLMConfig
+from socratic_nexus.exceptions import ConfigurationError
 
 
 @pytest.mark.asyncio

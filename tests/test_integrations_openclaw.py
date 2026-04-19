@@ -6,8 +6,8 @@ Tests for NexusLLMSkill - Openclaw integration with Socrates Nexus.
 
 import pytest
 from unittest.mock import Mock, patch
-from socrates_nexus.integrations.openclaw import NexusLLMSkill
-from socrates_nexus import ChatResponse, TokenUsage, RateLimitError
+from socratic_nexus.integrations.openclaw import NexusLLMSkill
+from socratic_nexus import ChatResponse, TokenUsage, RateLimitError
 
 
 class TestNexusLLMSkillInitialization:

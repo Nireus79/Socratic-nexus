@@ -5,8 +5,8 @@ Tests for SocratesNexusLLM - LangChain integration with Socrates Nexus.
 """
 
 from unittest.mock import Mock, patch
-from socrates_nexus.integrations.langchain import SocratesNexusLLM
-from socrates_nexus import ChatResponse, TokenUsage
+from socratic_nexus.integrations.langchain import SocratesNexusLLM
+from socratic_nexus import ChatResponse, TokenUsage
 
 
 class TestSocratesNexusLLMInitialization:
@@ -57,7 +57,7 @@ class TestSocratesNexusLLMCall:
     def test_call_basic(self):
         """Test basic _call execution."""
         llm = SocratesNexusLLM()
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
 
@@ -83,7 +83,7 @@ class TestSocratesNexusLLMCall:
     def test_call_with_stop_sequences(self):
         """Test _call with stop sequences."""
         llm = SocratesNexusLLM()
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -106,7 +106,7 @@ class TestSocratesNexusLLMCall:
     def test_call_with_kwargs(self):
         """Test _call with additional kwargs."""
         llm = SocratesNexusLLM()
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -135,7 +135,7 @@ class TestSocratesNexusLLMCall:
             max_tokens=2048,
             api_key="test-key",
         )
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -163,7 +163,7 @@ class TestSocratesNexusLLMProperties:
     def test_llm_type(self):
         """Test _llm_type property."""
         llm = SocratesNexusLLM()
-        assert llm._llm_type == "socrates_nexus"
+        assert llm._llm_type == "socratic_nexus"
 
     def test_identifying_params(self):
         """Test _identifying_params property."""
@@ -314,7 +314,7 @@ class TestSocratesNexusLLMCallbackManager:
         llm = SocratesNexusLLM()
         run_manager = Mock()
 
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -349,8 +349,8 @@ class TestSocratesNexusLLMMultiProviderUsage:
         assert llm2.provider == "openai"
 
         # Both should be usable
-        assert llm1._llm_type == "socrates_nexus"
-        assert llm2._llm_type == "socrates_nexus"
+        assert llm1._llm_type == "socratic_nexus"
+        assert llm2._llm_type == "socratic_nexus"
 
     def test_multiple_llm_instances(self):
         """Test creating multiple LLM instances with different configs."""
@@ -372,7 +372,7 @@ class TestSocratesNexusLLMEdgeCases:
     def test_empty_prompt(self):
         """Test handling of empty prompt."""
         llm = SocratesNexusLLM()
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -396,7 +396,7 @@ class TestSocratesNexusLLMEdgeCases:
         llm = SocratesNexusLLM()
         long_prompt = "A" * 10000
 
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(
@@ -420,7 +420,7 @@ class TestSocratesNexusLLMEdgeCases:
         llm = SocratesNexusLLM()
         special_prompt = "What is \\n\\t\\r 日本語 emoji 😀?"
 
-        with patch("socrates_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
+        with patch("socratic_nexus.integrations.langchain.llm.LLMClient") as mock_client_class:
             mock_client = Mock()
             mock_client_class.return_value = mock_client
             mock_client.chat.return_value = ChatResponse(

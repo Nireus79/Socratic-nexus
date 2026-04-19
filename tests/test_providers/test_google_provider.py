@@ -3,9 +3,9 @@
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
 
-from socrates_nexus.models import LLMConfig, ChatResponse, TokenUsage
-from socrates_nexus.providers.google import GoogleProvider
-from socrates_nexus.exceptions import (
+from socratic_nexus.models import LLMConfig, ChatResponse, TokenUsage
+from socratic_nexus.providers.google import GoogleProvider
+from socratic_nexus.exceptions import (
     RateLimitError,
     AuthenticationError,
 )

@@ -3,9 +3,9 @@
 import pytest
 from unittest.mock import Mock, patch
 
-from socrates_nexus.client import LLMClient
-from socrates_nexus.models import LLMConfig, ChatResponse, TokenUsage, UsageStats
-from socrates_nexus.exceptions import ConfigurationError, ProviderError
+from socratic_nexus.client import LLMClient
+from socratic_nexus.models import LLMConfig, ChatResponse, TokenUsage, UsageStats
+from socratic_nexus.exceptions import ConfigurationError, ProviderError
 
 
 class TestLLMClientInitialization:
@@ -119,7 +119,7 @@ class TestProviderFactory:
 class TestChatIntegration:
     """Test chat method with provider integration."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_calls_provider(self, mock_chat):
         """Test that chat method calls provider."""
         mock_response = ChatResponse(
@@ -143,7 +143,7 @@ class TestChatIntegration:
         assert response == mock_response
         mock_chat.assert_called_once()
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_chat_with_parameters(self, mock_chat):
         """Test passing parameters to provider."""
         mock_response = ChatResponse(
@@ -255,7 +255,7 @@ class TestChatIntegration:
 class TestCacheIntegration:
     """Test cache integration with client."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_cache_stores_response(self, mock_chat):
         """Test that cache stores responses."""
         usage = TokenUsage(
@@ -287,7 +287,7 @@ class TestCacheIntegration:
         assert mock_chat.call_count == 1
         assert response1.content == response2.content
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_cache_miss_calls_provider(self, mock_chat):
         """Test that cache miss calls provider."""
         usage = TokenUsage(
@@ -318,7 +318,7 @@ class TestCacheIntegration:
         # Provider should be called twice for different messages
         assert mock_chat.call_count == 2
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_no_cache_always_calls_provider(self, mock_chat):
         """Test that disabled cache always calls provider."""
         usage = TokenUsage(
@@ -349,10 +349,10 @@ class TestCacheIntegration:
 class TestErrorHandling:
     """Test error handling and propagation."""
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider.chat")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider.chat")
     def test_provider_error_propagates(self, mock_chat):
         """Test that provider errors propagate."""
-        from socrates_nexus.exceptions import RateLimitError
+        from socratic_nexus.exceptions import RateLimitError
 
         mock_chat.side_effect = RateLimitError("Rate limited")
 
@@ -375,7 +375,7 @@ class TestProviderLazyInitialization:
         client = LLMClient(provider="anthropic", model="claude-3", api_key="test")
         assert client._provider is None
 
-    @patch("socrates_nexus.providers.anthropic.AnthropicProvider")
+    @patch("socratic_nexus.providers.anthropic.AnthropicProvider")
     def test_provider_initialized_on_first_use(self, mock_provider_class):
         """Test that provider is initialized on first use."""
         mock_instance = Mock()

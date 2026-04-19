@@ -4,9 +4,9 @@ import json
 import pytest
 from unittest.mock import Mock
 
-from socrates_nexus.insights import Insight, InsightExtractor, InsightAnalyzer
-from socrates_nexus.exceptions import InvalidRequestError
-from socrates_nexus.models import ChatResponse, TokenUsage
+from socratic_nexus.insights import Insight, InsightExtractor, InsightAnalyzer
+from socratic_nexus.exceptions import InvalidRequestError
+from socratic_nexus.models import ChatResponse, TokenUsage
 
 
 class TestInsight:

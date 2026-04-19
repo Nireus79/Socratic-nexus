@@ -1,8 +1,8 @@
 """Tests for LLMClient."""
 
 import pytest
-from socrates_nexus import LLMClient, LLMConfig
-from socrates_nexus.exceptions import ConfigurationError
+from socratic_nexus import LLMClient, LLMConfig
+from socratic_nexus.exceptions import ConfigurationError
 
 
 def test_client_initialization():
