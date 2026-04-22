@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 """
 Socratic Nexus - Claude API Client Library
 
