@@ -18,7 +18,7 @@ import anthropic
 # from socratic_system.models import ConflictInfo, ProjectContext  # removed monolith dependency
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
 
 
 class ClaudeClient:
@@ -335,7 +335,7 @@ class ClaudeClient:
     def extract_insights(
         self,
         user_response: str,
-        project: ProjectContext,
+        project: "ProjectContext",
         user_auth_method: str = "api_key",
         user_id: str = None,
     ) -> Dict:
@@ -426,7 +426,7 @@ class ClaudeClient:
             return {}
 
     async def extract_insights_async(
-        self, user_response: str, project: ProjectContext, user_auth_method: str = "api_key"
+        self, user_response: str, project: "ProjectContext", user_auth_method: str = "api_key"
     ) -> Dict:
         """
         Extract insights from user response asynchronously with caching.
@@ -505,8 +505,8 @@ class ClaudeClient:
 
     def generate_conflict_resolution_suggestions(
         self,
-        conflict: ConflictInfo,
-        project: ProjectContext,
+        conflict: "ConflictInfo",
+        project: "ProjectContext",
         user_auth_method: str = "api_key",
         user_id: str = None,
     ) -> str:
@@ -654,7 +654,7 @@ OUTPUT FORMAT - CRITICAL:
 
             # Extract code from markdown if needed (defensive measure)
             raw_content = response.content[0].text
-            from socratic_system.utils.extractors.registry import LanguageExtractorRegistry
+            # from socratic_system.utils.extractors.registry import LanguageExtractorRegistry  # removed monolith dependency
 
             # Get Python extractor from registry
             extractor = LanguageExtractorRegistry.get_extractor("python")
@@ -1371,7 +1371,7 @@ Create a comprehensive, well-structured curriculum that guides learning, support
 
     def generate_documentation(
         self,
-        project: ProjectContext,
+        project: "ProjectContext",
         artifact: str,
         artifact_type: str = "code",
         user_auth_method: str = "api_key",
@@ -1817,7 +1817,7 @@ Create documentation that will enable others to successfully understand, impleme
             ) from e
 
     def generate_suggestions(
-        self, current_question: str, project: ProjectContext, user_auth_method: str = "api_key"
+        self, current_question: str, project: "ProjectContext", user_auth_method: str = "api_key"
     ) -> str:
         """Generate helpful suggestions when user can't answer a question"""
 
@@ -2144,7 +2144,7 @@ Create documentation that will enable others to successfully understand, impleme
             return []
 
     async def analyze_context_async(
-        self, project: ProjectContext, user_auth_method: str = "api_key"
+        self, project: "ProjectContext", user_auth_method: str = "api_key"
     ) -> str:
         """
         Analyze project context asynchronously.
@@ -2272,7 +2272,7 @@ Create documentation that will enable others to successfully understand, impleme
             return f"Error generating documentation: {e}"
 
     async def extract_tech_recommendations_async(
-        self, project: ProjectContext, query: str, user_auth_method: str = "api_key"
+        self, project: "ProjectContext", query: str, user_auth_method: str = "api_key"
     ) -> Dict[str, Any]:
         """
         Extract technology recommendations asynchronously.
@@ -2360,7 +2360,7 @@ Create documentation that will enable others to successfully understand, impleme
             return {"score": 0, "feedback": str(e)}
 
     async def generate_suggestions_async(
-        self, current_question: str, project: ProjectContext, user_auth_method: str = "api_key"
+        self, current_question: str, project: "ProjectContext", user_auth_method: str = "api_key"
     ) -> str:
         """
         Generate follow-up suggestions asynchronously.
@@ -2404,7 +2404,7 @@ Create documentation that will enable others to successfully understand, impleme
             return ""
 
     async def generate_conflict_resolution_async(
-        self, conflict: Any, project: ProjectContext, user_auth_method: str = "api_key"
+        self, conflict: Any, project: "ProjectContext", user_auth_method: str = "api_key"
     ) -> str:
         """Generate conflict resolution suggestions asynchronously."""
         prompt = f"""Help resolve this project specification conflict:
