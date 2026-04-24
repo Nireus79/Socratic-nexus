@@ -33,7 +33,10 @@ class OllamaClient:
     """
 
     def __init__(
-        self, api_key: Optional[str] = None, orchestrator: Optional["AgentOrchestrator"] = None, subscription_token: Optional[str] = None
+        self,
+        api_key: Optional[str] = None,
+        orchestrator: Optional["AgentOrchestrator"] = None,
+        subscription_token: Optional[str] = None,
     ):
         """
         Initialize Ollama client.
@@ -430,14 +433,12 @@ class OllamaClient:
             # Get the appropriate async client
             async_client = self._get_async_client(user_auth_method, user_id=None)
             # Use thread pool for async-like behavior
-            response_text = await asyncio.to_thread(
-                self._sync_generate,
-                async_client,
-                prompt
-            )
+            response_text = await asyncio.to_thread(self._sync_generate, async_client, prompt)
 
             # Track token usage asynchronously
-            await self._track_token_usage_async(len(prompt), len(response_text), "extract_insights_async")
+            await self._track_token_usage_async(
+                len(prompt), len(response_text), "extract_insights_async"
+            )
 
             insights = self._parse_json_response(response_text.strip())
 
@@ -594,13 +595,11 @@ OUTPUT FORMAT - CRITICAL:
         try:
             # Get the appropriate async client
             async_client = self._get_async_client(user_auth_method, user_id)
-            question = await asyncio.to_thread(
-                self._sync_generate,
-                async_client,
-                prompt
-            )
+            question = await asyncio.to_thread(self._sync_generate, async_client, prompt)
 
-            await self._track_token_usage_async(len(prompt), len(question), "generate_socratic_question_async")
+            await self._track_token_usage_async(
+                len(prompt), len(question), "generate_socratic_question_async"
+            )
             return question.strip()
 
         except Exception as e:
@@ -726,7 +725,8 @@ OUTPUT FORMAT - CRITICAL:
         except Exception as e:
             self.logger.error(f"Ollama API connection test failed: {e}")
             raise APIError(
-                f"Failed to connect to Ollama API at {self.base_url}: {e}", error_type="CONNECTION_ERROR"
+                f"Failed to connect to Ollama API at {self.base_url}: {e}",
+                error_type="CONNECTION_ERROR",
             ) from e
 
     # Helper Methods
@@ -775,7 +775,9 @@ OUTPUT FORMAT - CRITICAL:
             },
         )
 
-    async def _track_token_usage_async(self, input_len: int, output_len: int, operation: str) -> None:
+    async def _track_token_usage_async(
+        self, input_len: int, output_len: int, operation: str
+    ) -> None:
         """Track token usage asynchronously"""
         await asyncio.to_thread(self._track_token_usage_ollama, input_len, output_len, operation)
 

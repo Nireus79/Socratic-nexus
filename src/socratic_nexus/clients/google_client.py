@@ -32,7 +32,10 @@ class GoogleClient:
     """
 
     def __init__(
-        self, api_key: Optional[str] = None, orchestrator: "AgentOrchestrator" = None, subscription_token: Optional[str] = None
+        self,
+        api_key: Optional[str] = None,
+        orchestrator: "AgentOrchestrator" = None,
+        subscription_token: Optional[str] = None,
     ):
         """
         Initialize Google Generative AI client.
@@ -104,8 +107,7 @@ class GoogleClient:
         elif user_auth_method == "api_key":
             if not self.api_key or self.api_key.startswith("placeholder"):
                 raise ValueError(
-                    "API key not configured. "
-                    "Set GOOGLE_API_KEY environment variable."
+                    "API key not configured. " "Set GOOGLE_API_KEY environment variable."
                 )
             return self.api_key
         else:
@@ -450,13 +452,12 @@ class GoogleClient:
             # Get the appropriate async client based on user's auth method
             async_client = self._get_async_client(user_auth_method, user_id=None)
             # Google API doesn't support true async, use thread pool
-            response = await asyncio.to_thread(
-                async_client.generate_content,
-                prompt
-            )
+            response = await asyncio.to_thread(async_client.generate_content, prompt)
 
             # Track token usage asynchronously
-            await self._track_token_usage_async(len(prompt), len(response.text), "extract_insights_async")
+            await self._track_token_usage_async(
+                len(prompt), len(response.text), "extract_insights_async"
+            )
 
             insights = self._parse_json_response(response.text.strip())
 
@@ -581,7 +582,9 @@ OUTPUT FORMAT - CRITICAL:
             response = client.generate_content(prompt)
 
             # Track token usage
-            self._track_token_usage_google(len(prompt), len(response.text), "generate_socratic_question")
+            self._track_token_usage_google(
+                len(prompt), len(response.text), "generate_socratic_question"
+            )
 
             question = response.text.strip()
             return question
@@ -624,12 +627,11 @@ OUTPUT FORMAT - CRITICAL:
             # Get the appropriate async client based on user's auth method and user-specific API key
             async_client = self._get_async_client(user_auth_method, user_id)
             # Google API doesn't support true async, use thread pool
-            response = await asyncio.to_thread(
-                async_client.generate_content,
-                prompt
-            )
+            response = await asyncio.to_thread(async_client.generate_content, prompt)
 
-            await self._track_token_usage_async(len(prompt), len(response.text), "generate_socratic_question_async")
+            await self._track_token_usage_async(
+                len(prompt), len(response.text), "generate_socratic_question_async"
+            )
             question = response.text.strip()
             return question
 
@@ -671,10 +673,7 @@ OUTPUT FORMAT - CRITICAL:
                 "temperature": temperature,
             }
 
-            response = client.generate_content(
-                prompt,
-                generation_config=generation_config
-            )
+            response = client.generate_content(prompt, generation_config=generation_config)
 
             # Track token usage
             self._track_token_usage_google(len(prompt), len(response.text), "generate_response")
@@ -724,13 +723,13 @@ OUTPUT FORMAT - CRITICAL:
 
             # Google API doesn't support true async, use thread pool
             response = await asyncio.to_thread(
-                async_client.generate_content,
-                prompt,
-                generation_config=generation_config
+                async_client.generate_content, prompt, generation_config=generation_config
             )
 
             # Track token usage
-            await self._track_token_usage_async(len(prompt), len(response.text), "generate_response_async")
+            await self._track_token_usage_async(
+                len(prompt), len(response.text), "generate_response_async"
+            )
 
             return response.text.strip()
 
@@ -746,7 +745,9 @@ OUTPUT FORMAT - CRITICAL:
             self.logger.info("Google Generative AI connection test successful")
             return True
         except APIError:
-            self.logger.warning("Google Generative AI connection test skipped - no valid API key configured")
+            self.logger.warning(
+                "Google Generative AI connection test skipped - no valid API key configured"
+            )
             return False
         except Exception as e:
             self.logger.error(f"Google Generative AI connection test failed: {e}")
@@ -790,7 +791,9 @@ OUTPUT FORMAT - CRITICAL:
             },
         )
 
-    async def _track_token_usage_async(self, input_len: int, output_len: int, operation: str) -> None:
+    async def _track_token_usage_async(
+        self, input_len: int, output_len: int, operation: str
+    ) -> None:
         """Track token usage asynchronously"""
         await asyncio.to_thread(self._track_token_usage_google, input_len, output_len, operation)
 

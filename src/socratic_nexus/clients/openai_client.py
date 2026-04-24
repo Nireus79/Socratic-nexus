@@ -32,7 +32,10 @@ class OpenAIClient:
     """
 
     def __init__(
-        self, api_key: Optional[str] = None, orchestrator: "AgentOrchestrator" = None, subscription_token: Optional[str] = None
+        self,
+        api_key: Optional[str] = None,
+        orchestrator: "AgentOrchestrator" = None,
+        subscription_token: Optional[str] = None,
     ):
         """
         Initialize OpenAI client.
@@ -102,8 +105,7 @@ class OpenAIClient:
         elif user_auth_method == "api_key":
             if not self.api_key or self.api_key.startswith("placeholder"):
                 raise ValueError(
-                    "API key not configured. "
-                    "Set OPENAI_API_KEY environment variable."
+                    "API key not configured. " "Set OPENAI_API_KEY environment variable."
                 )
             return self.api_key
         else:

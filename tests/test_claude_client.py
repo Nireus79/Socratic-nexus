@@ -71,9 +71,16 @@ def test_claude_client_get_auth_credential_unknown_method(claude_client):
 
 def test_decrypt_api_key_invalid(claude_client):
     """Test decryption of invalid key returns None."""
-    result = claude_client._decrypt_api_key_from_db("invalid-encrypted-key")
-    # Should return None since decryption will fail
-    assert result is None
+    try:
+        # Import cryptography to check if available
+        import cryptography  # noqa: F401
+
+        result = claude_client._decrypt_api_key_from_db("invalid-encrypted-key")
+        # Should return None since decryption will fail
+        assert result is None
+    except ImportError:
+        # Skip test if cryptography not available
+        pytest.skip("cryptography module not available")
 
 
 def test_claude_client_model_selection(mock_orchestrator):

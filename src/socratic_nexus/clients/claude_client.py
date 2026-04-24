@@ -32,7 +32,10 @@ class ClaudeClient:
     """
 
     def __init__(
-        self, api_key: Optional[str] = None, orchestrator: "AgentOrchestrator" = None, subscription_token: Optional[str] = None
+        self,
+        api_key: Optional[str] = None,
+        orchestrator: "AgentOrchestrator" = None,
+        subscription_token: Optional[str] = None,
     ):
         """
         Initialize Claude client.
@@ -45,7 +48,9 @@ class ClaudeClient:
         self.api_key = api_key
         self.subscription_token = subscription_token
         self.orchestrator = orchestrator
-        self.model = orchestrator.config.claude_model if orchestrator else "claude-haiku-4-5-20251001"
+        self.model = (
+            orchestrator.config.claude_model if orchestrator else "claude-haiku-4-5-20251001"
+        )
         self.logger = logging.getLogger("socrates.clients.claude")
 
         # Initialize clients for both authentication methods
@@ -68,7 +73,9 @@ class ClaudeClient:
         if subscription_token:
             try:
                 self.subscription_client = anthropic.Anthropic(api_key=subscription_token)
-                self.subscription_async_client = anthropic.AsyncAnthropic(api_key=subscription_token)
+                self.subscription_async_client = anthropic.AsyncAnthropic(
+                    api_key=subscription_token
+                )
                 self.logger.info("Subscription-based clients initialized")
             except Exception as e:
                 self.logger.warning(f"Failed to initialize subscription clients: {e}")
