@@ -7,7 +7,7 @@ name = "socratic-nexus"
 version = "0.4.0"
 description = "Universal LLM client for production - works with Claude, GPT-4, Gemini, Llama, and any LLM. Built-in integrations with Openclaw and LangChain."
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Socrates Nexus Contributors"}
 ]
@@ -30,7 +30,6 @@ keywords = [
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
@@ -102,11 +101,6 @@ Changelog = "https://github.com/Nireus79/socrates-nexus/releases"
 packages = [
     "socratic_nexus",
     "socratic_nexus.clients",
-    "socratic_nexus.providers",
-    "socratic_nexus.utils",
-    "socratic_nexus.integrations",
-    "socratic_nexus.integrations.openclaw",
-    "socratic_nexus.integrations.langchain",
 ]
 
 [tool.setuptools.package-dir]
