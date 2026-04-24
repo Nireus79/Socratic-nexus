@@ -5,7 +5,6 @@ from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext
-from socratic_nexus.exceptions import APIError
 
 
 @pytest.fixture
@@ -194,7 +193,6 @@ class TestCacheInteraction:
             project = ProjectContext(project_name="Test")
             message = "test message"
 
-            cache_key = client._get_cache_key(message)
             initial_cache_size = len(client._insights_cache)
 
             client.extract_insights(message, project)

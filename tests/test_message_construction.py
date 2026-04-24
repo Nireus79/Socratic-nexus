@@ -279,7 +279,7 @@ class TestResponseHandlingVariations:
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
 
             try:
-                result = client.generate_response("prompt")
+                _ = client.generate_response("prompt")
                 # Should handle gracefully
             except Exception:
                 # Exception is acceptable for empty content

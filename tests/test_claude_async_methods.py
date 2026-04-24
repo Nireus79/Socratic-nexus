@@ -132,8 +132,6 @@ class TestCacheManagement:
 
     def test_insights_cache_persistence(self, claude_client):
         """Test that insights cache persists across calls."""
-        project = ProjectContext(project_name="Test")
-
         # Add to cache manually
         message = "test"
         key = claude_client._get_cache_key(message)

@@ -1,7 +1,7 @@
 """Integration tests to cover core method logic and increase coverage."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext

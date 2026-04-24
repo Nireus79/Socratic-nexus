@@ -109,7 +109,7 @@ class TestGenerateSocraticQuestionImplementation:
 
         try:
             # Try calling with different parameters
-            result = client.generate_socratic_question("test", phase="design")
+            _ = client.generate_socratic_question("test", phase="design")
         except TypeError:
             # Parameter might not be supported
             pass

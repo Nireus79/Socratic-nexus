@@ -63,7 +63,7 @@ class TestGenerateCodeMethod:
             mock_get_client.return_value = mock_client
 
             try:
-                result = client.generate_code("Write main function", language="python")
+                _ = client.generate_code("Write main function", language="python")
                 assert True
             except TypeError:
                 pass

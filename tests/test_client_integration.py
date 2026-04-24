@@ -15,7 +15,7 @@ Tests verify:
 import base64
 import hashlib
 import logging
-from typing import Dict
+from typing import Dict, Optional
 from unittest.mock import Mock, patch
 
 import pytest
@@ -66,7 +66,7 @@ class MockDatabase:
             print(f"Error saving API key: {e}")
             return False
 
-    def get_api_key(self, user_id: str, provider: str) -> str | None:
+    def get_api_key(self, user_id: str, provider: str) -> Optional[str]:
         """Retrieve encrypted API key"""
         return self.api_keys.get((user_id, provider))
 
