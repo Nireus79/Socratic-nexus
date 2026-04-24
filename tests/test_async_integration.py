@@ -50,7 +50,7 @@ class TestExtractInsightsAsync:
     @pytest.mark.asyncio
     async def test_extract_insights_async_empty_response(self, mock_orchestrator):
         """Test extract_insights_async with empty response."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
                 project = ProjectContext(project_name="Test")
@@ -61,7 +61,7 @@ class TestExtractInsightsAsync:
     @pytest.mark.asyncio
     async def test_extract_insights_async_non_informative(self, mock_orchestrator):
         """Test extract_insights_async with non-informative response."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
                 project = ProjectContext(project_name="Test")
@@ -331,7 +331,7 @@ class TestAsyncMethodClientSelection:
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
                 project = ProjectContext(project_name="Test")
-                result = await client.extract_insights_async("test response", project)
+                _ = await client.extract_insights_async("test response", project)
 
                 # Verify async client was created
                 assert client.async_client is not None
@@ -348,7 +348,7 @@ class TestAsyncMethodClientSelection:
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-                result = await client.generate_response_async("test")
+                _ = await client.generate_response_async("test")
 
                 # Async client should be used
                 assert client.async_client is not None
@@ -368,7 +368,7 @@ class TestAsyncTokenTracking:
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-                result = await client.generate_response_async("test")
+                _ = await client.generate_response_async("test")
 
                 # Token usage should be available
                 assert mock_response.usage.input_tokens == 50

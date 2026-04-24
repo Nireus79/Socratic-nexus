@@ -1,7 +1,7 @@
 """Tests for async methods and async initialization paths."""
 
 import pytest
-from unittest.mock import Mock, patch, AsyncMock
+from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext

@@ -7,7 +7,7 @@ from unittest.mock import Mock, patch
 pytest.importorskip("cryptography")
 
 from socratic_nexus.clients.ollama_client import OllamaClient
-from socratic_nexus.models import ProjectContext, ConflictInfo
+from socratic_nexus.models import ProjectContext
 from socratic_nexus.exceptions import APIError
 
 
@@ -318,7 +318,7 @@ class TestOllamaClientAuthFlow:
             client = OllamaClient(orchestrator=mock_orchestrator)
             # Ollama doesn't use API keys typically
             try:
-                cred = client.get_auth_credential("api_key")
+                _ = client.get_auth_credential("api_key")
                 # May raise or return None
             except APIError:
                 pass
