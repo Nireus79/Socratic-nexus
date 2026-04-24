@@ -6,7 +6,7 @@ with multiple encryption method fallbacks and error handling.
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 import base64
 import os
 
@@ -261,18 +261,17 @@ class TestGetClientMultiplePaths:
         orch.database.get_api_key.return_value = None
 
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            with patch("socratic_nexus.clients.claude_client.logger") as mock_logger:
-                mock_client = Mock()
-                mock_anth.return_value = mock_client
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
 
-                client = ClaudeClient(api_key="sk-api-key", orchestrator=orch)
+            client = ClaudeClient(api_key="sk-api-key", orchestrator=orch)
 
-                # Request with subscription method
-                result = client._get_client(user_auth_method="subscription")
+            # Request with subscription method
+            result = client._get_client(user_auth_method="subscription")
 
-                # Should log warning about fallback
-                # Should return a client (using api_key fallback)
-                assert result is not None
+            # Should log warning about fallback
+            # Should return a client (using api_key fallback)
+            assert result is not None
 
     def test_get_client_user_specific_key_creation(self):
         """Test _get_client creates new client with user-specific key"""
@@ -357,11 +356,10 @@ class TestDecryptionWithEnvironmentVariables:
             encrypted = cipher.encrypt(b"test-key").decode()
 
             with patch.dict(os.environ, {}, clear=True):
-                with patch.object(client, "logger") as mock_logger:
-                    result = client._decrypt_api_key_from_db(encrypted)
+                client._decrypt_api_key_from_db(encrypted)
 
-                    # Should have logged info about decryption
-                    assert client.logger is not None
+                # Should have logger available
+                assert client.logger is not None
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ class TestGoogleClientInitialization:
         pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
-        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+        with patch("socratic_nexus.clients.google_client.genai"):
             client = GoogleClient(api_key="test-api-key")
 
             assert client.api_key == "test-api-key"

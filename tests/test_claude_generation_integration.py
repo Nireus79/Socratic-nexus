@@ -78,8 +78,8 @@ class TestInsightsCaching:
             project = ProjectContext(project_name="Test")
 
             # Call with different inputs
-            result1 = client.extract_insights("web application", project)
-            result2 = client.extract_insights("mobile app", project)
+            client.extract_insights("web application", project)
+            client.extract_insights("mobile app", project)
 
             # Both should have called API (different cache keys)
             assert mock_client.messages.create.call_count >= 2

@@ -11,7 +11,7 @@ These tests focus on:
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext, ConflictInfo
 from socratic_nexus.exceptions import APIError
@@ -134,7 +134,7 @@ class TestGenerateResponseFunctional:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             # Call with temperature parameter
-            result = client.generate_response(
+            client.generate_response(
                 "test prompt",
                 temperature=0.7,
                 max_tokens=100
@@ -165,7 +165,7 @@ class TestGenerateResponseFunctional:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             # Call with user_id
-            result = client.generate_response(
+            client.generate_response(
                 "test",
                 user_id="user123"
             )
@@ -277,7 +277,7 @@ class TestGenerateCodeFunctional:
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
-            result = client.generate_code(
+            client.generate_code(
                 "write fibonacci",
                 user_id="user123",
                 user_auth_method="api_key"

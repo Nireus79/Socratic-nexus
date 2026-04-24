@@ -155,9 +155,7 @@ class TestOpenAIClientErrorScenarios:
         from socratic_nexus.clients.openai_client import OpenAIClient
 
         orch = Mock()
-        orch.config = Mock()
-        # No openai_model attribute
-        del orch.config.openai_model if hasattr(orch.config, 'openai_model') else None
+        orch.config = Mock(spec=[])  # Create mock with no attributes
 
         with patch("socratic_nexus.clients.openai_client.openai"):
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
