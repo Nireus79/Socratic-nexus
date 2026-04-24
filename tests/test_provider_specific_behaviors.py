@@ -14,10 +14,17 @@ from unittest.mock import Mock, patch
 
 # Skip all tests in this module if required dependencies are not installed
 pytest.importorskip("cryptography")
+pytest.importorskip("openai")
 
 from socratic_nexus.clients.openai_client import OpenAIClient
-from socratic_nexus.clients.google_client import GoogleClient
 from socratic_nexus.clients.ollama_client import OllamaClient
+
+# GoogleClient is optional - skip if google.generativeai is not available
+try:
+    pytest.importorskip("google")
+    from socratic_nexus.clients.google_client import GoogleClient
+except pytest.skip.Exception:
+    GoogleClient = None
 
 
 @pytest.fixture
