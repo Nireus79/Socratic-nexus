@@ -1,10 +1,9 @@
 """Comprehensive tests for client initialization and configuration."""
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
-from socratic_nexus.models import ProjectContext
 
 
 class TestClientInitializationVariations:
@@ -274,7 +273,7 @@ class TestClientInitializationEdgeCases:
 
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             try:
-                client = ClaudeClient(api_key="test", orchestrator=orch)
+                ClaudeClient(api_key="test", orchestrator=orch)
                 # Should handle gracefully
             except AttributeError:
                 # Missing config is acceptable
