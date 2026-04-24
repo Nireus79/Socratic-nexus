@@ -37,7 +37,7 @@ class TestExtractInsightsComprehensive:
             project = ProjectContext(project_name="Test")
 
             result = client.extract_insights(
-                response_text="long message here",
+                user_response="long message here",
                 project=project,
                 user_id="user123",
                 user_auth_method="api_key"
