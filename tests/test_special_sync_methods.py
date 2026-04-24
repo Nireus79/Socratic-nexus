@@ -4,7 +4,7 @@ import pytest
 from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
-from socratic_nexus.models import ProjectContext
+from socratic_nexus.models import ProjectContext, ConflictInfo
 
 
 @pytest.fixture
@@ -206,7 +206,8 @@ class TestGenerateDocumentation:
             mock_client.messages.create.return_value = create_mock_response("documentation")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_documentation("artifact content")
+            project = ProjectContext(project_name="Test")
+            result = client.generate_documentation(project, "artifact content")
 
             assert result is not None or result is None
 
@@ -218,7 +219,8 @@ class TestGenerateDocumentation:
             mock_client.messages.create.side_effect = Exception("API Error")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_documentation("artifact")
+            project = ProjectContext(project_name="Test")
+            result = client.generate_documentation(project, "artifact")
 
             assert result is None or isinstance(result, str)
 
@@ -235,7 +237,7 @@ class TestGenerateSuggestions:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            result = client.generate_suggestions(project)
+            result = client.generate_suggestions("current question", project)
 
             assert result is not None or result is None
 
@@ -248,7 +250,7 @@ class TestGenerateSuggestions:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            result = client.generate_suggestions(project)
+            result = client.generate_suggestions("current question", project)
 
             assert result is None or isinstance(result, str)
 
@@ -265,7 +267,8 @@ class TestGenerateConflictResolution:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            result = client.generate_conflict_resolution_suggestions(project)
+            conflict = ConflictInfo(description="test conflict", file_path="test.py")
+            result = client.generate_conflict_resolution_suggestions(conflict, project)
 
             assert result is not None or result is None
 
@@ -278,7 +281,8 @@ class TestGenerateConflictResolution:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            result = client.generate_conflict_resolution_suggestions(project)
+            conflict = ConflictInfo(description="test conflict", file_path="test.py")
+            result = client.generate_conflict_resolution_suggestions(conflict, project)
 
             assert result is None or isinstance(result, str)
 
