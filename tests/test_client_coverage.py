@@ -133,9 +133,7 @@ class TestClaudeClientInitialization:
 
     def test_client_with_valid_api_key_initializes_clients(self):
         """Test that valid API key initializes anthropic clients."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic"
-        ) as mock_anthropic:
+        with patch("socratic_nexus.clients.claude_client.anthropic") as mock_anthropic:
             mock_client = Mock()
             mock_async_client = Mock()
             mock_anthropic.Anthropic.return_value = mock_client
