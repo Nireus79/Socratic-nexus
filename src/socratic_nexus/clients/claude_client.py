@@ -15,7 +15,7 @@ import anthropic
 
 from socratic_system.events import EventType
 from socratic_system.exceptions import APIError
-from socratic_system.models import ProjectContext
+from socratic_system.models import ConflictInfo, ProjectContext
 
 if TYPE_CHECKING:
     from socratic_system.orchestration.orchestrator import AgentOrchestrator

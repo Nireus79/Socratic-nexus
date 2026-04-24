@@ -1,11 +1,11 @@
-from __future__ import annotations
-
 """
 Claude API client for Socrates AI
 
 Provides both synchronous and asynchronous interfaces for calling Claude API,
 with automatic token tracking and structured error handling.
 """
+
+from __future__ import annotations
 
 import asyncio
 import hashlib
@@ -15,12 +15,15 @@ from typing import TYPE_CHECKING, Any, Dict
 
 import anthropic
 
-# from socratic_system.events import EventType  # removed monolith dependency
-# from socratic_system.exceptions import APIError  # removed monolith dependency
-# from socratic_system.models import ConflictInfo, ProjectContext  # removed monolith dependency
+from socratic_system.events import EventType
+from socratic_system.exceptions import APIError
+from socratic_system.models import ConflictInfo, ProjectContext
+from socratic_system.utils.extractors.registry import LanguageExtractorRegistry
 
 if TYPE_CHECKING:
-    # from socratic_system.orchestration.orchestrator import AgentOrchestrator  # removed monolith dependency
+    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+
+logger = logging.getLogger(__name__)
 
 
 class ClaudeClient:
@@ -656,7 +659,6 @@ OUTPUT FORMAT - CRITICAL:
 
             # Extract code from markdown if needed (defensive measure)
             raw_content = response.content[0].text
-            # from socratic_system.utils.extractors.registry import LanguageExtractorRegistry  # removed monolith dependency
 
             # Get Python extractor from registry
             extractor = LanguageExtractorRegistry.get_extractor("python")

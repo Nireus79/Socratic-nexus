@@ -1,10 +1,10 @@
-from __future__ import annotations
-
 """
 Socratic Nexus - Claude API Client Library
 
 Extracted from Socrates v1.3.3
 """
+
+from __future__ import annotations
 
 from .claude_client import ClaudeClient
 
