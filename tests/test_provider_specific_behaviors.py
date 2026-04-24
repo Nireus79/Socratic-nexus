@@ -20,11 +20,12 @@ from socratic_nexus.clients.openai_client import OpenAIClient
 from socratic_nexus.clients.ollama_client import OllamaClient
 
 # GoogleClient is optional - skip if google.generativeai is not available
+GoogleClient = None
 try:
-    pytest.importorskip("google")
     from socratic_nexus.clients.google_client import GoogleClient
-except pytest.skip.Exception:
-    GoogleClient = None
+except (ImportError, ModuleNotFoundError):
+    # google.generativeai not installed - will skip tests using GoogleClient
+    pass
 
 
 @pytest.fixture
@@ -134,6 +135,7 @@ class TestOpenAISpecificBehaviors:
             assert isinstance(result, (str, type(None)))
 
 
+@pytest.mark.skipif(GoogleClient is None, reason="google.generativeai not installed")
 class TestGoogleSpecificBehaviors:
     """Tests for Google Gemini-specific provider behaviors."""
 
