@@ -3,7 +3,8 @@
 import pytest
 from unittest.mock import Mock, patch
 
-# Skip all tests in this module if openai is not installed
+# Skip all tests in this module if required dependencies are not installed
+pytest.importorskip("cryptography")
 pytest.importorskip("openai")
 
 from socratic_nexus.clients.openai_client import OpenAIClient

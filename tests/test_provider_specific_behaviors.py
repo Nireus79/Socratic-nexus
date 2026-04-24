@@ -12,6 +12,9 @@ Tests specific to each LLM provider:
 import pytest
 from unittest.mock import Mock, patch
 
+# Skip all tests in this module if required dependencies are not installed
+pytest.importorskip("cryptography")
+
 from socratic_nexus.clients.openai_client import OpenAIClient
 from socratic_nexus.clients.google_client import GoogleClient
 from socratic_nexus.clients.ollama_client import OllamaClient
