@@ -19,7 +19,7 @@ import hashlib
 import logging
 import os
 from pathlib import Path
-from typing import Dict
+from typing import Dict, Optional
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
@@ -72,7 +72,7 @@ class MockDatabase:
             print(f"Error saving API key: {e}")
             return False
 
-    def get_api_key(self, user_id: str = None, provider: str = None) -> str | None:
+    def get_api_key(self, user_id: Optional[str] = None, provider: Optional[str] = None) -> Optional[str]:
         """Retrieve encrypted API key"""
         if user_id is None and provider is None:
             return None
