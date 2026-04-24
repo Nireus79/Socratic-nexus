@@ -9,7 +9,7 @@ Focus on executing code branches that are currently uncovered:
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.exceptions import APIError
 

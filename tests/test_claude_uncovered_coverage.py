@@ -277,12 +277,6 @@ class TestClaudeClientAsyncMethods:
             client = ClaudeClient(api_key="test-key")
             assert hasattr(client, "generate_documentation_async")
 
-    def test_async_documentation_exists(self):
-        """Test async generate_documentation exists"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(api_key="test-key")
-            assert hasattr(client, "generate_documentation_async")
-
     def test_async_evaluate_quality_exists(self):
         """Test async evaluate_quality_async exists"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):

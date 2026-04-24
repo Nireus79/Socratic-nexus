@@ -55,14 +55,6 @@ class TestClaudeClientAsyncGenerationMethods:
                 assert callable(client.generate_documentation_async)
 
     @pytest.mark.asyncio
-    async def test_async_documentation_callable(self):
-        """Test async documentation generation is callable"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):
-            with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-                client = ClaudeClient(api_key="test-key")
-                assert callable(client.generate_documentation_async)
-
-    @pytest.mark.asyncio
     async def test_async_evaluate_quality_callable(self):
         """Test async quality evaluation is callable"""
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):

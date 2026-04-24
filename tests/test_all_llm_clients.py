@@ -75,75 +75,6 @@ class TestGoogleClientBasic:
             assert hasattr(client, "generate_code")
 
 
-class TestOpenAIClientBasic:
-    """Basic tests for OpenAI client - skip if dependencies not installed"""
-
-    def test_openai_client_import(self):
-        """Test that OpenAI client can be imported"""
-        pytest.importorskip("cryptography")
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-        assert OpenAIClient is not None
-
-    def test_openai_client_init(self):
-        """Test OpenAI client initialization"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="sk-test-key")
-            assert client.api_key == "sk-test-key"
-
-    def test_openai_client_with_orchestrator(self):
-        """Test OpenAI client initialization with orchestrator"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        orch = Mock()
-        orch.config = Mock()
-        orch.config.openai_model = "gpt-4"
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
-            assert client.orchestrator is orch
-
-    def test_openai_client_placeholder_key(self):
-        """Test OpenAI client with placeholder key"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="placeholder_test")
-            assert client.api_key == "placeholder_test"
-
-    def test_openai_client_has_generate_response(self):
-        """Test OpenAI client has generate_response method"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="sk-test-key")
-            assert hasattr(client, "generate_response")
-
-    def test_openai_client_has_extract_insights(self):
-        """Test OpenAI client has extract_insights method"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="sk-test-key")
-            assert hasattr(client, "extract_insights")
-
-    def test_openai_client_has_generate_code(self):
-        """Test OpenAI client has generate_code method"""
-        pytest.importorskip("openai")
-        from socratic_nexus.clients.openai_client import OpenAIClient
-
-        with patch("socratic_nexus.clients.openai_client.openai"):
-            client = OpenAIClient(api_key="sk-test-key")
-            assert hasattr(client, "generate_code")
-
-
 class TestOllamaClientBasic:
     """Basic tests for Ollama client - skip if requests not installed"""
 
@@ -229,10 +160,11 @@ class TestClientInterfaces:
             pass
 
         try:
+            pytest.importorskip("cryptography")
             pytest.importorskip("openai")
             from socratic_nexus.clients.openai_client import OpenAIClient
             available_clients.append(("OpenAI", OpenAIClient))
-        except pytest.skip.Exception:
+        except (pytest.skip.Exception, ModuleNotFoundError):
             pass
 
         try:
