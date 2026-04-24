@@ -111,7 +111,6 @@ class TestOllamaClientMethodExecution:
 
             # Verify execution
             assert mock_post.called
-            assert result is not None or result is None
 
     def test_ollama_generate_code_execution(self):
         """Test OllamaClient.generate_code actually executes"""
@@ -210,7 +209,6 @@ class TestOpenAIClientMethodExecution:
 
             # Verify execution
             assert mock_client.chat.completions.create.called
-            assert result is not None or result is None
 
     def test_openai_generate_code_execution(self):
         """Test OpenAIClient.generate_code actually executes"""

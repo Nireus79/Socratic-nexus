@@ -270,7 +270,7 @@ class TestGenerateCodeExecution:
             client = ClaudeClient(api_key="sk-test", orchestrator=orch)
 
             # ACTUALLY CALL WITH USER CONTEXT
-            result = client.generate_code(
+            client.generate_code(
                 "Write code",
                 user_id="user456",
                 user_auth_method="api_key"
