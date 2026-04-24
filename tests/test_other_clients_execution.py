@@ -107,7 +107,7 @@ class TestOllamaClientMethodExecution:
             client = OllamaClient()
 
             # ACTUALLY CALL THE METHOD
-                client.generate_response("Test prompt")
+            client.generate_response("Test prompt")
 
             # Verify execution
             assert mock_post.called
@@ -130,7 +130,7 @@ class TestOllamaClientMethodExecution:
             client = OllamaClient()
 
             # ACTUALLY CALL THE METHOD
-                client.generate_code("Write a function")
+            client.generate_code("Write a function")
 
             # Verify execution
             assert mock_post.called
@@ -153,7 +153,7 @@ class TestOllamaClientMethodExecution:
             project = ProjectContext(project_name="Test")
 
             # ACTUALLY CALL THE METHOD
-                client.extract_insights("user feedback", project)
+            client.extract_insights("user feedback", project)
 
             # Verify execution
             assert mock_post.called
@@ -177,7 +177,7 @@ class TestOllamaClientMethodExecution:
             client = OllamaClient(orchestrator=orch)
 
             # ACTUALLY CALL THE METHOD
-                client.generate_response("prompt")
+            client.generate_response("prompt")
 
             # Verify execution with orchestrator
             assert mock_post.called
@@ -206,7 +206,7 @@ class TestOpenAIClientMethodExecution:
             client = OpenAIClient(api_key="sk-test-key")
 
             # ACTUALLY CALL THE METHOD
-                client.generate_response("Test prompt")
+            client.generate_response("Test prompt")
 
             # Verify execution
             assert mock_client.chat.completions.create.called
@@ -232,7 +232,7 @@ class TestOpenAIClientMethodExecution:
             client = OpenAIClient(api_key="sk-test-key")
 
             # ACTUALLY CALL THE METHOD
-                client.generate_code("Write a function")
+            client.generate_code("Write a function")
 
             # Verify execution
             assert mock_client.chat.completions.create.called
@@ -258,7 +258,7 @@ class TestOpenAIClientMethodExecution:
             project = ProjectContext(project_name="Test")
 
             # ACTUALLY CALL THE METHOD
-                client.extract_insights("user input", project)
+            client.extract_insights("user input", project)
 
             # Verify execution
             assert mock_client.chat.completions.create.called
@@ -286,7 +286,7 @@ class TestOpenAIClientMethodExecution:
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
             # ACTUALLY CALL THE METHOD
-                client.generate_response("prompt")
+            client.generate_response("prompt")
 
             # Verify execution with orchestrator
             assert mock_client.chat.completions.create.called
