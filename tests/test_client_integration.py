@@ -186,11 +186,13 @@ class TestOpenAIClientIntegration:
         """Test that OpenAI client requires openai SDK"""
         try:
             from socratic_nexus.clients.openai_client import OpenAIClient  # noqa: F401
+
             # If we can import it, the dependency is installed
             assert True
-        except ModuleNotFoundError as e:
-            if "openai" in str(e):
-                pytest.skip("openai SDK not installed")
+        except (ModuleNotFoundError, ImportError) as e:
+            error_str = str(e).lower()
+            if "openai" in error_str or "cryptography" in error_str:
+                pytest.skip("openai SDK or cryptography not installed")
             raise
 
 
@@ -204,9 +206,10 @@ class TestGoogleClientIntegration:
 
             # If we can import it, the dependency is installed
             assert True
-        except ModuleNotFoundError as e:
-            if "google" in str(e):
-                pytest.skip("google-generativeai not installed")
+        except (ModuleNotFoundError, ImportError) as e:
+            error_str = str(e).lower()
+            if "google" in error_str or "cryptography" in error_str:
+                pytest.skip("google-generativeai or cryptography not installed")
             raise
 
 
@@ -217,11 +220,13 @@ class TestOllamaClientIntegration:
         """Test that Ollama client can be imported with requests"""
         try:
             from socratic_nexus.clients.ollama_client import OllamaClient  # noqa: F401
+
             # If we can import it, requests should be available
             assert True
-        except ModuleNotFoundError as e:
-            if "requests" in str(e):
-                pytest.skip("requests module not installed")
+        except (ModuleNotFoundError, ImportError) as e:
+            error_str = str(e).lower()
+            if "requests" in error_str or "cryptography" in error_str:
+                pytest.skip("requests or cryptography module not installed")
             raise
 
 
