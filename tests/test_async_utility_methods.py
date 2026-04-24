@@ -405,10 +405,10 @@ class TestExtractTechRecommendationsAsync:
             assert isinstance(result, (dict, list, type(None)))
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_with_constraints(
+    async def test_extract_tech_recommendations_async_with_tech_stack(
         self, mock_orchestrator
     ):
-        """Test tech recommendations with project constraints."""
+        """Test tech recommendations with project tech stack."""
         with patch(
             "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
         ) as mock_anth:
@@ -421,7 +421,7 @@ class TestExtractTechRecommendationsAsync:
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(
                 project_name="Test",
-                constraints=["low budget", "2 person team"],
+                tech_stack=["Python", "FastAPI"],
             )
             result = await client.extract_tech_recommendations_async(
                 project, "backend"

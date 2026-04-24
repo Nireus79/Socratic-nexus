@@ -45,10 +45,12 @@ class TestAPIErrorHandling:
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("prompt")
 
-            # Should handle error gracefully
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
     def test_timeout_error(self, mock_orchestrator):
         """Test handling of timeout errors."""
@@ -62,9 +64,12 @@ class TestAPIErrorHandling:
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("prompt")
 
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
     def test_connection_error(self, mock_orchestrator):
         """Test handling of connection errors."""
@@ -78,9 +83,12 @@ class TestAPIErrorHandling:
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("prompt")
 
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
     def test_authentication_error(self, mock_orchestrator):
         """Test handling of authentication errors."""
@@ -94,9 +102,12 @@ class TestAPIErrorHandling:
             )
 
             client = ClaudeClient(api_key="invalid-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("prompt")
 
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
     def test_rate_limit_error(self, mock_orchestrator):
         """Test handling of rate limit errors."""
@@ -110,9 +121,12 @@ class TestAPIErrorHandling:
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("prompt")
 
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
 
 class TestMalformedResponseHandling:
@@ -131,14 +145,12 @@ class TestMalformedResponseHandling:
             mock_client.messages.create.return_value = response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            # Should not crash
-            try:
-                result = client.generate_response("prompt")
-            except (IndexError, AttributeError):
-                result = None
 
-            # Should handle gracefully
-            assert result is None or isinstance(result, str)
+            # Should raise APIError when content is missing
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("prompt")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
     def test_invalid_json_response(self, mock_orchestrator):
         """Test handling of invalid JSON in structured responses."""
@@ -160,12 +172,12 @@ class TestMalformedResponseHandling:
             # Should return dict (empty or with parsed data)
             assert isinstance(result, dict)
 
-    def test_malformed_json_array(self, mock_orchestrator):
-        """Test handling of malformed JSON arrays."""
+    def test_malformed_json_array_in_detect_conflicts(self, mock_orchestrator):
+        """Test handling of malformed JSON arrays in async conflict detection."""
         with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
+            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
         ) as mock_anth:
-            mock_client = Mock()
+            mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response = Mock()
             response.content = [Mock(text="[1, 2, 3,")]  # Incomplete array
@@ -173,7 +185,9 @@ class TestMalformedResponseHandling:
             mock_client.messages.create.return_value = response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.detect_conflicts([])
+            # Use pytest.mark.asyncio or create an async test
+            import asyncio
+            result = asyncio.run(client.detect_conflicts_async([]))
 
             # Should handle gracefully
             assert isinstance(result, (list, dict))
@@ -207,16 +221,20 @@ class TestInputValidationErrors:
         ) as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
+            response = Mock()
+            response.content = [Mock(text="response")]
+            response.usage = Mock(input_tokens=10, output_tokens=20)
+            mock_client.messages.create.return_value = response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
             # Should handle None gracefully (convert to string or error)
             try:
                 result = client.generate_response(None)
-            except TypeError:
-                result = None
-
-            assert result is None or isinstance(result, str)
+                assert result is None or isinstance(result, str)
+            except (TypeError, APIError):
+                # Both are acceptable
+                pass
 
     def test_extremely_long_prompt(self, mock_orchestrator):
         """Test handling of very long prompts."""
@@ -328,10 +346,12 @@ class TestAuthenticationErrors:
             )
 
             client = ClaudeClient(api_key="not-a-real-key", orchestrator=mock_orchestrator)
-            result = client.test_connection()
 
-            # Should handle gracefully
-            assert isinstance(result, (bool, type(None)))
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.test_connection()
+
+            assert exc_info.value.error_type == "CONNECTION_ERROR"
 
     def test_expired_api_key(self, mock_orchestrator):
         """Test with expired API key."""
@@ -345,9 +365,12 @@ class TestAuthenticationErrors:
             )
 
             client = ClaudeClient(api_key="expired-key", orchestrator=mock_orchestrator)
-            result = client.generate_response("test")
 
-            assert result is None or isinstance(result, str)
+            # Should raise APIError
+            with pytest.raises(APIError) as exc_info:
+                client.generate_response("test")
+
+            assert exc_info.value.error_type == "GENERATION_ERROR"
 
 
 class TestParameterValidationErrors:

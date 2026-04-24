@@ -90,11 +90,15 @@ class TestDatabaseKeyRetrieval:
 
     def test_get_user_api_key_from_database(self, mock_orchestrator_with_key):
         """Test retrieving user API key from database."""
-        client = ClaudeClient(api_key=None, orchestrator=mock_orchestrator_with_key)
-        key, is_user = client._get_user_api_key("user123")
+        # Mock the decryption to return the stored key as plaintext
+        with patch.object(
+            ClaudeClient, "_decrypt_api_key_from_db", return_value="db-stored-key"
+        ):
+            client = ClaudeClient(api_key=None, orchestrator=mock_orchestrator_with_key)
+            key, is_user = client._get_user_api_key("user123")
 
-        assert key == "db-stored-key"
-        assert is_user is True
+            assert key == "db-stored-key"
+            assert is_user is True
 
     def test_get_user_api_key_fallback_to_env(self, mock_orchestrator):
         """Test fallback to environment key when database has none."""
@@ -123,22 +127,27 @@ class TestDatabaseKeyRetrieval:
     def test_get_user_api_key_multiple_users(self, mock_orchestrator_with_key):
         """Test retrieving keys for different users."""
         mock_orchestrator_with_key.database.get_api_key.side_effect = [
-            "user1-key",
-            "user2-key",
-            "user3-key",
+            "user1-encrypted",
+            "user2-encrypted",
+            "user3-encrypted",
         ]
         client = ClaudeClient(
             api_key="default-key",
             orchestrator=mock_orchestrator_with_key,
         )
 
-        key1, _ = client._get_user_api_key("user1")
-        key2, _ = client._get_user_api_key("user2")
-        key3, _ = client._get_user_api_key("user3")
+        with patch.object(
+            client, "_decrypt_api_key_from_db"
+        ) as mock_decrypt:
+            mock_decrypt.side_effect = ["user1-key", "user2-key", "user3-key"]
 
-        assert key1 == "user1-key"
-        assert key2 == "user2-key"
-        assert key3 == "user3-key"
+            key1, _ = client._get_user_api_key("user1")
+            key2, _ = client._get_user_api_key("user2")
+            key3, _ = client._get_user_api_key("user3")
+
+            assert key1 == "user1-key"
+            assert key2 == "user2-key"
+            assert key3 == "user3-key"
 
 
 class TestAPIKeyDecryption:
@@ -146,25 +155,22 @@ class TestAPIKeyDecryption:
 
     def test_decrypt_valid_api_key(self, mock_orchestrator):
         """Test decryption of valid encrypted API key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.ClaudeClient._decrypt_api_key_from_db"
+        client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
+
+        with patch.object(
+            client, "_decrypt_api_key_from_db", return_value="decrypted-key"
         ) as mock_decrypt:
-            mock_decrypt.return_value = "decrypted-key"
-
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             decrypted = client._decrypt_api_key_from_db("encrypted-key")
-
             assert decrypted == "decrypted-key"
+            mock_decrypt.assert_called_once_with("encrypted-key")
 
     def test_decrypt_handles_invalid_key(self, mock_orchestrator):
         """Test decryption with invalid encrypted key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.ClaudeClient._decrypt_api_key_from_db"
-        ) as mock_decrypt:
-            mock_decrypt.side_effect = Exception("Decryption failed")
+        client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-
+        with patch.object(
+            client, "_decrypt_api_key_from_db", side_effect=Exception("Decryption failed")
+        ):
             try:
                 _ = client._decrypt_api_key_from_db("invalid-encrypted-key")
             except Exception:
@@ -173,14 +179,10 @@ class TestAPIKeyDecryption:
 
     def test_decrypt_empty_encrypted_key(self, mock_orchestrator):
         """Test decryption with empty encrypted key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.ClaudeClient._decrypt_api_key_from_db"
-        ) as mock_decrypt:
-            mock_decrypt.return_value = ""
+        client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
+        with patch.object(client, "_decrypt_api_key_from_db", return_value=""):
             result = client._decrypt_api_key_from_db("")
-
             assert result == ""
 
 
@@ -371,19 +373,17 @@ class TestAuthWithDifferentUserIDs:
 
     def test_different_users_different_keys(self, mock_orchestrator):
         """Test that different users can have different API keys."""
-        with patch(
-            "socratic_nexus.clients.claude_client.ClaudeClient._get_user_api_key"
-        ) as mock_get_key:
-            mock_get_key.side_effect = [
+        client = ClaudeClient(
+            api_key="default-key",
+            orchestrator=mock_orchestrator,
+        )
+
+        with patch.object(
+            client, "_get_user_api_key", side_effect=[
                 ("user1-key", True),
                 ("user2-key", True),
             ]
-
-            client = ClaudeClient(
-                api_key="default-key",
-                orchestrator=mock_orchestrator,
-            )
-
+        ):
             key1, _ = client._get_user_api_key("user1")
             key2, _ = client._get_user_api_key("user2")
 
@@ -393,16 +393,14 @@ class TestAuthWithDifferentUserIDs:
 
     def test_same_user_consistent_key(self, mock_orchestrator):
         """Test that same user gets same key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.ClaudeClient._get_user_api_key"
-        ) as mock_get_key:
-            mock_get_key.return_value = ("user-key", True)
+        mock_orchestrator.database.get_api_key.return_value = "user-encrypted"
 
-            client = ClaudeClient(
-                api_key="default-key",
-                orchestrator=mock_orchestrator,
-            )
+        client = ClaudeClient(
+            api_key="default-key",
+            orchestrator=mock_orchestrator,
+        )
 
+        with patch.object(client, "_decrypt_api_key_from_db", return_value="user-key"):
             key1, _ = client._get_user_api_key("user1")
             key2, _ = client._get_user_api_key("user1")
 
