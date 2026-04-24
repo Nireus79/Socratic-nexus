@@ -34,7 +34,7 @@ class TestParseJsonResponse:
         """Test parsing valid JSON array."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
-            result = client._parse_json_response('[1, 2, 3]')
+            result = client._parse_json_response("[1, 2, 3]")
 
             assert isinstance(result, (list, dict))
 
@@ -42,7 +42,7 @@ class TestParseJsonResponse:
         """Test parsing JSON number."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
-            result = client._parse_json_response('42')
+            result = client._parse_json_response("42")
 
             assert result is not None or isinstance(result, (int, float, dict))
 
@@ -245,7 +245,7 @@ class TestTrackTokenUsage:
                 "generate_code",
                 "extract_insights",
                 "generate_response",
-                "generate_socratic_question"
+                "generate_socratic_question",
             ]
 
             for op in operations:

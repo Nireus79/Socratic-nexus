@@ -88,8 +88,7 @@ class TestGenerateCodeBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -102,8 +101,7 @@ class TestGenerateCodeBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -116,8 +114,7 @@ class TestGenerateCodeBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -131,8 +128,7 @@ class TestGenerateCodeBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -146,8 +142,7 @@ class TestGenerateCodeBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -165,8 +160,7 @@ class TestGenerateSocraticBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="question")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="question")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -180,8 +174,7 @@ class TestGenerateSocraticBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="q")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="q")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -207,8 +200,7 @@ class TestGenerateSocraticBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="question")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="question")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -233,8 +225,7 @@ class TestGenerateResponseBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -248,8 +239,7 @@ class TestGenerateResponseBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -263,8 +253,7 @@ class TestGenerateResponseBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -278,8 +267,7 @@ class TestGenerateResponseBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -293,8 +281,7 @@ class TestGenerateResponseBranches:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -365,7 +352,7 @@ class TestProjectContextBranches:
                 tech_stack=["tech1"],
                 project_type="type",
                 deployment_target="target",
-                status="status"
+                status="status",
             )
             result = client.extract_insights("message", project)
             assert isinstance(result, dict)
@@ -374,10 +361,6 @@ class TestProjectContextBranches:
         """Test with None fields in ProjectContext."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=orch)
-            project = ProjectContext(
-                project_name="Test",
-                description=None,
-                goals=None
-            )
+            project = ProjectContext(project_name="Test", description=None, goals=None)
             result = client.extract_insights("message", project)
             assert isinstance(result, dict)

@@ -334,7 +334,7 @@ class TestParseJsonResponse:
         """Test _parse_json_response with JSON array."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client._parse_json_response('[1, 2, 3]')
+            result = client._parse_json_response("[1, 2, 3]")
 
             assert isinstance(result, (list, dict, type(None)))
 

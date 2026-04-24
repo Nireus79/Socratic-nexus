@@ -153,7 +153,7 @@ class TestExtractInsightsMessageConstruction:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -166,13 +166,11 @@ class TestExtractInsightsMessageConstruction:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(
-                project_name="TestProject",
-                phase="planning",
-                goals=["goal1", "goal2"]
+                project_name="TestProject", phase="planning", goals=["goal1", "goal2"]
             )
             client.extract_insights("response", project)
 
@@ -186,7 +184,7 @@ class TestExtractInsightsMessageConstruction:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -252,11 +250,7 @@ class TestResponseHandlingVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
-            response.content = [
-                Mock(text="first"),
-                Mock(text="second"),
-                Mock(text="third")
-            ]
+            response.content = [Mock(text="first"), Mock(text="second"), Mock(text="third")]
             response.usage = Mock(input_tokens=10, output_tokens=20)
             mock_client.messages.create.return_value = response
 

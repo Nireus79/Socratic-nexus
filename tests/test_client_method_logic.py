@@ -201,10 +201,7 @@ class TestResponseGeneration:
         mock_api_client.messages.create.return_value = mock_response
 
         try:
-            result = client.generate_response(
-                "prompt",
-                system_prompt="You are helpful"
-            )
+            result = client.generate_response("prompt", system_prompt="You are helpful")
             assert result is not None or result is None
         except Exception:
             pass

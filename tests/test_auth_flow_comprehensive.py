@@ -67,7 +67,9 @@ class TestGetUserApiKeyFlow:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             mock_orchestrator_with_db.database.get_api_key.return_value = None
 
-            client = ClaudeClient(api_key="placeholder_test", orchestrator=mock_orchestrator_with_db)
+            client = ClaudeClient(
+                api_key="placeholder_test", orchestrator=mock_orchestrator_with_db
+            )
 
             with pytest.raises(APIError):
                 client._get_user_api_key(user_id="user123")

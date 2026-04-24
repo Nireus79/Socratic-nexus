@@ -29,7 +29,7 @@ class TestExtractInsightsComprehensive:
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
                 content=[Mock(text='{"key": "value"}')],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                usage=Mock(input_tokens=10, output_tokens=20),
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -39,7 +39,7 @@ class TestExtractInsightsComprehensive:
                 user_response="long message here",
                 project=project,
                 user_id="user123",
-                user_auth_method="api_key"
+                user_auth_method="api_key",
             )
 
             assert isinstance(result, dict)
@@ -55,8 +55,7 @@ class TestExtractInsightsComprehensive:
 
             # Test with empty JSON
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text='{}')],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="{}")], usage=Mock(input_tokens=10, output_tokens=20)
             )
             result = client.extract_insights("message", project)
             assert isinstance(result, dict)
@@ -64,7 +63,7 @@ class TestExtractInsightsComprehensive:
             # Test with nested JSON
             mock_client.messages.create.return_value = Mock(
                 content=[Mock(text='{"nested": {"key": "value"}}')],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                usage=Mock(input_tokens=10, output_tokens=20),
             )
             result = client.extract_insights("message", project)
             assert isinstance(result, dict)
@@ -75,8 +74,7 @@ class TestExtractInsightsComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text='{}')],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="{}")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -102,8 +100,7 @@ class TestGenerateCodeComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -140,8 +137,7 @@ class TestGenerateCodeComprehensive:
             # Test with successful retry
             mock_client.messages.create.side_effect = None
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
             result = client.generate_code("test")
             assert result is not None or result is None
@@ -156,17 +152,13 @@ class TestGenerateSocraticComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="question")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="question")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
 
             result = client.generate_socratic_question(
-                prompt="test",
-                cache_key="key123",
-                user_id="user1",
-                user_auth_method="api_key"
+                prompt="test", cache_key="key123", user_id="user1", user_auth_method="api_key"
             )
 
             assert result is None or isinstance(result, str)
@@ -177,8 +169,7 @@ class TestGenerateSocraticComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="q")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="q")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -206,8 +197,7 @@ class TestGenerateResponseComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -230,8 +220,7 @@ class TestGenerateResponseComprehensive:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -249,9 +238,7 @@ class TestAuthenticationFlows:
         """Test get_auth_credential with variations."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(
-                api_key="api-key",
-                orchestrator=orch,
-                subscription_token="sub-token"
+                api_key="api-key", orchestrator=orch, subscription_token="sub-token"
             )
 
             # Test api_key
@@ -313,11 +300,7 @@ class TestInitializationScenarios:
     def test_init_with_subscription_token(self, orch):
         """Test initialization with subscription token."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(
-                api_key="test",
-                orchestrator=orch,
-                subscription_token="sub-token"
-            )
+            client = ClaudeClient(api_key="test", orchestrator=orch, subscription_token="sub-token")
 
             assert client.subscription_token == "sub-token"
 
@@ -339,8 +322,7 @@ class TestEdgeCases:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=0, output_tokens=0)
+                content=[Mock(text="response")], usage=Mock(input_tokens=0, output_tokens=0)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -354,8 +336,7 @@ class TestEdgeCases:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=1000, output_tokens=100)
+                content=[Mock(text="response")], usage=Mock(input_tokens=1000, output_tokens=100)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -370,8 +351,7 @@ class TestEdgeCases:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -386,8 +366,7 @@ class TestEdgeCases:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)

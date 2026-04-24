@@ -57,7 +57,7 @@ class TestOllamaClientInitialization:
         """Test caches are initialized."""
         with patch("socratic_nexus.clients.ollama_client.requests"):
             client = OllamaClient(orchestrator=mock_orchestrator)
-            assert hasattr(client, '_insights_cache')
+            assert hasattr(client, "_insights_cache")
             assert isinstance(client._insights_cache, dict)
 
 
@@ -69,10 +69,7 @@ class TestOllamaClientGenerateResponse:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "test response",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "test response", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -85,10 +82,7 @@ class TestOllamaClientGenerateResponse:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "response",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "response", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -101,10 +95,7 @@ class TestOllamaClientGenerateResponse:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "response",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "response", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -135,7 +126,7 @@ class TestOllamaClientGenerateCode:
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "response": "def hello():\n    pass",
-                "model": "mistral"
+                "model": "mistral",
             }
             mock_requests.post.return_value = mock_response
 
@@ -149,10 +140,7 @@ class TestOllamaClientGenerateCode:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "code",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "code", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -171,7 +159,7 @@ class TestOllamaClientExtractInsights:
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "response": '{"insights": "test"}',
-                "model": "mistral"
+                "model": "mistral",
             }
             mock_requests.post.return_value = mock_response
 
@@ -186,10 +174,7 @@ class TestOllamaClientExtractInsights:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -203,10 +188,7 @@ class TestOllamaClientExtractInsights:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": '{"test": "data"}',
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": '{"test": "data"}', "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -226,7 +208,7 @@ class TestOllamaClientSocraticQuestion:
             mock_response.status_code = 200
             mock_response.json.return_value = {
                 "response": "What would you try next?",
-                "model": "mistral"
+                "model": "mistral",
             }
             mock_requests.post.return_value = mock_response
 
@@ -240,10 +222,7 @@ class TestOllamaClientSocraticQuestion:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "question",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "question", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -332,10 +311,7 @@ class TestOllamaClientIntegration:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "test response",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "test response", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
@@ -350,10 +326,7 @@ class TestOllamaClientIntegration:
         with patch("socratic_nexus.clients.ollama_client.requests") as mock_requests:
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "response",
-                "model": "mistral"
-            }
+            mock_response.json.return_value = {"response": "response", "model": "mistral"}
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)

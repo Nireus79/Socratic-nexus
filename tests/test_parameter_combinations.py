@@ -111,7 +111,7 @@ class TestExtractInsightsParameterVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Minimal")
@@ -124,7 +124,7 @@ class TestExtractInsightsParameterVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(
@@ -135,7 +135,7 @@ class TestExtractInsightsParameterVariations:
                 tech_stack=["Python", "FastAPI", "PostgreSQL"],
                 project_type="web_application",
                 deployment_target="AWS",
-                status="active"
+                status="active",
             )
             result = client.extract_insights("response", project)
 
@@ -146,7 +146,7 @@ class TestExtractInsightsParameterVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -159,15 +159,11 @@ class TestExtractInsightsParameterVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            result = client.extract_insights(
-                "response",
-                project,
-                user_auth_method="api_key"
-            )
+            result = client.extract_insights("response", project, user_auth_method="api_key")
 
             assert isinstance(result, dict)
 
@@ -176,7 +172,7 @@ class TestExtractInsightsParameterVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -187,7 +183,7 @@ class TestExtractInsightsParameterVariations:
                 "this is a longer response with more details",
                 "x" * 100,
                 "x" * 1000,
-                "x" * 10000
+                "x" * 10000,
             ]
 
             for response in test_responses:
@@ -253,7 +249,7 @@ class TestGenerateCodeParameterVariations:
                 "Python script for data processing",
                 "JavaScript async function",
                 "SQL migration script",
-                "API endpoint handler"
+                "API endpoint handler",
             ]
 
             for prompt in prompts:
@@ -300,7 +296,7 @@ class TestGenerateSocraticQuestionParameterVariations:
                 "design patterns",
                 "database optimization",
                 "API design",
-                "testing strategies"
+                "testing strategies",
             ]
 
             for topic in topics:

@@ -61,7 +61,7 @@ class TestGoogleClientInitialization:
         """Test caches are initialized."""
         with patch("socratic_nexus.clients.google_client.genai"):
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
-            assert hasattr(client, '_insights_cache')
+            assert hasattr(client, "_insights_cache")
             assert isinstance(client._insights_cache, dict)
 
 

@@ -203,9 +203,7 @@ class TestGenerateCodeAsync:
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
             mock_client = AsyncMock()
             mock_async.return_value = mock_client
-            mock_client.messages.create = AsyncMock(
-                return_value=create_mock_async_response("code")
-            )
+            mock_client.messages.create = AsyncMock(return_value=create_mock_async_response("code"))
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -219,9 +217,7 @@ class TestGenerateCodeAsync:
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
             mock_client = AsyncMock()
             mock_async.return_value = mock_client
-            mock_client.messages.create = AsyncMock(
-                return_value=create_mock_async_response("code")
-            )
+            mock_client.messages.create = AsyncMock(return_value=create_mock_async_response("code"))
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -296,7 +292,9 @@ class TestGenerateSocraticQuestionAsync:
                 cache_key = client._get_cache_key("test prompt")
                 client._question_cache[cache_key] = "Cached question"
 
-                result = await client.generate_socratic_question_async("test prompt", cache_key=cache_key)
+                result = await client.generate_socratic_question_async(
+                    "test prompt", cache_key=cache_key
+                )
                 # Should return cached value or valid response
                 assert result is None or isinstance(result, str)
 
@@ -324,9 +322,7 @@ class TestAsyncMethodClientSelection:
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
             mock_client = AsyncMock()
             mock_async.return_value = mock_client
-            mock_client.messages.create = AsyncMock(
-                return_value=create_mock_async_response('{}')
-            )
+            mock_client.messages.create = AsyncMock(return_value=create_mock_async_response("{}"))
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -363,7 +359,9 @@ class TestAsyncTokenTracking:
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
             mock_client = AsyncMock()
             mock_async.return_value = mock_client
-            mock_response = create_mock_async_response("response", input_tokens=50, output_tokens=30)
+            mock_response = create_mock_async_response(
+                "response", input_tokens=50, output_tokens=30
+            )
             mock_client.messages.create = AsyncMock(return_value=mock_response)
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):

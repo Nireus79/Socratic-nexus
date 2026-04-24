@@ -51,8 +51,8 @@ class TestClientInitializationVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=None)
             assert client.logger is not None
-            assert hasattr(client.logger, 'info')
-            assert hasattr(client.logger, 'error')
+            assert hasattr(client.logger, "info")
+            assert hasattr(client.logger, "error")
 
     def test_init_initializes_caches(self):
         """Test caches are initialized."""
@@ -85,9 +85,7 @@ class TestClientInitializationVariations:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):
                 client = ClaudeClient(
-                    api_key="test",
-                    orchestrator=None,
-                    subscription_token="sub-token-123"
+                    api_key="test", orchestrator=None, subscription_token="sub-token-123"
                 )
                 assert client.subscription_token == "sub-token-123"
 
@@ -119,9 +117,7 @@ class TestGetAuthCredentialVariations:
         """Test getting subscription token."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(
-                api_key="api-key",
-                orchestrator=None,
-                subscription_token="sub-token-123"
+                api_key="api-key", orchestrator=None, subscription_token="sub-token-123"
             )
             cred = client.get_auth_credential("subscription")
             assert cred == "sub-token-123"
@@ -222,11 +218,7 @@ class TestClientAttributeAccessibility:
     def test_subscription_token_stored(self):
         """Test subscription token is stored."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(
-                api_key="test",
-                orchestrator=None,
-                subscription_token="token123"
-            )
+            client = ClaudeClient(api_key="test", orchestrator=None, subscription_token="token123")
             assert client.subscription_token == "token123"
 
     def test_model_accessible(self):

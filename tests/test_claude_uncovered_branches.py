@@ -190,10 +190,10 @@ class TestGenerateAsyncMethods:
             mock_client = Mock()
             mock_async.return_value = mock_client
             from unittest.mock import AsyncMock
+
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="artifact")],
-                    usage=Mock(input_tokens=10, output_tokens=20)
+                    content=[Mock(text="artifact")], usage=Mock(input_tokens=10, output_tokens=20)
                 )
             )
 
@@ -209,10 +209,10 @@ class TestGenerateAsyncMethods:
             mock_client = Mock()
             mock_async.return_value = mock_client
             from unittest.mock import AsyncMock
+
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="plan")],
-                    usage=Mock(input_tokens=10, output_tokens=20)
+                    content=[Mock(text="plan")], usage=Mock(input_tokens=10, output_tokens=20)
                 )
             )
 
@@ -229,10 +229,10 @@ class TestGenerateAsyncMethods:
             mock_client = Mock()
             mock_async.return_value = mock_client
             from unittest.mock import AsyncMock
+
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="doc")],
-                    usage=Mock(input_tokens=10, output_tokens=20)
+                    content=[Mock(text="doc")], usage=Mock(input_tokens=10, output_tokens=20)
                 )
             )
 
@@ -293,7 +293,7 @@ class TestParameterVariations:
                 max_tokens=1000,
                 temperature=0.7,
                 user_id="user123",
-                user_auth_method="api_key"
+                user_auth_method="api_key",
             )
 
             mock_client.messages.create.assert_called()
@@ -310,10 +310,7 @@ class TestParameterVariations:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_code(
-                "write function",
-                language="python",
-                user_id="user123",
-                user_auth_method="api_key"
+                "write function", language="python", user_id="user123", user_auth_method="api_key"
             )
 
             mock_client.messages.create.assert_called()
@@ -324,17 +321,14 @@ class TestParameterVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_response = Mock()
-            mock_response.content = [Mock(text='{}')]
+            mock_response.content = [Mock(text="{}")]
             mock_response.usage = Mock(input_tokens=30, completion_tokens=20)
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
             _ = client.extract_insights(
-                "response",
-                project,
-                user_id="user123",
-                user_auth_method="api_key"
+                "response", project, user_id="user123", user_auth_method="api_key"
             )
 
             mock_client.messages.create.assert_called()

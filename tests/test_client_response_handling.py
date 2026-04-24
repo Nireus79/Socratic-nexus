@@ -89,19 +89,14 @@ class TestProjectContextHandling:
             phase="implementation",
             tech_stack=["Python", "Django"],
             project_type="web",
-            deployment_target="cloud"
+            deployment_target="cloud",
         )
         result = client.extract_insights("test message", project)
         assert isinstance(result, dict)
 
     def test_extract_insights_with_none_fields(self, client):
         """Test with ProjectContext containing None fields."""
-        project = ProjectContext(
-            project_name="Test",
-            description=None,
-            goals=None,
-            phase=None
-        )
+        project = ProjectContext(project_name="Test", description=None, goals=None, phase=None)
         result = client.extract_insights("test message", project)
         assert isinstance(result, dict)
 
@@ -133,11 +128,7 @@ class TestAuthMethodVariations:
         mock_orch.database = Mock()
 
         try:
-            result = client.extract_insights(
-                "test",
-                project,
-                user_auth_method="api_key"
-            )
+            result = client.extract_insights("test", project, user_auth_method="api_key")
             assert isinstance(result, dict)
         except Exception:
             pass
@@ -216,12 +207,7 @@ class TestGenerateResponseVariations:
 
     def test_generate_response_system_prompt_variations(self, client):
         """Test generate_response with different system prompts."""
-        system_prompts = [
-            "You are helpful",
-            "",
-            "You are an expert",
-            "Be concise: " * 100
-        ]
+        system_prompts = ["You are helpful", "", "You are an expert", "Be concise: " * 100]
 
         for sys_prompt in system_prompts:
             try:
@@ -251,7 +237,7 @@ class TestGenerateCodeVariations:
             [],
             ["requests"],
             ["django", "djangorestframework", "celery"],
-            ["a" * 100]  # very long requirement name
+            ["a" * 100],  # very long requirement name
         ]
 
         for reqs in req_lists:

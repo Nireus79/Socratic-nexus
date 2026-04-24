@@ -70,12 +70,10 @@ class TestAsyncClientInitialization:
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"):
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(
-                    api_key="sk-key",
-                    orchestrator=orch,
-                    subscription_token="sub-token"
+                    api_key="sk-key", orchestrator=orch, subscription_token="sub-token"
                 )
                 # Async client attributes should exist
-                assert hasattr(client, 'subscription_async_client')
+                assert hasattr(client, "subscription_async_client")
 
 
 class TestEventEmitterIntegration:
@@ -93,8 +91,7 @@ class TestEventEmitterIntegration:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -113,8 +110,7 @@ class TestMessageCreationVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -128,8 +124,7 @@ class TestMessageCreationVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="{}")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="{}")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -144,8 +139,7 @@ class TestMessageCreationVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -163,8 +157,7 @@ class TestModelParameterUsage:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             orch.config.claude_model = "test-model-123"
@@ -190,8 +183,7 @@ class TestResponseContentExtraction:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response text")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response text")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -205,11 +197,8 @@ class TestResponseContentExtraction:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[
-                    Mock(text="block1"),
-                    Mock(text="block2")
-                ],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="block1"), Mock(text="block2")],
+                usage=Mock(input_tokens=10, output_tokens=20),
             )
 
             client = ClaudeClient(api_key="test", orchestrator=orch)
@@ -338,7 +327,7 @@ class TestLoggerConfiguration:
         """Test logger attribute exists."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=orch)
-            assert hasattr(client, 'logger')
+            assert hasattr(client, "logger")
 
     def test_logger_is_not_none(self, orch):
         """Test logger is initialized."""
@@ -350,7 +339,7 @@ class TestLoggerConfiguration:
         """Test logger has standard logging methods."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test", orchestrator=orch)
-            assert hasattr(client.logger, 'info')
-            assert hasattr(client.logger, 'error')
-            assert hasattr(client.logger, 'debug')
-            assert hasattr(client.logger, 'warning')
+            assert hasattr(client.logger, "info")
+            assert hasattr(client.logger, "error")
+            assert hasattr(client.logger, "debug")
+            assert hasattr(client.logger, "warning")

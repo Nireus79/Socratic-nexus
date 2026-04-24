@@ -71,6 +71,7 @@ class TestAPIErrorPaths:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             import socket
+
             mock_client.messages.create.side_effect = socket.timeout("Request timeout")
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -110,10 +111,7 @@ class TestContentParsing:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
-            response.content = [
-                Mock(text='{"part1": "data"}'),
-                Mock(text='{"part2": "more"}')
-            ]
+            response.content = [Mock(text='{"part1": "data"}'), Mock(text='{"part2": "more"}')]
             response.usage = Mock(input_tokens=10, output_tokens=20)
             mock_client.messages.create.return_value = response
 
@@ -148,8 +146,7 @@ class TestMessageConstruction:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="code")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="code")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -164,8 +161,7 @@ class TestMessageConstruction:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="{}")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="{}")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -186,7 +182,7 @@ class TestCacheInteraction:
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
                 content=[Mock(text='{"test": "data"}')],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                usage=Mock(input_tokens=10, output_tokens=20),
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -207,8 +203,7 @@ class TestCacheInteraction:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="Question")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="Question")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -230,17 +225,12 @@ class TestParameterVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
-            result = client.generate_response(
-                prompt="test",
-                max_tokens=100,
-                temperature=0.7
-            )
+            result = client.generate_response(prompt="test", max_tokens=100, temperature=0.7)
 
             assert result is not None or result is None
 
@@ -250,8 +240,7 @@ class TestParameterVariations:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="{}")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="{}")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
@@ -262,7 +251,7 @@ class TestParameterVariations:
                     response_text="test",
                     project=project,
                     user_id="user123",
-                    user_auth_method="api_key"
+                    user_auth_method="api_key",
                 )
                 assert isinstance(result, dict)
             except Exception:
@@ -315,8 +304,7 @@ class TestModelSelection:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="response")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             orch.config.claude_model = "custom-model-123"
@@ -338,7 +326,9 @@ class TestInitializationPaths:
     def test_real_api_key_initializes_clients(self):
         """Test that real API key initializes clients."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_anth.return_value = Mock()
                 mock_async.return_value = Mock()
 
@@ -362,10 +352,6 @@ class TestInitializationPaths:
             orch.config = Mock()
             orch.config.claude_model = "test"
 
-            client = ClaudeClient(
-                api_key="key",
-                orchestrator=orch,
-                subscription_token="sub-token"
-            )
+            client = ClaudeClient(api_key="key", orchestrator=orch, subscription_token="sub-token")
 
             assert client.subscription_token == "sub-token"

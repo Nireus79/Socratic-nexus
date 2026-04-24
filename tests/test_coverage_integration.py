@@ -111,8 +111,7 @@ class TestGenerateSocraticCoverage:
             mock_client = Mock()
             mock_anthropic.return_value = mock_client
             mock_client.messages.create.return_value = Mock(
-                content=[Mock(text="Cached answer")],
-                usage=Mock(input_tokens=10, output_tokens=20)
+                content=[Mock(text="Cached answer")], usage=Mock(input_tokens=10, output_tokens=20)
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -205,7 +204,7 @@ class TestExtractInsightsCoverage:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anthropic:
             mock_client = Mock()
             mock_anthropic.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response('{}')
+            mock_client.messages.create.return_value = create_mock_response("{}")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -294,6 +293,7 @@ class TestGetClientMethod:
             client = ClaudeClient(api_key=None, orchestrator=mock_orchestrator)
 
             from socratic_nexus.exceptions import APIError
+
             with pytest.raises(APIError):
                 client._get_client(user_auth_method="api_key")
 
@@ -361,9 +361,7 @@ class TestAuthCredentialHandling:
         """Test get_auth_credential returns subscription token."""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(
-                api_key="test-key",
-                orchestrator=mock_orchestrator,
-                subscription_token="sub-token"
+                api_key="test-key", orchestrator=mock_orchestrator, subscription_token="sub-token"
             )
             cred = client.get_auth_credential("subscription")
 

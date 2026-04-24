@@ -119,9 +119,7 @@ class TestClientParameterVariations:
             orch.config.claude_model = "test"
 
             client = ClaudeClient(
-                api_key="key",
-                orchestrator=orch,
-                subscription_token="sub_token_123"
+                api_key="key", orchestrator=orch, subscription_token="sub_token_123"
             )
             assert client.subscription_token == "sub_token_123"
 
@@ -257,9 +255,7 @@ class TestIntegrationScenarios:
         """Test client with different authentication methods."""
         with patch("socratic_nexus.clients.claude_client.anthropic"):
             client = ClaudeClient(
-                api_key="test-api-key",
-                orchestrator=None,
-                subscription_token="test-sub-token"
+                api_key="test-api-key", orchestrator=None, subscription_token="test-sub-token"
             )
 
             # Can retrieve api_key
