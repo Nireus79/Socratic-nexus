@@ -1,11 +1,10 @@
 """Tests for Claude API client."""
 
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext, ConflictInfo, TokenUsage
-from socratic_nexus.exceptions import APIError
 
 
 @pytest.fixture
@@ -128,13 +127,6 @@ def test_conflict_info_in_client_context(claude_client):
 
 def test_token_usage_cost_calculation():
     """Test token cost calculation in client context."""
-    usage = TokenUsage(
-        input_tokens=1000,
-        output_tokens=500,
-        total_tokens=1500,
-        provider="claude",
-        model="claude-3-sonnet",
-    )
     # The cost should be calculated by the client
     # This test verifies the model can store cost information
     usage_with_cost = TokenUsage(
