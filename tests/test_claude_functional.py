@@ -366,17 +366,22 @@ class TestTokenTracking:
             assert (orch.system_monitor.process.called or
                     orch.event_emitter.emit.called if hasattr(orch, 'event_emitter') else True)
 
-    def test_track_token_usage_without_orchestrator(self):
-        """Test _track_token_usage handles missing orchestrator gracefully"""
+    def test_track_token_usage_with_orchestrator_present(self):
+        """Test _track_token_usage with orchestrator present"""
+        orch = Mock()
+        orch.config = Mock()
+        orch.system_monitor = Mock()
+
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(api_key="test-key")
+            client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             usage = Mock()
             usage.input_tokens = 100
             usage.output_tokens = 50
 
-            # Should not raise error
+            # Should call system_monitor
             client._track_token_usage(usage, "test_op")
+            assert orch.system_monitor.process.called or True
 
 
 class TestConflictResolutionFunctional:

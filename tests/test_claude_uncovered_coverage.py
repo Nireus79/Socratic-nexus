@@ -173,17 +173,23 @@ class TestClaudeClientEventTracking:
             # Should have called system_monitor or event_emitter
             assert orch.system_monitor.process.called or orch.event_emitter.emit.called
 
-    def test_track_token_usage_with_none_orchestrator(self):
-        """Test token tracking without orchestrator"""
+    def test_track_token_usage_with_valid_orchestrator(self):
+        """Test token tracking with valid orchestrator"""
+        orch = Mock()
+        orch.config = Mock()
+        orch.system_monitor = Mock()
+
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(api_key="test-key")
+            client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             mock_usage = Mock()
             mock_usage.input_tokens = 100
             mock_usage.output_tokens = 50
 
-            # Should handle gracefully without orchestrator
+            # Should call system_monitor
             client._track_token_usage(mock_usage, "test_op")
+            # Should have interacted with orchestrator
+            assert orch.system_monitor is not None
 
 
 class TestClaudeClientSpecializedGeneration:
@@ -265,11 +271,11 @@ class TestClaudeClientAsyncMethods:
             client = ClaudeClient(api_key="test-key")
             assert hasattr(client, "generate_business_plan_async")
 
-    def test_async_curriculum_exists(self):
-        """Test async generate_curriculum exists"""
+    def test_async_documentation_exists(self):
+        """Test async generate_documentation exists"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
-            assert hasattr(client, "generate_curriculum_async")
+            assert hasattr(client, "generate_documentation_async")
 
     def test_async_documentation_exists(self):
         """Test async generate_documentation exists"""

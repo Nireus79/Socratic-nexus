@@ -80,6 +80,7 @@ class TestOpenAIClientBasic:
 
     def test_openai_client_import(self):
         """Test that OpenAI client can be imported"""
+        pytest.importorskip("cryptography")
         pytest.importorskip("openai")
         from socratic_nexus.clients.openai_client import OpenAIClient
         assert OpenAIClient is not None
@@ -358,7 +359,6 @@ class TestClaudeClientMethods:
                 "generate_code_async",
                 "extract_insights_async",
                 "generate_business_plan_async",
-                "generate_curriculum_async",
                 "generate_documentation_async",
             ]
 

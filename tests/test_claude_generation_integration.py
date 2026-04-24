@@ -243,7 +243,7 @@ class TestArtifactGeneration:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             if hasattr(client, 'generate_artifact'):
-                result = client.generate_artifact("create an SVG logo")
+                result = client.generate_artifact("create an SVG logo", "svg_design")
                 assert result is not None or result is None
 
 

@@ -12,6 +12,9 @@ These tests execute real method calls with proper mocking and verify:
 import pytest
 from unittest.mock import Mock, patch
 
+# Skip all tests if cryptography is not available
+pytest.importorskip("cryptography")
+
 
 class TestOpenAIClientInitialization:
     """Functional tests for OpenAI client initialization"""

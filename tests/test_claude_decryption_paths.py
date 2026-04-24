@@ -10,6 +10,9 @@ from unittest.mock import Mock, patch
 import base64
 import os
 
+# Skip all tests if cryptography is not available
+pytest.importorskip("cryptography")
+
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.exceptions import APIError
 
