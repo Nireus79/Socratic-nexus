@@ -5,7 +5,6 @@ These tests call real methods with proper mocking to increase code coverage
 from 2% to meaningful levels.
 """
 
-import sys
 import pytest
 from unittest.mock import Mock, patch
 from socratic_nexus.models import ProjectContext
