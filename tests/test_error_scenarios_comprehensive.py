@@ -14,7 +14,7 @@ from unittest.mock import Mock, patch, AsyncMock
 import asyncio
 
 from socratic_nexus.clients.claude_client import ClaudeClient
-from socratic_nexus.models import ProjectContext, ConflictInfo
+from socratic_nexus.models import ProjectContext
 from socratic_nexus.exceptions import APIError
 
 

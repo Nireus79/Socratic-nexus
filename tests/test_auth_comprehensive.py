@@ -10,11 +10,9 @@ Tests authentication flows:
 """
 
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
-from socratic_nexus.models import ProjectContext
-from socratic_nexus.exceptions import APIError
 
 
 @pytest.fixture
@@ -467,7 +465,7 @@ class TestAuthErrorRecovery:
                      usage=Mock(input_tokens=10, output_tokens=20)),
             ]
 
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
+            _ = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
             # Simulate retry logic
             for attempt in range(3):

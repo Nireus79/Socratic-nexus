@@ -15,7 +15,6 @@ from unittest.mock import Mock, patch
 from socratic_nexus.clients.openai_client import OpenAIClient
 from socratic_nexus.clients.google_client import GoogleClient
 from socratic_nexus.clients.ollama_client import OllamaClient
-from socratic_nexus.models import ProjectContext
 
 
 @pytest.fixture
