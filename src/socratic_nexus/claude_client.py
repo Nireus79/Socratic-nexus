@@ -15,13 +15,12 @@ from typing import TYPE_CHECKING, Any, Dict
 
 import anthropic
 
-from socratic_system.events import EventType
-from socratic_system.exceptions import APIError
-from socratic_system.models import ConflictInfo, ProjectContext
-from socratic_system.utils.extractors.registry import LanguageExtractorRegistry
+from socratic_nexus.events import EventType
+from socratic_nexus.exceptions import APIError
+from socratic_nexus.models import ConflictInfo, ProjectContext
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+    from typing import Any as AgentOrchestrator
 
 logger = logging.getLogger(__name__)
 
@@ -657,27 +656,8 @@ OUTPUT FORMAT - CRITICAL:
                 }
             )
 
-            # Extract code from markdown if needed (defensive measure)
+            # Return the raw content directly
             raw_content = response.content[0].text
-
-            # Get Python extractor from registry
-            extractor = LanguageExtractorRegistry.get_extractor("python")
-            if extractor and extractor.is_markdown_format(raw_content):
-                logger.warning(
-                    "Received markdown-formatted response from Claude, extracting Python code"
-                )
-
-                # Extract and validate in one call using new registry API
-                extraction_result = extractor.extract_and_validate(raw_content)
-
-                if extraction_result.is_valid:
-                    logger.info("Successfully extracted and validated Python code from markdown")
-                    return extraction_result.extracted_code
-                else:
-                    logger.error(f"Extracted code has syntax errors: {extraction_result.validation_error}")
-                    logger.error("Returning original response - may contain markdown")
-                    return raw_content
-
             return raw_content
 
         except Exception as e:
