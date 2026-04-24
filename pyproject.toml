@@ -60,8 +60,10 @@ langchain = ["langchain>=0.1.0"]
 all = [
     "anthropic>=0.40.0",
     "openai>=1.0.0",
+    "google-generativeai>=0.3.0",
     "ollama>=0.0.8",
     "huggingface-hub>=0.17.0",
+    "cryptography>=41.0.0",
 ]
 
 # All integrations
@@ -88,6 +90,7 @@ dev = [
     "ruff>=0.1.0",
     "mypy>=1.0",
     "types-requests>=2.31.0",
+    "cryptography>=41.0.0",
 ]
 
 [project.urls]
