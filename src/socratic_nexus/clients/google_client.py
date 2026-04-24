@@ -15,12 +15,12 @@ from typing import TYPE_CHECKING, Any, Dict
 import google.generativeai as genai
 from cryptography.fernet import Fernet
 
-from socratic_system.events import EventType
-from socratic_system.exceptions import APIError
-from socratic_system.models import ProjectContext
+from socratic_nexus.events import EventType
+from socratic_nexus.exceptions import APIError
+from socratic_nexus.models import ProjectContext
 
 if TYPE_CHECKING:
-    from socratic_system.orchestration.orchestrator import AgentOrchestrator
+    from typing import Any as AgentOrchestrator
 
 
 class GoogleClient:
