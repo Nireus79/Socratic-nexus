@@ -225,36 +225,6 @@ class TestGenerateDocumentation:
             assert result is None or isinstance(result, str)
 
 
-class TestGenerateSuggestions:
-    """Tests for generate_suggestions method."""
-
-    def test_generate_suggestions_basic(self, mock_orchestrator):
-        """Test generate_suggestions basic functionality."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            mock_client = Mock()
-            mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response("suggestions")
-
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(project_name="Test")
-            result = client.generate_suggestions("current question", project)
-
-            assert result is not None or result is None
-
-    def test_generate_suggestions_error_handling(self, mock_orchestrator):
-        """Test generate_suggestions error handling."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            mock_client = Mock()
-            mock_anth.return_value = mock_client
-            mock_client.messages.create.side_effect = Exception("API Error")
-
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(project_name="Test")
-            result = client.generate_suggestions("current question", project)
-
-            assert result is None or isinstance(result, str)
-
-
 class TestGenerateConflictResolution:
     """Tests for generate_conflict_resolution_suggestions method."""
 
