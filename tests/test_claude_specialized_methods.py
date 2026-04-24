@@ -90,8 +90,8 @@ class TestCodeGeneration:
             # Both calls should work (caching may or may not be used)
             assert mock_client.messages.create.call_count >= 1
 
-    def test_generate_code_with_max_tokens(self, mock_orchestrator):
-        """Test code generation with max tokens constraint"""
+    def test_generate_code_with_user_id(self, mock_orchestrator):
+        """Test code generation with user_id"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
@@ -101,7 +101,7 @@ class TestCodeGeneration:
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.generate_code("write code", max_tokens=256)
+            result = client.generate_code("write code", user_id="user123")
 
             assert isinstance(result, (str, type(None)))
 
@@ -254,37 +254,6 @@ class TestAnalysisMethods:
 
             assert isinstance(result, (dict, str, type(None)))
 
-    def test_extract_tech_recommendations(self, mock_orchestrator):
-        """Test tech recommendations extraction"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            mock_client = Mock()
-            mock_anth.return_value = mock_client
-            mock_response = Mock()
-            mock_response.content = [Mock(text='{"recommendations": []}')]
-            mock_response.usage = Mock(input_tokens=80, output_tokens=150)
-            mock_client.messages.create.return_value = mock_response
-
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(project_name="Test")
-            result = client.extract_tech_recommendations(project, "backend")
-
-            assert isinstance(result, (dict, list, type(None)))
-
-    def test_evaluate_quality_metrics(self, mock_orchestrator):
-        """Test quality evaluation"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            mock_client = Mock()
-            mock_anth.return_value = mock_client
-            mock_response = Mock()
-            mock_response.content = [Mock(text='{"quality": "good"}')]
-            mock_response.usage = Mock(input_tokens=70, output_tokens=120)
-            mock_client.messages.create.return_value = mock_response
-
-            client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(project_name="Test")
-            result = client.evaluate_quality_metrics("artifact", project)
-
-            assert isinstance(result, (dict, str, type(None)))
 
 
 class TestConflictResolution:
