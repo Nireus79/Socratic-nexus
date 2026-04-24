@@ -84,21 +84,42 @@ class TestGenerateCodeBranches:
 
     def test_generate_code_empty_prompt(self, orch):
         """Test generate_code with empty prompt."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
+            mock_client.messages.create.return_value = Mock(
+                content=[Mock(text="code")],
+                usage=Mock(input_tokens=10, output_tokens=20)
+            )
+
             client = ClaudeClient(api_key="test", orchestrator=orch)
             result = client.generate_code("")
             assert result is None or isinstance(result, str)
 
     def test_generate_code_long_prompt(self, orch):
         """Test generate_code with very long prompt."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
+            mock_client.messages.create.return_value = Mock(
+                content=[Mock(text="code")],
+                usage=Mock(input_tokens=10, output_tokens=20)
+            )
+
             client = ClaudeClient(api_key="test", orchestrator=orch)
             result = client.generate_code("x" * 5000)
             assert result is None or isinstance(result, str)
 
     def test_generate_code_special_characters(self, orch):
         """Test generate_code with special characters."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
+            mock_client.messages.create.return_value = Mock(
+                content=[Mock(text="code")],
+                usage=Mock(input_tokens=10, output_tokens=20)
+            )
+
             client = ClaudeClient(api_key="test", orchestrator=orch)
             prompt = "Generate: @#$%^&*()_+-=[]{}|;:,.<>?/"
             result = client.generate_code(prompt)
@@ -106,7 +127,14 @@ class TestGenerateCodeBranches:
 
     def test_generate_code_multiline_prompt(self, orch):
         """Test generate_code with multiline prompt."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
+            mock_client.messages.create.return_value = Mock(
+                content=[Mock(text="code")],
+                usage=Mock(input_tokens=10, output_tokens=20)
+            )
+
             client = ClaudeClient(api_key="test", orchestrator=orch)
             prompt = "Line 1\nLine 2\nLine 3"
             result = client.generate_code(prompt)
@@ -114,7 +142,14 @@ class TestGenerateCodeBranches:
 
     def test_generate_code_unicode_prompt(self, orch):
         """Test generate_code with unicode characters."""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
+            mock_client = Mock()
+            mock_anth.return_value = mock_client
+            mock_client.messages.create.return_value = Mock(
+                content=[Mock(text="code")],
+                usage=Mock(input_tokens=10, output_tokens=20)
+            )
+
             client = ClaudeClient(api_key="test", orchestrator=orch)
             prompt = "测试 テスト тест"
             result = client.generate_code(prompt)

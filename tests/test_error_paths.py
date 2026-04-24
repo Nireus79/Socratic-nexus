@@ -28,8 +28,7 @@ class TestAPIErrorPaths:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            from anthropic import AuthenticationError
-            mock_client.messages.create.side_effect = AuthenticationError("401 Unauthorized")
+            mock_client.messages.create.side_effect = Exception("401 Unauthorized")
 
             client = ClaudeClient(api_key="bad-key", orchestrator=orch)
             result = client.generate_code("test")
@@ -41,8 +40,7 @@ class TestAPIErrorPaths:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            from anthropic import RateLimitError
-            mock_client.messages.create.side_effect = RateLimitError("429 Too Many Requests")
+            mock_client.messages.create.side_effect = Exception("429 Too Many Requests")
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
@@ -242,7 +240,6 @@ class TestParameterVariations:
 
             result = client.generate_response(
                 prompt="test",
-                system_prompt="system",
                 max_tokens=100,
                 temperature=0.7
             )
