@@ -10,7 +10,7 @@ import base64
 import hashlib
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import openai
 from cryptography.fernet import Fernet
@@ -32,7 +32,7 @@ class OpenAIClient:
     """
 
     def __init__(
-        self, api_key: str = None, orchestrator: "AgentOrchestrator" = None, subscription_token: str = None
+        self, api_key: Optional[str] = None, orchestrator: "AgentOrchestrator" = None, subscription_token: Optional[str] = None
     ):
         """
         Initialize OpenAI client.
@@ -79,7 +79,7 @@ class OpenAIClient:
         # Maps question_cache_key (project_id:phase:question_count) -> generated question
         self._question_cache: Dict[str, str] = {}
 
-    def get_auth_credential(self, user_auth_method: str = "api_key") -> str:
+    def get_auth_credential(self, user_auth_method: str = "api_key") -> Optional[str]:
         """
         Get the appropriate credential based on user's preferred auth method.
 
@@ -109,7 +109,7 @@ class OpenAIClient:
         else:
             raise ValueError(f"Unknown auth method: {user_auth_method}")
 
-    def _get_user_api_key(self, user_id: str = None) -> tuple:
+    def _get_user_api_key(self, user_id: Optional[str] = None) -> tuple:
         """
         Get the API key for a specific user from the database.
 
@@ -135,7 +135,7 @@ class OpenAIClient:
 
         return None, False
 
-    def _decrypt_api_key_from_db(self, encrypted_key: str) -> str:
+    def _decrypt_api_key_from_db(self, encrypted_key: str) -> Optional[str]:
         """
         Decrypt API key stored in database.
 
@@ -193,9 +193,9 @@ class OpenAIClient:
         # Method 3: Try base64 fallback (for keys saved with base64 encoding)
         try:
             self.logger.info("Attempting base64 decoding as fallback...")
-            decrypted = base64.b64decode(encrypted_key.encode()).decode()
+            decrypted_str = base64.b64decode(encrypted_key.encode()).decode()
             self.logger.info("API key decoded successfully using base64 fallback")
-            return decrypted
+            return decrypted_str
         except Exception as e:
             self.logger.debug(f"Base64 decoding failed: {e}")
 
@@ -206,7 +206,7 @@ class OpenAIClient:
         )
         return None
 
-    def _get_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate sync client based on user's auth method and user-specific API key.
 
@@ -253,7 +253,7 @@ class OpenAIClient:
                 error_type="MISSING_API_KEY",
             )
 
-    def _get_async_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_async_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate async client based on user's auth method and user-specific API key.
 
@@ -305,7 +305,7 @@ class OpenAIClient:
         user_response: str,
         project: ProjectContext,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> Dict:
         """
         Extract insights from user response using OpenAI (synchronous) with caching.
@@ -472,7 +472,7 @@ class OpenAIClient:
             return {}
 
     def generate_code(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate code based on project context"""
         prompt = f"""
@@ -561,9 +561,9 @@ OUTPUT FORMAT - CRITICAL:
     def generate_socratic_question(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a Socratic question using OpenAI with optional caching.
@@ -611,9 +611,9 @@ OUTPUT FORMAT - CRITICAL:
     async def generate_socratic_question_async(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate socratic question asynchronously (high-frequency operation).
@@ -657,7 +657,7 @@ OUTPUT FORMAT - CRITICAL:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from OpenAI for any prompt.
@@ -703,7 +703,7 @@ OUTPUT FORMAT - CRITICAL:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from OpenAI asynchronously.
@@ -809,7 +809,7 @@ OUTPUT FORMAT - CRITICAL:
 
         return input_cost + output_cost
 
-    def _parse_json_response(self, response_text: str) -> any:
+    def _parse_json_response(self, response_text: str) -> Any:
         """Parse JSON from OpenAI response with error handling. Returns dict or list."""
         try:
             # Clean up markdown code blocks if present

@@ -9,7 +9,7 @@ import asyncio
 import hashlib
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import anthropic
 
@@ -32,7 +32,7 @@ class ClaudeClient:
     """
 
     def __init__(
-        self, api_key: str = None, orchestrator: "AgentOrchestrator" = None, subscription_token: str = None
+        self, api_key: Optional[str] = None, orchestrator: "AgentOrchestrator" = None, subscription_token: Optional[str] = None
     ):
         """
         Initialize Claude client.
@@ -81,7 +81,7 @@ class ClaudeClient:
         # Maps question_cache_key (project_id:phase:question_count) -> generated question
         self._question_cache: Dict[str, str] = {}
 
-    def get_auth_credential(self, user_auth_method: str = "api_key") -> str:
+    def get_auth_credential(self, user_auth_method: str = "api_key") -> Optional[str]:
         """
         Get the appropriate credential based on user's preferred auth method.
 
@@ -109,7 +109,7 @@ class ClaudeClient:
                 )
             return self.api_key
 
-    def _get_user_api_key(self, user_id: str = None) -> tuple:
+    def _get_user_api_key(self, user_id: Optional[str] = None) -> tuple:
         """
         Get API key for a user, trying in order:
         1. User's stored API key from database (decrypted)
@@ -151,7 +151,7 @@ class ClaudeClient:
             error_type="MISSING_API_KEY",
         )
 
-    def _decrypt_api_key_from_db(self, encrypted_key: str) -> str:
+    def _decrypt_api_key_from_db(self, encrypted_key: str) -> Optional[str]:
         """
         Decrypt an API key stored in the database.
 
@@ -227,9 +227,9 @@ class ClaudeClient:
         # Method 3: Try base64 fallback (for keys saved with base64 encoding)
         try:
             self.logger.info("Attempting base64 decoding as fallback...")
-            decrypted = base64.b64decode(encrypted_key.encode()).decode()
+            decrypted_str = base64.b64decode(encrypted_key.encode()).decode()
             self.logger.info("API key decoded successfully using base64 fallback")
-            return decrypted
+            return decrypted_str
         except Exception as e:
             self.logger.debug(f"Base64 decoding failed: {e}")
 
@@ -240,7 +240,7 @@ class ClaudeClient:
         )
         return None
 
-    def _get_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate sync client based on user's auth method and user-specific API key.
 
@@ -287,7 +287,7 @@ class ClaudeClient:
                 error_type="MISSING_API_KEY",
             )
 
-    def _get_async_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_async_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate async client based on user's auth method and user-specific API key.
 
@@ -339,7 +339,7 @@ class ClaudeClient:
         user_response: str,
         project: ProjectContext,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> Dict:
         """
         Extract insights from user response using Claude (synchronous) with caching.
@@ -510,7 +510,7 @@ class ClaudeClient:
         conflict: ConflictInfo,
         project: ProjectContext,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """Generate suggestions for resolving a specific conflict"""
         context_summary = self.orchestrator.context_analyzer.get_context_summary(project)
@@ -553,7 +553,7 @@ class ClaudeClient:
         context: str,
         project_type: str,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """Generate project-type-appropriate artifact"""
         if project_type == "software":
@@ -572,7 +572,7 @@ class ClaudeClient:
             return self.generate_code(context, user_auth_method, user_id)  # Default to code
 
     def generate_code(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate code based on project context"""
         # Enhanced prompt engineering: extract and emphasize key project details
@@ -662,7 +662,7 @@ OUTPUT FORMAT - CRITICAL:
             return f"Error generating code: {e}"
 
     def generate_business_plan(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate business plan document"""
         prompt = f"""
@@ -794,7 +794,7 @@ Create a business plan that is compelling to investors, realistic in projections
             return f"Error generating business plan: {e}"
 
     def generate_research_protocol(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate research protocol and methodology document"""
         prompt = f"""
@@ -927,7 +927,7 @@ Create a research protocol that is scientifically rigorous, ethically sound, and
             return f"Error generating research protocol: {e}"
 
     def generate_creative_brief(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate creative/design brief document"""
         prompt = f"""
@@ -1052,7 +1052,7 @@ Create a professional creative brief that inspires creative work while providing
             return f"Error generating creative brief: {e}"
 
     def generate_marketing_plan(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate marketing campaign plan document"""
         prompt = f"""
@@ -1190,7 +1190,7 @@ Create a professional marketing plan that drives customer acquisition, builds br
             return f"Error generating marketing plan: {e}"
 
     def generate_curriculum(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate educational curriculum document"""
         prompt = f"""
@@ -1357,7 +1357,7 @@ Create a comprehensive, well-structured curriculum that guides learning, support
         artifact: str,
         artifact_type: str = "code",
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """Generate comprehensive documentation for any artifact type"""
         doc_instructions = {
@@ -1699,7 +1699,7 @@ Create documentation that will enable others to successfully understand, impleme
 
         return input_cost + output_cost
 
-    def _parse_json_response(self, response_text: str) -> any:
+    def _parse_json_response(self, response_text: str) -> Any:
         """Parse JSON from Claude response with error handling. Returns dict or list."""
         try:
             # Clean up markdown code blocks if present
@@ -1748,9 +1748,9 @@ Create documentation that will enable others to successfully understand, impleme
     def generate_socratic_question(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a Socratic question using Claude with optional caching.
@@ -1902,7 +1902,7 @@ Create documentation that will enable others to successfully understand, impleme
             }
 
             return fallback_suggestions.get(
-                project.phase,
+                project.phase or "unknown",
                 "Consider breaking the question into smaller parts and researching each "
                 "aspect individually.",
             )
@@ -1913,7 +1913,7 @@ Create documentation that will enable others to successfully understand, impleme
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from Claude for any prompt.
@@ -1959,7 +1959,7 @@ Create documentation that will enable others to successfully understand, impleme
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from Claude asynchronously.
@@ -2001,7 +2001,7 @@ Create documentation that will enable others to successfully understand, impleme
     # =====================================================================
 
     async def generate_code_async(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate code asynchronously (high-traffic for code_generator agent)."""
         prompt = f"""
@@ -2039,9 +2039,9 @@ Create documentation that will enable others to successfully understand, impleme
     async def generate_socratic_question_async(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate socratic question asynchronously (high-frequency operation).

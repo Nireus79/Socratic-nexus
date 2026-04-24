@@ -39,6 +39,16 @@ class ProjectContext:
     description: str = ""
     files: Dict[str, str] = field(default_factory=dict)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    goals: Optional[list] = None
+    phase: Optional[str] = None
+    tech_stack: Optional[list] = None
+    project_type: Optional[str] = None
+    deployment_target: Optional[str] = None
+    code_style: Optional[Dict[str, str]] = None
+    conversation_history: Optional[list] = None
+    status: Optional[str] = None
+    progress: Optional[Dict[str, Any]] = None
+    name: Optional[str] = None
 
 
 @dataclass
@@ -50,6 +60,12 @@ class ConflictInfo:
     line_number: int = 0
     resolution_options: list = field(default_factory=list)
     metadata: Dict[str, Any] = field(default_factory=dict)
+    conflict_type: Optional[str] = None
+    old_value: Optional[str] = None
+    old_author: Optional[str] = None
+    new_value: Optional[str] = None
+    new_author: Optional[str] = None
+    severity: Optional[str] = None
 
 
 __all__ = ["TokenUsage", "ChatResponse", "ProjectContext", "ConflictInfo"]

@@ -10,7 +10,7 @@ import base64
 import hashlib
 import json
 import logging
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import requests
 from cryptography.fernet import Fernet
@@ -33,7 +33,7 @@ class OllamaClient:
     """
 
     def __init__(
-        self, api_key: str = None, orchestrator: "AgentOrchestrator" = None, subscription_token: str = None
+        self, api_key: Optional[str] = None, orchestrator: Optional["AgentOrchestrator"] = None, subscription_token: Optional[str] = None
     ):
         """
         Initialize Ollama client.
@@ -70,7 +70,7 @@ class OllamaClient:
         # Maps question_cache_key (project_id:phase:question_count) -> generated question
         self._question_cache: Dict[str, str] = {}
 
-    def get_auth_credential(self, user_auth_method: str = "api_key") -> str:
+    def get_auth_credential(self, user_auth_method: str = "api_key") -> Optional[str]:
         """
         Get the appropriate credential based on user's preferred auth method.
 
@@ -98,7 +98,7 @@ class OllamaClient:
         else:
             raise ValueError(f"Unknown auth method: {user_auth_method}")
 
-    def _get_user_api_key(self, user_id: str = None) -> tuple:
+    def _get_user_api_key(self, user_id: Optional[str] = None) -> tuple:
         """
         Get the API key for a specific user from the database.
 
@@ -113,7 +113,7 @@ class OllamaClient:
             came from the database
         """
         if user_id:
-            stored_key = self.orchestrator.database.get_api_key(user_id, "ollama")
+            stored_key = self.orchestrator.database.get_api_key(user_id, "ollama")  # type: ignore[union-attr]
             if stored_key:
                 decrypted_key = self._decrypt_api_key_from_db(stored_key)
                 return decrypted_key, True
@@ -124,7 +124,7 @@ class OllamaClient:
 
         return None, False
 
-    def _decrypt_api_key_from_db(self, encrypted_key: str) -> str:
+    def _decrypt_api_key_from_db(self, encrypted_key: str) -> Optional[str]:
         """
         Decrypt API key stored in database.
 
@@ -182,9 +182,9 @@ class OllamaClient:
         # Method 3: Try base64 fallback (for keys saved with base64 encoding)
         try:
             self.logger.info("Attempting base64 decoding as fallback...")
-            decrypted = base64.b64decode(encrypted_key.encode()).decode()
+            decrypted_str = base64.b64decode(encrypted_key.encode()).decode()
             self.logger.info("API key decoded successfully using base64 fallback")
-            return decrypted
+            return decrypted_str
         except Exception as e:
             self.logger.debug(f"Base64 decoding failed: {e}")
 
@@ -195,7 +195,7 @@ class OllamaClient:
         )
         return None
 
-    def _get_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate sync client session.
 
@@ -213,7 +213,7 @@ class OllamaClient:
         """
         try:
             # Verify Ollama is running
-            response = self.client.get(f"{self.base_url}/api/tags", timeout=5)
+            response = self.client.get(f"{self.base_url}/api/tags", timeout=5)  # type: ignore[union-attr]
             if response.status_code != 200:
                 raise APIError(
                     f"Ollama server returned status {response.status_code}. "
@@ -234,7 +234,7 @@ class OllamaClient:
                 error_type="CONNECTION_ERROR",
             ) from e
 
-    def _get_async_client(self, user_auth_method: str = "api_key", user_id: str = None):
+    def _get_async_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
         """
         Get the appropriate async client session.
 
@@ -253,7 +253,7 @@ class OllamaClient:
         """
         try:
             # Verify Ollama is running
-            response = self.async_client.get(f"{self.base_url}/api/tags", timeout=5)
+            response = self.async_client.get(f"{self.base_url}/api/tags", timeout=5)  # type: ignore[union-attr]
             if response.status_code != 200:
                 raise APIError(
                     f"Ollama server returned status {response.status_code}. "
@@ -279,7 +279,7 @@ class OllamaClient:
         user_response: str,
         project: ProjectContext,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> Dict:
         """
         Extract insights from user response using Ollama (synchronous) with caching.
@@ -367,7 +367,7 @@ class OllamaClient:
 
         except Exception as e:
             self.logger.error(f"Error extracting insights: {e}")
-            self.orchestrator.event_emitter.emit(
+            self.orchestrator.event_emitter.emit(  # type: ignore[union-attr]
                 EventType.LOG_ERROR, {"message": f"Failed to extract insights: {e}"}
             )
             return {}
@@ -451,7 +451,7 @@ class OllamaClient:
             return {}
 
     def generate_code(
-        self, context: str, user_auth_method: str = "api_key", user_id: str = None
+        self, context: str, user_auth_method: str = "api_key", user_id: Optional[str] = None
     ) -> str:
         """Generate code based on project context"""
         prompt = f"""
@@ -507,7 +507,7 @@ OUTPUT FORMAT - CRITICAL:
             code = result.get("response", "")
 
             # Track token usage
-            self.orchestrator.system_monitor.process(
+            self.orchestrator.system_monitor.process(  # type: ignore[union-attr]
                 {
                     "action": "track_tokens",
                     "input_tokens": len(prompt),
@@ -525,9 +525,9 @@ OUTPUT FORMAT - CRITICAL:
     def generate_socratic_question(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a Socratic question using Ollama with optional caching.
@@ -565,7 +565,7 @@ OUTPUT FORMAT - CRITICAL:
 
         except Exception as e:
             self.logger.error(f"Error generating Socratic question: {e}")
-            self.orchestrator.event_emitter.emit(
+            self.orchestrator.event_emitter.emit(  # type: ignore[union-attr]
                 EventType.LOG_ERROR, {"message": f"Failed to generate Socratic question: {e}"}
             )
             raise APIError(
@@ -575,9 +575,9 @@ OUTPUT FORMAT - CRITICAL:
     async def generate_socratic_question_async(
         self,
         prompt: str,
-        cache_key: str = None,
+        cache_key: Optional[str] = None,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate socratic question asynchronously (high-frequency operation).
@@ -613,7 +613,7 @@ OUTPUT FORMAT - CRITICAL:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from Ollama for any prompt.
@@ -655,7 +655,7 @@ OUTPUT FORMAT - CRITICAL:
 
         except Exception as e:
             self.logger.error(f"Error generating response: {e}")
-            self.orchestrator.event_emitter.emit(
+            self.orchestrator.event_emitter.emit(  # type: ignore[union-attr]
                 EventType.LOG_ERROR, {"message": f"Failed to generate response: {e}"}
             )
             raise APIError(f"Error generating response: {e}", error_type="GENERATION_ERROR") from e
@@ -666,7 +666,7 @@ OUTPUT FORMAT - CRITICAL:
         max_tokens: int = 2000,
         temperature: float = 0.7,
         user_auth_method: str = "api_key",
-        user_id: str = None,
+        user_id: Optional[str] = None,
     ) -> str:
         """
         Generate a general response from Ollama asynchronously.
@@ -753,7 +753,7 @@ OUTPUT FORMAT - CRITICAL:
         output_tokens = max(1, output_len // 4)
         total_tokens = input_tokens + output_tokens
 
-        self.orchestrator.system_monitor.process(
+        self.orchestrator.system_monitor.process(  # type: ignore[union-attr]
             {
                 "action": "track_tokens",
                 "operation": operation,
@@ -764,7 +764,7 @@ OUTPUT FORMAT - CRITICAL:
             }
         )
 
-        self.orchestrator.event_emitter.emit(
+        self.orchestrator.event_emitter.emit(  # type: ignore[union-attr]
             EventType.TOKEN_USAGE,
             {
                 "operation": operation,
@@ -779,7 +779,7 @@ OUTPUT FORMAT - CRITICAL:
         """Track token usage asynchronously"""
         await asyncio.to_thread(self._track_token_usage_ollama, input_len, output_len, operation)
 
-    def _parse_json_response(self, response_text: str) -> any:
+    def _parse_json_response(self, response_text: str) -> Any:
         """Parse JSON from Ollama response with error handling. Returns dict or list."""
         try:
             # Clean up markdown code blocks if present
@@ -820,7 +820,7 @@ OUTPUT FORMAT - CRITICAL:
 
         except json.JSONDecodeError as e:
             self.logger.warning(f"Failed to parse JSON response: {e}")
-            self.orchestrator.event_emitter.emit(
+            self.orchestrator.event_emitter.emit(  # type: ignore[union-attr]
                 EventType.LOG_WARNING, {"message": f"Could not parse JSON response: {e}"}
             )
             return {}
