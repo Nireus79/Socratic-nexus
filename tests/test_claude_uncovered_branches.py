@@ -5,7 +5,6 @@ from unittest.mock import Mock, patch
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.models import ProjectContext, ConflictInfo
-from socratic_nexus.exceptions import APIError
 
 
 @pytest.fixture
@@ -184,23 +183,25 @@ class TestGenerateAsyncMethods:
     """Tests for async variants of generation methods."""
 
     @pytest.mark.asyncio
-    async def test_generate_artifact_async(self, mock_orchestrator):
-        """Test async artifact generation."""
+    async def test_extract_tech_recommendations_with_subscription_auth(self, mock_orchestrator):
+        """Test tech recommendations with subscription auth."""
+        from unittest.mock import AsyncMock
+
         with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
             mock_client = Mock()
             mock_async.return_value = mock_client
-            from unittest.mock import AsyncMock
 
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="artifact")], usage=Mock(input_tokens=10, output_tokens=20)
+                    content=[Mock(text='{"recommendations": []}')], usage=Mock(input_tokens=10, output_tokens=20)
                 )
             )
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-                client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-                result = await client.generate_artifact_async("description", "type")
-                assert result is not None or result is None
+                client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator, subscription_token="sub-token")
+                project = ProjectContext(project_name="Test")
+                result = await client.extract_tech_recommendations_async(project, "backend", user_auth_method="subscription")
+                assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio
     async def test_generate_business_plan_async(self, mock_orchestrator):
@@ -305,12 +306,12 @@ class TestParameterVariations:
             mock_anth.return_value = mock_client
             mock_response = Mock()
             mock_response.content = [Mock(text="code")]
-            mock_response.usage = Mock(input_tokens=20, completion_tokens=15)
+            mock_response.usage = Mock(input_tokens=20, output_tokens=15)
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_code(
-                "write function", language="python", user_id="user123", user_auth_method="api_key"
+                "write function", user_id="user123", user_auth_method="api_key"
             )
 
             mock_client.messages.create.assert_called()
