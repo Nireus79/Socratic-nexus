@@ -3,6 +3,9 @@
 import pytest
 from unittest.mock import Mock, patch
 
+# Skip all tests in this module if openai is not installed
+pytest.importorskip("openai")
+
 from socratic_nexus.clients.openai_client import OpenAIClient
 from socratic_nexus.models import ProjectContext, ConflictInfo
 from socratic_nexus.exceptions import APIError

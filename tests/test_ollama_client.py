@@ -3,6 +3,9 @@
 import pytest
 from unittest.mock import Mock, patch
 
+# Skip all tests in this module if required dependencies are not installed
+pytest.importorskip("cryptography")
+
 from socratic_nexus.clients.ollama_client import OllamaClient
 from socratic_nexus.models import ProjectContext, ConflictInfo
 from socratic_nexus.exceptions import APIError
