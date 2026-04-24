@@ -1,14 +1,13 @@
 """
 Comprehensive execution tests for OpenAIClient to increase code coverage.
 Tests that actually EXECUTE methods with proper mocking.
+Skipped if cryptography or openai are not installed.
 """
 
 import pytest
 from unittest.mock import Mock, patch
 from socratic_nexus.models import ProjectContext
 
-
-# Handle optional dependencies
 pytest.importorskip("cryptography")
 pytest.importorskip("openai")
 
@@ -35,7 +34,7 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            result = client.generate_response("Test prompt")
+            client.generate_response("Test prompt")
 
             assert mock_client.chat.completions.create.called
 
@@ -58,7 +57,7 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            result = client.generate_code("Write code")
+            client.generate_code("Write code")
 
             assert mock_client.chat.completions.create.called
 
@@ -82,7 +81,7 @@ class TestOpenAIClientMethodExecution:
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
             project = ProjectContext(project_name="Test")
-            result = client.extract_insights("feedback", project)
+            client.extract_insights("feedback", project)
 
             assert mock_client.chat.completions.create.called
 
@@ -106,7 +105,7 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            result = client.generate_response("prompt")
+            client.generate_response("prompt")
 
             assert mock_client.chat.completions.create.called
 
@@ -130,7 +129,7 @@ class TestOpenAIClientMethodExecution:
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
             if hasattr(client, 'generate_business_plan'):
-                result = client.generate_business_plan(
+                client.generate_business_plan(
                     ProjectContext(project_name="Test")
                 )
                 assert mock_client.chat.completions.create.called
@@ -155,7 +154,7 @@ class TestOpenAIClientMethodExecution:
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
             if hasattr(client, 'generate_documentation'):
-                result = client.generate_documentation(
+                client.generate_documentation(
                     ProjectContext(project_name="Test")
                 )
                 assert mock_client.chat.completions.create.called
@@ -179,7 +178,7 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            result = client.generate_response("prompt", temperature=0.7)
+            client.generate_response("prompt", temperature=0.7)
 
             assert mock_client.chat.completions.create.called
 
@@ -215,7 +214,7 @@ class TestOpenAIClientMethodExecution:
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
 
             try:
-                result = client.generate_response("test")
+                client.generate_response("test")
             except (APIError, Exception):
                 pass
 
