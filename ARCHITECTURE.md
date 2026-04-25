@@ -10,7 +10,8 @@ Comprehensive documentation of the internal architecture and design patterns in 
 4. [Data Flow](#data-flow)
 5. [Design Patterns](#design-patterns)
 6. [Extension Points](#extension-points)
-7. [Performance Considerations](#performance-considerations)
+7. [Framework Integrations](#framework-integrations-v035)
+8. [Performance Considerations](#performance-considerations)
 
 ## System Overview
 
@@ -355,6 +356,140 @@ class CustomClaudeClient(ClaudeClient):
         # Send to custom analytics
         self.analytics.record(response.usage)
 ```
+
+## Framework Integrations (v0.3.5+)
+
+Socratic Nexus includes built-in integrations with popular AI frameworks:
+
+### LangChain Integration
+
+**File**: `src/socratic_nexus/integrations/langchain.py`
+
+Provides `SocratesNexusLLM` wrapper for use in LangChain applications:
+
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.langchain import SocratesNexusLLM
+from langchain.chains import LLMChain
+from langchain.prompts import PromptTemplate
+
+client = ClaudeClient(api_key="...")
+llm = SocratesNexusLLM(client=client)
+
+prompt = PromptTemplate(template="Explain {topic}", input_variables=["topic"])
+chain = LLMChain(llm=llm, prompt=prompt)
+result = chain.run(topic="Machine Learning")
+```
+
+**Features**:
+- Full LangChain `LLM` base class compatibility
+- Async support with `_generate_async()`
+- Token counting heuristics
+- Multi-provider support (Claude, OpenAI, Google, Ollama)
+- Temperature and max_tokens configuration
+
+### LangGraph Integration
+
+**File**: `src/socratic_nexus/integrations/langgraph.py`
+
+Provides factory functions for creating LangGraph workflow nodes:
+
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.langgraph import (
+    create_nexus_node,
+    create_nexus_agent,
+    create_routing_node
+)
+
+client = ClaudeClient(api_key="...")
+
+# Create a workflow node
+node = create_nexus_node(
+    client=client,
+    node_name="analyze",
+    prompt_key="content",
+    output_key="analysis"
+)
+
+# Create a stateful agent
+agent = create_nexus_agent(
+    client=client,
+    system_prompt="You are helpful."
+)
+
+# Create a routing node
+router = create_routing_node(
+    client=client,
+    routes={"summarize": "...", "analyze": "..."}
+)
+```
+
+**Features**:
+- State dict-based interface for LangGraph compatibility
+- Factory functions for common patterns
+- Error handling with fallback responses
+- System prompt support
+- Custom state key mapping
+
+### Openclaw Integration
+
+**File**: `src/socratic_nexus/integrations/openclaw.py`
+
+Provides skill wrappers for Openclaw framework:
+
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.openclaw import (
+    NexusLLMSkill,
+    NexusAnalysisSkill,
+    NexusCodeGenSkill,
+    NexusDocumentationSkill
+)
+
+client = ClaudeClient(api_key="...")
+
+# Basic LLM skill
+skill = NexusLLMSkill(client=client, name="analyzer")
+response = skill.query("Analyze this text...")
+
+# Specialized skills
+analysis = NexusAnalysisSkill(client=client)
+code = NexusCodeGenSkill(client=client)
+docs = NexusDocumentationSkill(client=client)
+
+# Structured processing
+result = skill.process({"prompt": "...", "context": "..."})
+```
+
+**Features**:
+- Skill base class implementing Openclaw interface
+- Specialized skill subclasses for common tasks
+- `query()` and `query_async()` methods
+- `process()` method for structured workflows
+- Skill metadata and introspection via `get_info()`
+- System prompt support
+
+### Integration Architecture
+
+All integrations follow this pattern:
+
+```
+Application Framework (LangChain/LangGraph/Openclaw)
+        ↓
+    Integration Module
+        ↓
+    Socratic Nexus Client (ClaudeClient, OpenAIClient, etc.)
+        ↓
+    Provider APIs (Anthropic, OpenAI, Google, etc.)
+```
+
+**Benefits**:
+- No lock-in to a single framework
+- Consistent client interface across integrations
+- Async support throughout the stack
+- Full token tracking and cost estimation
+- Error handling at each layer
 
 ## Performance Considerations
 

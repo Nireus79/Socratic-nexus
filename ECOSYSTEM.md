@@ -1,60 +1,60 @@
-# The Socrates Ecosystem
+# The Socratic Nexus Ecosystem
 
-> **Socrates Nexus** is the foundation of the Socrates Ecosystem - a collection of production-grade AI packages extracted from the Socrates AI platform.
+> **Socratic Nexus** is the universal LLM client library - the foundation for multi-provider AI integration.
 
 ## Ecosystem Overview
 
-The **Socrates Ecosystem** provides a complete toolkit for AI-powered development, knowledge management, code analysis, and intelligent automation. All packages are built on **Socrates Nexus** as their LLM foundation.
+**Socratic Nexus** (v0.3.5) is a production-ready universal LLM client that provides:
+- **Unified interface** across 4 major LLM providers (Claude, GPT-4, Gemini, Ollama)
+- **Framework integrations** with LangChain, LangGraph, and Openclaw
+- **70%+ test coverage** with comprehensive error handling
+- **Multi-provider fallback** with automatic retries
+- **Token tracking and cost estimation**
+
+The library integrates with various AI tools and frameworks, enabling seamless LLM capabilities across your applications.
 
 ```
-                    ┌─────────────────────┐
-                    │  Socrates Nexus     │
-                    │  (Universal LLM)    │
-                    │  4 Providers        │
-                    └────────────────────┬┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
-    ┌───────────┐      ┌──────────┐      ┌─────────────┐
-    │ Socratic  │      │ Socratic │      │ Socratic    │
-    │ RAG       │      │ Analyzer │      │ Agents      │
-    │           │      │          │      │             │
-    │ Knowledge │      │ Code     │      │ 18 Agents + │
-    │ Retrieval │      │ Analysis │      │ Orchestration
-    └───────────┘      └──────────┘      └─────────────┘
-        │                    │                    │
-        └────────────────────┼────────────────────┘
-                             │
-        ┌────────────────────┼────────────────────┐
-        │                    │                    │
-        ▼                    ▼                    ▼
-    ┌────────────┐  ┌──────────────┐  ┌─────────────┐
-    │ Socratic   │  │ Socratic     │  │ Socratic    │
-    │ Knowledge  │  │ Learning     │  │ Conflict    │
-    │            │  │              │  │             │
-    │ Enterprise │  │ Continuous   │  │ Resolution  │
-    │ Knowledge  │  │ Improvement  │  │ System      │
-    └────────────┘  └──────────────┘  └─────────────┘
-                             │
-                    ┌────────┴────────┐
-                    │                 │
-                    ▼                 ▼
-                ┌─────────┐    ┌────────────┐
-                │Openclaw │    │ LangChain  │
-                │Skills   │    │Components  │
-                └─────────┘    └────────────┘
+                    ┌──────────────────────────┐
+                    │  Socratic Nexus v0.3.5   │
+                    │  Universal LLM Client    │
+                    │  • Claude (Anthropic)    │
+                    │  • GPT-4 (OpenAI)        │
+                    │  • Gemini (Google)       │
+                    │  • Ollama (Local)        │
+                    └────────────┬─────────────┘
+                                 │
+         ┌───────────────────────┼───────────────────────┐
+         │                       │                       │
+         ▼                       ▼                       ▼
+    ┌──────────┐          ┌───────────┐         ┌──────────────┐
+    │ LangChain│          │ LangGraph │         │  Openclaw    │
+    │ Wrapper  │          │   Nodes   │         │   Skills     │
+    └──────────┘          └───────────┘         └──────────────┘
+         │                       │                       │
+         └───────────────────────┼───────────────────────┘
+                                 │
+         ┌───────────────────────┼───────────────────────┐
+         │                       │                       │
+         ▼                       ▼                       ▼
+    ┌──────────────┐    ┌─────────────────┐   ┌──────────────┐
+    │ Local: RAG   │    │ Local: Socrates │   │ Local: Core  │
+    │              │    │ (Monolith)      │   │ (Learning)   │
+    │ Knowledge    │    │                 │   │              │
+    │ Retrieval    │    │ Orchestration   │   │ Algorithms   │
+    └──────────────┘    │ UI/CLI          │   │ Workflows    │
+                        │ Models/Config   │   └──────────────┘
+                        └─────────────────┘
 ```
 
 ---
 
 ## Core Packages (Production Ready ✅)
 
-### 1. Socrates Nexus (Foundation)
+### 1. Socratic Nexus (Foundation)
 
-**Repository**: [Nireus79/Socrates-nexus](https://github.com/Nireus79/Socrates-nexus)
-**Status**: ✅ v0.1.0 - Production Ready
-**PyPI**: [`socrates-nexus`](https://pypi.org/project/socrates-nexus/)
+**Repository**: [Nireus79/Socratic-nexus](https://github.com/Nireus79/Socratic-nexus)
+**Status**: ✅ v0.3.5 - Production Ready (70.94% test coverage, 1000+ tests)
+**PyPI**: [`socratic-nexus`](https://pypi.org/project/socratic-nexus/)
 
 Universal LLM client with support for multiple providers.
 
@@ -73,25 +73,24 @@ pip install socrates-nexus
 ```
 
 ```python
-from socrates_nexus import LLMClient
+from socratic_nexus.clients import ClaudeClient
 
-client = LLMClient(provider="anthropic", model="claude-opus")
-response = client.chat("What is machine learning?")
-print(response.content)
+client = ClaudeClient(api_key="sk-ant-...")
+response = client.generate_response("What is machine learning?")
+print(response)
 ```
 
-**Dependency in Ecosystem**: All packages below depend on Socrates Nexus
+**New in v0.3.5**: Framework integrations with LangChain, LangGraph, and Openclaw for seamless integration into existing AI workflows.
 
 ---
 
-### 2. Socratic RAG
+### 2. Socratic RAG (Local - Part of Socrates Monolith)
 
-**Repository**: [Nireus79/Socratic-rag](https://github.com/Nireus79/Socratic-rag)
-**Status**: ✅ v0.1.0 - Production Ready
-**PyPI**: [`socratic-rag`](https://pypi.org/project/socratic-rag/)
-**Depends on**: `socrates-nexus>=0.1.0`
+**Location**: Local component in Socrates monolith
+**Status**: ✅ Production Ready
+**Depends on**: `socratic-nexus>=0.3.5` and local Socrates modules
 
-Retrieval-Augmented Generation system with multi-provider support.
+Retrieval-Augmented Generation system with multi-provider LLM support via Socratic Nexus.
 
 **Features**:
 - 📚 Multi-vector store support (ChromaDB, Qdrant, FAISS)
@@ -115,7 +114,7 @@ rag.add_document("Python is a programming language.", "intro.txt")
 results = rag.search("What is Python?", top_k=3)
 ```
 
-**Ecosystem Role**: Handles knowledge management and retrieval for other packages
+**Architecture**: RAG is integrated into Socrates monolith as `socratic_system/rag/` and depends on Socratic Nexus for LLM operations
 
 ---
 
@@ -314,10 +313,11 @@ pip install socrates-nexus
 ```
 
 ### Path 2: Building Knowledge Systems?
-→ Use **Socratic RAG** + **Socrates Nexus**
+→ Use **Socratic Nexus** (integrated with local Socrates RAG)
 ```bash
-pip install socratic-rag
-# Nexus is installed as dependency
+# For standalone RAG, use Socratic Nexus directly
+# RAG functionality is integrated in the Socrates monolith
+pip install socratic-nexus
 ```
 
 ### Path 3: Analyzing Code Projects?
@@ -403,21 +403,24 @@ export SOCRATES_LOG_LEVEL=INFO
 
 ## Roadmap
 
-### ✅ Complete (Phase 1-3)
-- Socrates Nexus v0.1.0
-- Socratic RAG v0.1.0
-- Socratic Analyzer v0.1.0
+### ✅ Complete
+- Socratic Nexus v0.3.5 (April 2026)
+  - 4 LLM providers with fallback support
+  - 70%+ test coverage (1000+ tests)
+  - LangChain, LangGraph, and Openclaw integrations
+  - Framework integration tests (71 new tests)
 
-### 🚀 Next (Phase 1.5)
-- Socrates Nexus v0.2.0 with enhanced integrations
-- Marketing launch to Openclaw + LangChain communities
+### 🚀 Next Release (v0.3.6)
+- Enhanced Google Generative AI support
+- Additional framework integrations
+- Expanded documentation
+- Performance optimizations
 
-### 🔜 Planned (Phase 4a-e)
-- Socratic Agents (Q4 2026)
-- Socratic Workflow (Q4 2026)
-- Socratic Knowledge (Q1 2027)
-- Socratic Learning (Q1 2027)
-- Socratic Conflict (Q1 2027)
+### 🔜 Planned (Phase 2+)
+- Extended integration library
+- Additional provider support
+- Advanced agent patterns
+- Enterprise deployment guides
 
 ### 💡 Future (Post-Phase 4)
 - SaaS hosted versions
@@ -465,4 +468,24 @@ Each package is standalone and useful on its own, but together they form a power
 
 **Made with ❤️ as part of the Socrates Ecosystem**
 
-Last Updated: March 10, 2026
+## Local vs Library Components
+
+### In Socratic Nexus Library (Published to PyPI)
+- **Core**: Universal LLM client with 4 providers
+- **Clients**: Claude, OpenAI, Google, Ollama implementations
+- **Integrations**: LangChain, LangGraph, Openclaw wrappers
+- **Test Coverage**: 1000+ tests, 70%+ coverage
+
+### Local in Socrates Monolith (Not Extracted)
+- **RAG System** (`socratic_system/rag/`) - Knowledge retrieval and management
+- **Core Engine** (`socratic_system/core/`) - Learning algorithms and workflows
+- **Orchestration** (`socratic_system/orchestration/`) - Agent coordination
+- **UI/CLI** (`socratic_system/ui/`) - User interfaces
+- **Models & Config** (`socratic_system/models/`, `socratic_system/config/`) - Shared utilities
+
+### Architecture Strategy
+- **Socratic Nexus**: Universal, reusable LLM abstraction
+- **Socrates Monolith**: Specialized AI platform with RAG, learning, orchestration
+- **Symbiotic Design**: Monolith uses Nexus for LLM operations; Nexus used independently for integration
+
+Last Updated: April 25, 2026
