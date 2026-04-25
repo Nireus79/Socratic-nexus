@@ -5,7 +5,7 @@ Focuses on high-impact code paths that are currently untested.
 
 import importlib.util
 import pytest
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import Mock, patch
 
 # Check which clients are available
 _google_available = importlib.util.find_spec("google.generativeai") is not None
@@ -40,14 +40,14 @@ class TestGoogleClientGaps:
             credential = client.get_auth_credential(user_auth_method="api_key")
             assert credential == "real-api-key"
 
-    def test_google_get_auth_credential_returns_none_without_creds(self):
-        """Test get_auth_credential returns None without valid credentials."""
+    def test_google_get_auth_credential_raises_without_creds(self):
+        """Test get_auth_credential raises ValueError without valid credentials."""
         with patch("socratic_nexus.clients.google_client.genai"):
             from socratic_nexus.clients.google_client import GoogleClient
 
             client = GoogleClient(api_key="placeholder-key")
-            credential = client.get_auth_credential(user_auth_method="api_key")
-            assert credential is None
+            with pytest.raises(ValueError):
+                client.get_auth_credential(user_auth_method="api_key")
 
     def test_google_get_auth_credential_raises_for_missing_subscription(self):
         """Test get_auth_credential raises ValueError for unavailable subscription."""
