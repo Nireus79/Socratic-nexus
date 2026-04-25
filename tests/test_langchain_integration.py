@@ -14,9 +14,7 @@ def mock_claude_client():
     """Create a mock Claude client."""
     client = Mock(spec=ClaudeClient)
     client.model = "claude-3-5-sonnet-20241022"
-    client.generate_response = Mock(
-        return_value="This is a test response from Claude."
-    )
+    client.generate_response = Mock(return_value="This is a test response from Claude.")
     return client
 
 
@@ -141,9 +139,7 @@ class TestSocratesNexusLLMProperties:
 
     def test_identifying_params(self, mock_claude_client):
         """Test _identifying_params property."""
-        llm = SocratesNexusLLM(
-            client=mock_claude_client, temperature=0.8, max_tokens=512
-        )
+        llm = SocratesNexusLLM(client=mock_claude_client, temperature=0.8, max_tokens=512)
         params = llm._identifying_params
         assert params["model"] == "claude-3-5-sonnet-20241022"
         assert params["temperature"] == 0.8
@@ -225,10 +221,7 @@ class TestSocratesNexusLLMIntegration:
     def test_temperature_variation(self, mock_claude_client):
         """Test different temperature settings."""
         temps = [0.1, 0.5, 0.9]
-        llms = [
-            SocratesNexusLLM(client=mock_claude_client, temperature=t)
-            for t in temps
-        ]
+        llms = [SocratesNexusLLM(client=mock_claude_client, temperature=t) for t in temps]
 
         assert all(isinstance(llm, SocratesNexusLLM) for llm in llms)
         assert [llm.temperature for llm in llms] == temps

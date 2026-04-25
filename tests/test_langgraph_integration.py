@@ -151,11 +151,7 @@ class TestCreateNexusAgent:
         agent = create_nexus_agent(client=mock_client, system_prompt="System")
         process_fn = agent["process_fn"]
 
-        state = {
-            "messages": [
-                {"role": "user", "content": "What is AI?"}
-            ]
-        }
+        state = {"messages": [{"role": "user", "content": "What is AI?"}]}
 
         result = process_fn(state)
 
@@ -183,11 +179,7 @@ class TestCreateNexusAgent:
         agent = create_nexus_agent(client=mock_client)
         process_fn = agent["process_fn"]
 
-        state = {
-            "messages": [
-                {"role": "user", "content": "Hello"}
-            ]
-        }
+        state = {"messages": [{"role": "user", "content": "Hello"}]}
 
         result = process_fn(state)
         # Should have error message
@@ -353,20 +345,14 @@ class TestNodeIntegration:
         agent = create_nexus_agent(client=mock_client)
         process_fn = agent["process_fn"]
 
-        state = {
-            "messages": [
-                {"role": "user", "content": "Hello"}
-            ]
-        }
+        state = {"messages": [{"role": "user", "content": "Hello"}]}
 
         # First turn
         state = process_fn(state)
         assert len(state["messages"]) == 2
 
         # Add another user message
-        state["messages"].append(
-            {"role": "user", "content": "Follow up"}
-        )
+        state["messages"].append({"role": "user", "content": "Follow up"})
 
         # Second turn
         state = process_fn(state)

@@ -172,10 +172,12 @@ class TestNexusLLMSkillProcess:
     def test_process_with_context(self, mock_client):
         """Test process with context."""
         skill = NexusLLMSkill(client=mock_client)
-        result = skill.process({
-            "prompt": "Question?",
-            "context": "Background info",
-        })
+        result = skill.process(
+            {
+                "prompt": "Question?",
+                "context": "Background info",
+            }
+        )
 
         assert result["success"] is True
         call_args = mock_client.generate_response.call_args[0][0]
@@ -184,10 +186,12 @@ class TestNexusLLMSkillProcess:
     def test_process_with_instructions(self, mock_client):
         """Test process with special instructions."""
         skill = NexusLLMSkill(client=mock_client)
-        result = skill.process({
-            "prompt": "Q",
-            "instructions": "Answer briefly",
-        })
+        result = skill.process(
+            {
+                "prompt": "Q",
+                "instructions": "Answer briefly",
+            }
+        )
 
         assert result["success"] is True
         call_args = mock_client.generate_response.call_args[0][0]
@@ -295,10 +299,7 @@ class TestSpecializedSkills:
     def test_documentation_skill_generate_docs(self, mock_client):
         """Test documentation generation."""
         skill = NexusDocumentationSkill(client=mock_client)
-        result = skill.generate_documentation(
-            "REST API design",
-            doc_type="guide"
-        )
+        result = skill.generate_documentation("REST API design", doc_type="guide")
 
         assert "subject" in result
         assert "type" in result
