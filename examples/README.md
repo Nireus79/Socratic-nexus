@@ -108,25 +108,104 @@ python examples/06_async_calls.py
 - Try primary provider
 - Fall back to secondary
 - Reliability patterns
+- Sequential and parallel fallback strategies
 
-#### 10. **10_openclaw_integration.py** - Openclaw Integration
-- Integrate with Openclaw
-- Specialized workflows
+**Run:**
+```bash
+python examples/09_provider_fallback.py
+```
 
-#### 11. **11_langchain_integration.py** - LangChain Integration
-- Use with LangChain
-- Chain operations
-- Complex workflows
+#### 10. **10_integration_patterns.py** - Custom Integration Patterns
+- Custom wrapper classes
+- Service encapsulation
+- Extension points
+- Event handling
+
+#### 11. **11_langchain_integration.py** - LangChain Integration (Conceptual)
+- Conceptual approach to LangChain integration
+- Manual integration patterns
+- Service design
 
 #### 12. **12_vision_models.py** - Vision/Multimodal
-- Image analysis
+- Image analysis capabilities
 - Multi-modal inputs
-- Vision capabilities
+- Vision provider support
 
-#### 13. **13_function_calling.py** - Function Calling
-- Tool use / function calling
+#### 13. **13_function_calling.py** - Function Calling / Tool Use
+- Tool use and function calling concept
 - Structured outputs
 - Complex reasoning
+
+### Framework Integration Examples
+
+#### 14. **14_langchain_integration.py** - Full LangChain Integration
+- Use Socratic Nexus clients with LangChain chains
+- LLMChain and prompt templates
+- Multi-provider support
+- Async/await patterns
+
+**Installation:**
+```bash
+pip install langchain
+```
+
+**Run:**
+```bash
+python examples/14_langchain_integration.py
+```
+
+**Features:**
+- `SocratesNexusLLM` wrapper for LangChain compatibility
+- Works with all client types (Claude, OpenAI, Google, Ollama)
+- Token tracking and cost calculation
+- Async support for concurrent operations
+
+#### 15. **15_langgraph_integration.py** - LangGraph Workflow Integration
+- Build stateful multi-step workflows
+- Node factories for LangGraph compatibility
+- State management and routing
+- Agent creation utilities
+
+**Installation:**
+```bash
+pip install langgraph
+```
+
+**Run:**
+```bash
+python examples/15_langgraph_integration.py
+```
+
+**Features:**
+- `create_nexus_node()` - Create workflow nodes
+- `create_nexus_agent()` - Create stateful agents
+- `create_routing_node()` - Dynamic routing decisions
+- Support for complex state machines
+
+#### 16. **16_openclaw_integration.py** - Openclaw Skill Integration
+- Create Openclaw skills from Socratic Nexus clients
+- Specialized skill types (analysis, code generation, docs)
+- Process interface for structured workflows
+- Skill registration and metadata
+
+**Installation:**
+```bash
+# Openclaw integration requires Openclaw framework
+# See https://github.com/openclaw/openclaw
+```
+
+**Run:**
+```bash
+python examples/16_openclaw_integration.py
+```
+
+**Features:**
+- `NexusLLMSkill` - Basic LLM skill wrapper
+- `NexusAnalysisSkill` - Text analysis specialization
+- `NexusCodeGenSkill` - Code generation specialization
+- `NexusDocumentationSkill` - Documentation specialization
+- Structured input/output processing
+- Skill metadata and introspection
 
 ## Client Classes
 
@@ -290,14 +369,57 @@ Error: No module named 'socratic_nexus'
 Solution: Install it: pip install socratic-nexus
 ```
 
+## Framework Integrations
+
+### LangChain Integration
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.langchain import SocratesNexusLLM
+from langchain.chains import LLMChain
+
+client = ClaudeClient(api_key="sk-ant-...")
+llm = SocratesNexusLLM(client=client)
+
+# Use with LangChain chains
+from langchain.prompts import PromptTemplate
+prompt = PromptTemplate(template="Explain {topic}", input_variables=["topic"])
+chain = LLMChain(llm=llm, prompt=prompt)
+result = chain.run(topic="Machine Learning")
+```
+
+### LangGraph Integration
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.langgraph import create_nexus_node
+
+client = ClaudeClient(api_key="sk-ant-...")
+node = create_nexus_node(client=client, node_name="analyze")
+
+# Use in LangGraph workflow
+state = {"content": "..."}
+result = node(state)
+```
+
+### Openclaw Integration
+```python
+from socratic_nexus.clients import ClaudeClient
+from socratic_nexus.integrations.openclaw import NexusLLMSkill
+
+client = ClaudeClient(api_key="sk-ant-...")
+skill = NexusLLMSkill(client=client, name="analyzer")
+
+response = skill.query("Analyze this text...")
+info = skill.get_info()  # Get skill metadata
+```
+
 ## More Examples
 
 For more advanced patterns, see:
 - `08_error_handling.py` - Comprehensive error handling
 - `09_provider_fallback.py` - Multi-provider patterns
-- `11_langchain_integration.py` - LangChain integration
-- `12_vision_models.py` - Image analysis
-- `13_function_calling.py` - Tool use
+- `14_langchain_integration.py` - Full LangChain integration
+- `15_langgraph_integration.py` - LangGraph workflows
+- `16_openclaw_integration.py` - Openclaw skills
 
 ## Contributing
 

@@ -1,34 +1,27 @@
-# Framework Integrations
+# Framework Integrations Guide
 
-Socrates Nexus integrates seamlessly with popular frameworks, providing multi-provider LLM support wherever you need it.
+Comprehensive guide for integrating Socratic Nexus clients with LangChain, LangGraph, and Openclaw frameworks.
 
 ## Installation
 
-### Openclaw Integration
 ```bash
-pip install socrates-nexus[openclaw]
-```
+# Base package
+pip install socratic-nexus
 
-### LangChain Integration
-```bash
-pip install socrates-nexus[langchain]
-```
+# With LangChain support
+pip install socratic-nexus[langchain]
 
-### All Integrations
-```bash
-pip install socrates-nexus[integrations]
-
-# Or everything
-pip install socrates-nexus[full]
+# All integrations
+pip install socratic-nexus[full]
 ```
 
 ---
 
-## Openclaw Integration
+## LangChain Integration
 
 ### Overview
 
-The Openclaw integration provides a `NexusLLMSkill` that brings multi-provider LLM support to Openclaw AI assistant framework.
+Use Socratic Nexus clients with LangChain chains, agents, and other components. The `SocratesNexusLLM` wrapper makes any Socratic Nexus client compatible with LangChain.
 
 **Benefits for Openclaw users**:
 - Multi-provider LLM support (not locked to one provider)
