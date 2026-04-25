@@ -3,16 +3,12 @@ Tests for all LLM client implementations.
 Designed to quickly increase coverage of Google, OpenAI, and Ollama clients.
 """
 
+import importlib.util
 import pytest
 from unittest.mock import Mock, patch
 
-# Check if google.genai is available (newer API, required by GoogleClient)
-_google_available = False
-try:
-    import google.genai
-    _google_available = True
-except (ImportError, ModuleNotFoundError):
-    _google_available = False
+# Check if google.generativeai is available (required by GoogleClient)
+_google_available = importlib.util.find_spec("google.generativeai") is not None
 
 
 @pytest.mark.skipif(not _google_available, reason="google.genai not installed")
