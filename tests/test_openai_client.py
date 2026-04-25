@@ -144,7 +144,7 @@ class TestOpenAIClientGenerateCode:
             mock_client.chat.completions.create.return_value = mock_response
 
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
-            _ = client.generate_code("write function", language="javascript")
+            _ = client.generate_code("write function")
 
             mock_client.chat.completions.create.assert_called()
 
