@@ -13,7 +13,7 @@ __all__ = []
 
 # LangChain integration
 try:
-    from .langchain import SocratesNexusLLM
+    from .langchain import SocratesNexusLLM  # noqa: F401
 
     __all__.append("SocratesNexusLLM")
 except ImportError:
@@ -21,7 +21,10 @@ except ImportError:
 
 # LangGraph integration
 try:
-    from .langgraph import create_nexus_node, create_nexus_agent
+    from .langgraph import (  # noqa: F401
+        create_nexus_node,
+        create_nexus_agent,
+    )
 
     __all__.extend(["create_nexus_node", "create_nexus_agent"])
 except ImportError:
@@ -29,7 +32,7 @@ except ImportError:
 
 # Openclaw integration
 try:
-    from .openclaw import NexusLLMSkill
+    from .openclaw import NexusLLMSkill  # noqa: F401
 
     __all__.append("NexusLLMSkill")
 except ImportError:

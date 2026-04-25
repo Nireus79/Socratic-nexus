@@ -73,9 +73,7 @@ class SocratesNexusLLM:
             client,
             (ClaudeClient, OpenAIClient, GoogleClient, OllamaClient),
         ):
-            raise ValueError(
-                f"client must be a Socratic Nexus client, got {type(client).__name__}"
-            )
+            raise ValueError(f"client must be a Socratic Nexus client, got {type(client).__name__}")
 
         self.client = client
         self.temperature = temperature
