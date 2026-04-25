@@ -1,176 +1,79 @@
 """
-Example: Using Socrates Nexus with LangChain
+Example 11: LangChain Integration
 
-Demonstrates how to use Socrates Nexus as a LangChain-compatible LLM provider.
+Demonstrates how to use Socratic Nexus clients with LangChain.
 
 Installation:
-    pip install socrates-nexus[langchain]
+    pip install socrates-nexus langchain
 """
 
-from socrates_nexus.integrations.langchain import SocratesNexusLLM
+import os
+from socratic_nexus.clients import ClaudeClient
+
+print("=" * 60)
+print("LANGCHAIN INTEGRATION CONCEPT")
+print("=" * 60)
+
+# Note: Full LangChain integration would require implementing
+# LangChain's LLM interface. This example shows the conceptual approach.
 
 
-def example_basic_chain():
-    """Basic LangChain chain with Socrates Nexus."""
-    print("=== Basic LangChain Chain ===\n")
+class SimpleChain:
+    """Simple chain pattern with Socratic Nexus client."""
 
-    try:
-        from langchain.prompts import PromptTemplate
-        from langchain.chains import LLMChain
-    except ImportError:
-        print("LangChain not installed. Install with: pip install langchain")
-        return
+    def __init__(self):
+        self.client = ClaudeClient(
+            api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-...")
+        )
 
-    llm = SocratesNexusLLM(provider="anthropic", model="claude-opus")
-    prompt = PromptTemplate(template="Explain {topic} in one sentence", input_variables=["topic"])
-    chain = LLMChain(llm=llm, prompt=prompt)
+    def run(self, prompt_template: str, variables: dict) -> str:
+        """Run a simple chain with variable substitution."""
+        # Format the template with variables
+        formatted_prompt = prompt_template.format(**variables)
 
-    result = chain.run(topic="machine learning")
-    print(f"Topic: machine learning")
-    print(f"Response: {result}\n")
+        # Get response
+        response = self.client.generate_response(formatted_prompt)
 
-
-def example_multi_provider_chains():
-    """Compare responses from multiple providers using same chain."""
-    print("=== Multi-Provider Comparison ===\n")
-
-    try:
-        from langchain.prompts import PromptTemplate
-        from langchain.chains import LLMChain
-    except ImportError:
-        print("LangChain not installed. Install with: pip install langchain")
-        return
-
-    prompt = PromptTemplate(
-        template="What is {topic}? Answer in 2 sentences.", input_variables=["topic"]
-    )
-
-    providers = [
-        ("anthropic", "claude-opus"),
-        ("openai", "gpt-4"),
-        ("google", "gemini-pro"),
-    ]
-
-    topic = "artificial intelligence"
-
-    for provider, model in providers:
-        print(f"{provider.upper()} ({model}):")
-        try:
-            llm = SocratesNexusLLM(provider=provider, model=model)
-            chain = LLMChain(llm=llm, prompt=prompt)
-            result = chain.run(topic=topic)
-            print(f"  {result[:120]}...\n")
-        except Exception as e:
-            print(f"  [Error] {str(e)[:100]}\n")
+        return response
 
 
-def example_qa_chain():
-    """Question-answering chain with multiple providers."""
-    print("=== Q&A Chain ===\n")
+# Example usage
+print("\nExample 1: Simple Template Chain")
+print("-" * 40)
 
-    try:
-        from langchain.prompts import PromptTemplate
-        from langchain.chains import LLMChain
-    except ImportError:
-        print("LangChain not installed. Install with: pip install langchain")
-        return
+chain = SimpleChain()
 
-    qa_template = """Answer the following question based on your knowledge:
+template = "Write a short poem about {topic} in the style of {style}."
+variables = {
+    "topic": "technology",
+    "style": "Shakespeare"
+}
 
-Question: {question}
+result = chain.run(template, variables)
+print(f"Prompt: {template.format(**variables)}")
+print(f"Result: {result[:100]}...\n")
 
-Answer:"""
+# Example 2: Sequential operations
+print("\nExample 2: Sequential Operations")
+print("-" * 40)
 
-    llm = SocratesNexusLLM(provider="anthropic", model="claude-opus")
-    prompt = PromptTemplate(template=qa_template, input_variables=["question"])
-    chain = LLMChain(llm=llm, prompt=prompt)
+client = ClaudeClient(api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-..."))
 
-    questions = [
-        "What is the capital of France?",
-        "What is 2 + 2?",
-        "How many planets are in our solar system?",
-    ]
+# Step 1: Generate initial content
+content = client.generate_response("Write a summary of quantum computing")
+print(f"Step 1 (Generate): {content[:80]}...")
 
-    for q in questions:
-        result = chain.run(question=q)
-        print(f"Q: {q}")
-        print(f"A: {result.strip()}\n")
+# Step 2: Extract insights
+insights = client.extract_insights(content)
+print(f"Step 2 (Extract): {insights[:80]}...")
 
+print("\n" + "=" * 60)
+print("INTEGRATION DEMONSTRATION COMPLETE")
+print("=" * 60)
 
-def example_provider_fallback():
-    """Fallback chain that tries multiple providers."""
-    print("=== Provider Fallback Pattern ===\n")
-
-    try:
-        from langchain.prompts import PromptTemplate
-        from langchain.chains import LLMChain
-    except ImportError:
-        print("LangChain not installed. Install with: pip install langchain")
-        return
-
-    providers = [
-        ("anthropic", "claude-opus"),
-        ("openai", "gpt-4"),
-        ("google", "gemini-pro"),
-    ]
-
-    prompt = PromptTemplate(
-        template="Write a creative name for a {product} company", input_variables=["product"]
-    )
-
-    product = "coffee shop"
-
-    for provider, model in providers:
-        print(f"Trying {provider} ({model})...")
-        try:
-            llm = SocratesNexusLLM(provider=provider, model=model)
-            chain = LLMChain(llm=llm, prompt=prompt)
-            result = chain.run(product=product)
-            print(f"Success! Generated name: {result.strip()}\n")
-            break
-        except Exception as e:
-            print(f"Failed: {str(e)[:80]}")
-            print(f"Trying next provider...\n")
-
-
-def example_chain_with_config():
-    """Chain with custom configuration."""
-    print("=== Chain with Custom Config ===\n")
-
-    try:
-        from langchain.prompts import PromptTemplate
-        from langchain.chains import LLMChain
-    except ImportError:
-        print("LangChain not installed. Install with: pip install langchain")
-        return
-
-    llm = SocratesNexusLLM(
-        provider="anthropic",
-        model="claude-opus",
-        temperature=0.9,  # More creative
-        max_tokens=500,
-        retry_attempts=3,
-        cache_responses=True,
-    )
-
-    prompt = PromptTemplate(
-        template="Tell me a creative story about {character}", input_variables=["character"]
-    )
-    chain = LLMChain(llm=llm, prompt=prompt)
-
-    result = chain.run(character="a robot learning to paint")
-    print(f"Story:\n{result}\n")
-
-
-if __name__ == "__main__":
-    print("Socrates Nexus - LangChain Integration Examples\n")
-    print("=" * 50 + "\n")
-
-    example_basic_chain()
-    example_multi_provider_chains()
-    example_qa_chain()
-    example_provider_fallback()
-    example_chain_with_config()
-
-    print("=" * 50)
-    print("Examples complete!")
+print("\nNote: For full LangChain integration, you would:")
+print("1. Inherit from langchain.llms.base.LLM")
+print("2. Implement required methods (_generate, _llm_type)")
+print("3. Use with LangChain chains and agents")
+print("\nThe Socratic Nexus clients work great with LangChain's")
+print("flexible architecture!")

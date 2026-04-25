@@ -1,12 +1,12 @@
 """
 Example 6: Async/Await and Concurrent Requests
 
-Demonstrates asynchronous usage and parallel requests to multiple models.
+Demonstrates asynchronous usage and parallel requests with Socratic Nexus.
 """
 
 import asyncio
 import os
-from socrates_nexus import AsyncLLMClient
+from socratic_nexus.clients import ClaudeClient, OpenAIClient
 
 print("=" * 60)
 print("ASYNC - EXAMPLE 1: Single Async Request")
@@ -15,16 +15,13 @@ print("=" * 60)
 
 async def single_async_request():
     """Simple async request to Claude."""
-    client = AsyncLLMClient(
-        provider="anthropic",
-        model="claude-haiku-4-5-20251001",
-        api_key=os.getenv("ANTHROPIC_API_KEY"),
+    client = ClaudeClient(
+        api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-..."),
+        model="claude-3-5-haiku-20241022"
     )
 
-    response = await client.chat("What is the speed of light?")
-
-    print(f"Response: {response.content}")
-    print(f"Cost: ${response.usage.cost_usd:.6f}")
+    response = await client.generate_response_async("What is the speed of light?")
+    print(f"Response: {response}")
 
 
 asyncio.run(single_async_request())
@@ -37,89 +34,51 @@ print("=" * 60)
 
 async def parallel_same_provider():
     """Send multiple concurrent requests to the same provider."""
-    client = AsyncLLMClient(
-        provider="anthropic",
-        model="claude-haiku-4-5-20251001",
-        api_key=os.getenv("ANTHROPIC_API_KEY"),
+    client = ClaudeClient(
+        api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-..."),
+        model="claude-3-5-haiku-20241022"
     )
 
     # Launch all requests concurrently
     responses = await asyncio.gather(
-        client.chat("What is Python?"),
-        client.chat("What is JavaScript?"),
-        client.chat("What is Rust?"),
+        client.generate_response_async("What is Python?"),
+        client.generate_response_async("What is JavaScript?"),
+        client.generate_response_async("What is Rust?"),
     )
 
-    total_cost = 0
     for i, response in enumerate(responses, 1):
-        print(f"\nRequest {i}:")
-        print(f"  Response: {response.content[:100]}...")
-        print(f"  Cost: ${response.usage.cost_usd:.6f}")
-        total_cost += response.usage.cost_usd
-
-    print(f"\nTotal cost for 3 parallel requests: ${total_cost:.6f}")
+        print(f"\nResponse {i}:\n{response[:100]}...")
 
 
 asyncio.run(parallel_same_provider())
 
-# Example 3: Multi-provider concurrent requests
+# Example 3: Parallel requests to different providers
 print("\n" + "=" * 60)
 print("ASYNC - EXAMPLE 3: Parallel Requests (Different Providers)")
 print("=" * 60)
 
 
-async def multi_provider_parallel():
-    """Send requests to different providers in parallel."""
-
-    # Create clients for different providers
-    anthropic_client = AsyncLLMClient(
-        provider="anthropic",
-        model="claude-haiku-4-5-20251001",
-        api_key=os.getenv("ANTHROPIC_API_KEY"),
+async def parallel_different_providers():
+    """Send concurrent requests to different providers."""
+    claude = ClaudeClient(
+        api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-..."),
+        model="claude-3-5-haiku-20241022"
+    )
+    openai = OpenAIClient(
+        api_key=os.getenv("OPENAI_API_KEY", "sk-..."),
+        model="gpt-3.5-turbo"
     )
 
-    openai_client = AsyncLLMClient(
-        provider="openai",
-        model="gpt-3.5-turbo",
-        api_key=os.getenv("OPENAI_API_KEY"),
+    prompt = "Explain machine learning in one sentence"
+
+    # Get responses from both providers concurrently
+    claude_response, openai_response = await asyncio.gather(
+        claude.generate_response_async(prompt),
+        openai.generate_response_async(prompt),
     )
 
-    google_client = AsyncLLMClient(
-        provider="google",
-        model="gemini-1.5-flash",
-        api_key=os.getenv("GOOGLE_API_KEY"),
-    )
-
-    try:
-        # Send the same prompt to all three providers concurrently
-        prompt = "Explain what an API is in one sentence"
-
-        responses = await asyncio.gather(
-            anthropic_client.chat(prompt),
-            openai_client.chat(prompt),
-            google_client.chat(prompt),
-            return_exceptions=True,  # Don't fail if one provider errors
-        )
-
-        providers = ["Anthropic Claude", "OpenAI GPT", "Google Gemini"]
-
-        total_cost = 0
-        for provider_name, response in zip(providers, responses):
-            if isinstance(response, Exception):
-                print(f"\n{provider_name}: Error - {response}")
-            else:
-                print(f"\n{provider_name}:")
-                print(f"  Response: {response.content[:80]}...")
-                print(f"  Cost: ${response.usage.cost_usd:.6f}")
-                total_cost += response.usage.cost_usd
-
-        print(f"\nTotal cost across all 3 providers: ${total_cost:.6f}")
-
-    except Exception as e:
-        print(f"Error: {e}")
-        print(
-            "Make sure all API keys are set: ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY"
-        )
+    print(f"\nClaude:\n{claude_response[:100]}...")
+    print(f"\nOpenAI:\n{openai_response[:100]}...")
 
 
-asyncio.run(multi_provider_parallel())
+asyncio.run(parallel_different_providers())

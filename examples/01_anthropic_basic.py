@@ -1,31 +1,37 @@
 """
-Example 1: Basic Anthropic Claude Usage
+Example 1: Basic Claude Usage with Socratic Nexus
 
-Demonstrates the simplest way to use Socrates Nexus with Claude.
+Demonstrates the simplest way to use Socratic Nexus with Anthropic's Claude.
 """
 
 import os
-from socrates_nexus import LLMClient
+from socratic_nexus.clients import ClaudeClient
 
-# Initialize client with Claude
-client = LLMClient(
-    provider="anthropic",
-    model="claude-haiku-4-5-20251001",
-    api_key=os.getenv("ANTHROPIC_API_KEY"),
+# Initialize Claude client
+client = ClaudeClient(
+    api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-..."),
+    model="claude-3-5-sonnet-20241022"  # or claude-3-5-haiku-20241022
 )
 
-# Simple chat - just send a message and get a response
-response = client.chat("What is machine learning? Explain in 2 sentences.")
+# Generate a simple response
+prompt = "What is machine learning? Explain in 2 sentences."
+response = client.generate_response(prompt)
 
 print("=" * 60)
-print("ANTHROPIC CLAUDE - BASIC USAGE")
+print("CLAUDE - BASIC USAGE")
 print("=" * 60)
-print(f"\nModel: {response.model}")
-print(f"Provider: {response.provider}")
-print(f"\nResponse:\n{response.content}")
-print(f"\n--- Usage Stats ---")
-print(f"Input tokens: {response.usage.input_tokens}")
-print(f"Output tokens: {response.usage.output_tokens}")
-print(f"Total tokens: {response.usage.total_tokens}")
-print(f"Cost: ${response.usage.cost_usd:.6f}")
-print(f"Latency: {response.usage.latency_ms:.2f}ms")
+print(f"\nPrompt: {prompt}")
+print(f"\nResponse:\n{response}")
+print("\n" + "=" * 60)
+
+# For orchestrator integration
+if False:  # Set to True if using with AgentOrchestrator
+    from socratic_nexus.models import ProjectContext
+
+    # Use with project context
+    project = ProjectContext(
+        name="My Project",
+        description="Learning about ML"
+    )
+    insights = client.extract_insights(prompt, project=project)
+    print(f"\nExtracted Insights:\n{insights}")

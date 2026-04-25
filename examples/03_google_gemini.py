@@ -1,48 +1,41 @@
 """
-Example 3: Google Gemini
+Example 3: Google Gemini Usage with Socratic Nexus
 
-Demonstrates using Google's Gemini models through Socrates Nexus.
+Demonstrates how to use Socratic Nexus with Google's Gemini models.
 """
 
 import os
-from socrates_nexus import LLMClient
+from socratic_nexus.clients import GoogleClient
 
 # Initialize Google Gemini client
-client = LLMClient(
-    provider="google",
-    model="gemini-1.5-flash",  # or gemini-1.5-pro
-    api_key=os.getenv("GOOGLE_API_KEY"),
+client = GoogleClient(
+    api_key=os.getenv("GOOGLE_API_KEY", "AIza-..."),
+    model="gemini-pro"  # or gemini-pro-vision
 )
 
 print("=" * 60)
 print("GOOGLE GEMINI - BASIC USAGE")
 print("=" * 60)
 
-# Simple chat
-response = client.chat("List 3 benefits of cloud computing in bullet points")
+# Simple response generation
+prompt = "List 3 benefits of cloud computing in bullet points"
+response = client.generate_response(prompt)
 
-print(f"\nModel: {response.model}")
-print(f"Provider: {response.provider}")
-print(f"\nResponse:\n{response.content}")
-print(f"\n--- Usage Stats ---")
-print(f"Input tokens: {response.usage.input_tokens}")
-print(f"Output tokens: {response.usage.output_tokens}")
-print(f"Total tokens: {response.usage.total_tokens}")
-print(f"Cost: ${response.usage.cost_usd:.6f}")
-print(f"Latency: {response.usage.latency_ms:.2f}ms")
-
-# Stream example
+print(f"\nPrompt: {prompt}")
+print(f"Model: {client.model}")
+print(f"\nResponse:\n{response}")
 print("\n" + "=" * 60)
-print("GOOGLE GEMINI - STREAMING")
-print("=" * 60)
-print("\nStreaming response:\n")
 
-def on_chunk(chunk: str):
-    print(chunk, end="", flush=True)
+# Generate code
+if False:
+    code = client.generate_code(
+        "Create a REST API endpoint in Python"
+    )
+    print(f"\nGenerated Code:\n{code}")
 
-response = client.stream(
-    "Explain quantum computing briefly",
-    on_chunk=on_chunk,
-)
-
-print(f"\n\nTotal cost: ${response.usage.cost_usd:.6f}")
+# Extract insights
+if False:
+    insights = client.extract_insights(
+        "What are the advantages of microservices architecture?"
+    )
+    print(f"\nExtracted Insights:\n{insights}")

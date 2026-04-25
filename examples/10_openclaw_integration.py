@@ -1,120 +1,64 @@
 """
-Example: Using Socrates Nexus with Openclaw
+Example 10: Integration Patterns
 
-Demonstrates how to use Socrates Nexus as an Openclaw Skill for multi-provider LLM support.
-
-Installation:
-    pip install socrates-nexus[openclaw]
+Demonstrates how to integrate Socratic Nexus clients into larger applications.
+Shows patterns for:
+- Custom wrappers
+- Agent integration
+- Event handling
 """
 
-from socrates_nexus.integrations.openclaw import NexusLLMSkill
+import os
+from socratic_nexus.clients import ClaudeClient
+
+print("=" * 60)
+print("INTEGRATION PATTERN - CUSTOM WRAPPER")
+print("=" * 60)
 
 
-def example_basic_usage():
-    """Basic Openclaw skill usage."""
-    print("=== Basic Openclaw Skill Usage ===\n")
+class MyLLMService:
+    """Custom wrapper around Socratic Nexus clients."""
 
-    skill = NexusLLMSkill(provider="anthropic", model="claude-opus")
+    def __init__(self, provider_name: str = "claude"):
+        """Initialize with a specific provider."""
+        self.provider_name = provider_name
 
-    response = skill.query("What is machine learning in one sentence?")
-    print(f"Query: 'What is machine learning in one sentence?'")
-    print(f"Response: {response.content}")
-    print(f"Cost: ${response.usage.cost_usd:.6f}")
-    print(f"Tokens: {response.usage.total_tokens}\n")
+        if provider_name == "claude":
+            self.client = ClaudeClient(
+                api_key=os.getenv("ANTHROPIC_API_KEY", "sk-ant-...")
+            )
+        else:
+            raise ValueError(f"Unknown provider: {provider_name}")
 
+    def ask(self, question: str) -> str:
+        """Simple interface to ask questions."""
+        return self.client.generate_response(question)
 
-def example_provider_switching():
-    """Switch between providers."""
-    print("=== Provider Switching ===\n")
+    def code(self, spec: str) -> str:
+        """Generate code from specification."""
+        return self.client.generate_code(spec)
 
-    skill = NexusLLMSkill(provider="anthropic", model="claude-opus")
-
-    # Query with Claude
-    print("1. Query with Claude Opus:")
-    response1 = skill.query("What is AI?")
-    print(f"   {response1.content[:100]}...\n")
-
-    # Switch to OpenAI
-    print("2. Switch to GPT-4 and query:")
-    skill.switch_provider("openai", "gpt-4")
-    response2 = skill.query("What is AI?")
-    print(f"   {response2.content[:100]}...\n")
-
-    # Switch to Google
-    print("3. Switch to Gemini and query:")
-    skill.switch_provider("google", "gemini-pro")
-    response3 = skill.query("What is AI?")
-    print(f"   {response3.content[:100]}...\n")
+    def insights(self, text: str) -> str:
+        """Extract insights from text."""
+        return self.client.extract_insights(text)
 
 
-def example_usage_tracking():
-    """Track token usage across multiple queries."""
-    print("=== Usage Tracking ===\n")
+# Usage
+print("\nCreating custom LLM service...")
+service = MyLLMService()
 
-    skill = NexusLLMSkill(provider="anthropic", model="claude-opus")
+print("\n1. Asking a question:")
+answer = service.ask("What is machine learning?")
+print(f"   {answer[:80]}...")
 
-    queries = [
-        "What is Python?",
-        "What is JavaScript?",
-        "What is Rust?",
-    ]
+print("\n2. Generating code:")
+code = service.code("Function to calculate fibonacci")
+print(f"   {code[:80]}...")
 
-    for query in queries:
-        response = skill.query(query)
-        print(f"Query: {query}")
-        print(f"  Tokens: {response.usage.total_tokens}, Cost: ${response.usage.cost_usd:.6f}")
+print("\n3. Extracting insights:")
+insights = service.insights("The future of AI is uncertain but promising")
+print(f"   {insights[:80]}...")
 
-    stats = skill.get_usage_stats()
-    print(f"\nTotal Stats:")
-    print(f"  Requests: {stats['total_requests']}")
-    print(f"  Total Cost: ${stats['total_cost_usd']:.6f}")
-    print(f"  Total Tokens: {stats['total_input_tokens'] + stats['total_output_tokens']}\n")
-
-
-def example_callback_tracking():
-    """Use callbacks for real-time tracking."""
-    print("=== Callback Tracking ===\n")
-
-    def track_usage(usage):
-        print(f"  [Usage] Tokens: {usage.total_tokens}, Cost: ${usage.cost_usd:.6f}")
-
-    skill = NexusLLMSkill(provider="anthropic", model="claude-opus")
-    skill.add_usage_callback(track_usage)
-
-    print("Query 1:")
-    skill.query("What is machine learning?")
-
-    print("\nQuery 2:")
-    skill.query("What is deep learning?")
-
-    print("\nQuery 3:")
-    skill.query("What is reinforcement learning?\n")
-
-
-def example_streaming():
-    """Stream responses for real-time output."""
-    print("=== Streaming Responses ===\n")
-
-    skill = NexusLLMSkill(provider="anthropic", model="claude-opus")
-
-    def on_chunk(chunk):
-        print(chunk, end="", flush=True)
-
-    print("Query: 'Write a haiku about programming'")
-    print("\nResponse:\n")
-    response = skill.stream("Write a haiku about programming", on_chunk=on_chunk)
-    print(f"\n\nCost: ${response.usage.cost_usd:.6f}\n")
-
-
-if __name__ == "__main__":
-    print("Socrates Nexus - Openclaw Integration Examples\n")
-    print("=" * 50 + "\n")
-
-    example_basic_usage()
-    example_provider_switching()
-    example_usage_tracking()
-    example_callback_tracking()
-    example_streaming()
-
-    print("=" * 50)
-    print("Examples complete!")
+print("\n" + "=" * 60)
+print("INTEGRATION PATTERN COMPLETE")
+print("=" * 60)
