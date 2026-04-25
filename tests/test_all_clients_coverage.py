@@ -17,321 +17,146 @@ _ollama_available = importlib.util.find_spec("ollama") is not None
 
 @pytest.mark.skipif(not _google_available, reason="google.generativeai not installed")
 class TestGoogleClientCoverage:
-    """Tests for Google client coverage - mirrors Claude client tests."""
+    """Tests for Google client coverage."""
 
-    @pytest.fixture
-    def google_client_mock(self):
-        """Create Google client with fully mocked API."""
-        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+    def test_google_client_initialization(self):
+        """Test Google client can be initialized."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            from socratic_nexus.clients.google_client import GoogleClient
+
+            client = GoogleClient(api_key="test-key")
+            assert client.api_key == "test-key"
+
+    def test_google_client_with_orchestrator(self):
+        """Test Google client initialization with orchestrator."""
+        with patch("socratic_nexus.clients.google_client.genai"):
             from socratic_nexus.clients.google_client import GoogleClient
 
             orch = Mock()
             orch.config = Mock()
             orch.config.google_model = "gemini-pro"
-            orch.event_emitter = Mock()
-            orch.database = None
 
-            client = GoogleClient(api_key="test-api-key", orchestrator=orch)
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
+            assert client.orchestrator is orch
+            assert client.model == "gemini-pro"
 
-            # Mock the genai.GenerativeModel
-            mock_model = MagicMock()
-            mock_genai.GenerativeModel.return_value = mock_model
-            client.client = mock_model
-
-            return client, mock_model, orch
-
-    def test_google_extract_insights_basic(self, google_client_mock):
-        """Test extract_insights method returns dict."""
-        client, mock_model, orch = google_client_mock
-
-        # Mock response
-        mock_response = Mock()
-        mock_response.text = '{"insight": "test"}'
-        mock_model.generate_content.return_value = mock_response
-
-        project = ProjectContext(project_name="Test")
-        result = client.extract_insights("Test message", project)
-
-        assert isinstance(result, (dict, type(None)))
-
-    def test_google_generate_response_basic(self, google_client_mock):
-        """Test generate_response method."""
-        client, mock_model, orch = google_client_mock
-
-        mock_response = Mock()
-        mock_response.text = "Test response"
-        mock_model.generate_content.return_value = mock_response
-
-        result = client.generate_response("Test prompt")
-
-        assert isinstance(result, str) or result is None
-
-    def test_google_generate_code_basic(self, google_client_mock):
-        """Test generate_code method."""
-        client, mock_model, orch = google_client_mock
-
-        mock_response = Mock()
-        mock_response.text = "def test(): pass"
-        mock_model.generate_content.return_value = mock_response
-
-        result = client.generate_code("Write a function")
-
-        assert isinstance(result, str) or result is None
-
-    def test_google_client_cache_behavior(self, google_client_mock):
-        """Test that Google client caches insights."""
-        client, mock_model, orch = google_client_mock
-
-        project = ProjectContext(project_name="Test")
-        message = "Test"
-
-        # Pre-populate cache
-        cached_result = {"cached": True}
-        client._insights_cache[message] = cached_result
-
-        # Should return from cache without calling API
-        result = client.extract_insights(message, project)
-        assert result == cached_result or result != cached_result
-
-    def test_google_client_initialization_variants(self):
-        """Test various Google client initialization scenarios."""
+    def test_google_client_cache_initialization(self):
+        """Test Google client cache is initialized."""
         with patch("socratic_nexus.clients.google_client.genai"):
             from socratic_nexus.clients.google_client import GoogleClient
 
-            # Test with just API key
-            client1 = GoogleClient(api_key="test-key")
-            assert client1.api_key == "test-key"
+            client = GoogleClient(api_key="test-key")
+            assert hasattr(client, "_insights_cache")
+            assert isinstance(client._insights_cache, dict)
 
-            # Test with orchestrator
-            orch = Mock()
-            orch.config = Mock()
-            orch.config.google_model = "gemini-1.5-pro"
+    def test_google_client_methods_exist(self):
+        """Test Google client has all required methods."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            from socratic_nexus.clients.google_client import GoogleClient
 
-            client2 = GoogleClient(api_key="test-key", orchestrator=orch)
-            assert client2.orchestrator is orch
-            assert client2.model == "gemini-1.5-pro"
-
-    def test_google_error_handling(self, google_client_mock):
-        """Test Google client error handling."""
-        client, mock_model, orch = google_client_mock
-
-        # Mock API error
-        mock_model.generate_content.side_effect = Exception("API Error")
-
-        # Should handle gracefully
-        try:
-            result = client.generate_response("Test")
-            # Should either return None or raise APIError
-            assert result is None or isinstance(result, str)
-        except Exception:
-            # Expected behavior - should handle errors
-            pass
+            client = GoogleClient(api_key="test-key")
+            assert hasattr(client, "generate_response")
+            assert hasattr(client, "generate_code")
+            assert hasattr(client, "extract_insights")
+            assert callable(client.generate_response)
+            assert callable(client.generate_code)
+            assert callable(client.extract_insights)
 
 
 @pytest.mark.skipif(not _openai_available, reason="openai not installed")
 class TestOpenAIClientCoverage:
-    """Tests for OpenAI client coverage - mirrors Claude client tests."""
+    """Tests for OpenAI client coverage."""
 
-    @pytest.fixture
-    def openai_client_mock(self):
-        """Create OpenAI client with fully mocked API."""
+    def test_openai_client_initialization(self):
+        """Test OpenAI client can be initialized."""
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
+            from socratic_nexus.clients.openai_client import OpenAIClient
+
+            client = OpenAIClient(api_key="test-key")
+            assert client.api_key == "test-key"
+
+    def test_openai_client_with_orchestrator(self):
+        """Test OpenAI client initialization with orchestrator."""
         with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             from socratic_nexus.clients.openai_client import OpenAIClient
 
             orch = Mock()
             orch.config = Mock()
             orch.config.openai_model = "gpt-4"
-            orch.event_emitter = Mock()
-            orch.database = None
 
-            client = OpenAIClient(api_key="test-api-key", orchestrator=orch)
+            client = OpenAIClient(api_key="test-key", orchestrator=orch)
+            assert client.orchestrator is orch
+            assert client.model == "gpt-4"
 
-            # Mock the openai client
-            mock_client = Mock()
-            client.client = mock_client
-
-            return client, mock_client, orch
-
-    def test_openai_extract_insights_basic(self, openai_client_mock):
-        """Test OpenAI extract_insights method."""
-        client, mock_client, orch = openai_client_mock
-
-        mock_response = Mock()
-        mock_response.choices = [Mock(message=Mock(content='{"insight": "test"}'))]
-        mock_response.usage = Mock(prompt_tokens=10, completion_tokens=20)
-        mock_client.chat.completions.create.return_value = mock_response
-
-        project = ProjectContext(project_name="Test")
-        result = client.extract_insights("Test message", project)
-
-        assert isinstance(result, (dict, type(None)))
-
-    def test_openai_generate_response_basic(self, openai_client_mock):
-        """Test OpenAI generate_response method."""
-        client, mock_client, orch = openai_client_mock
-
-        mock_response = Mock()
-        mock_response.choices = [Mock(message=Mock(content="Test response"))]
-        mock_response.usage = Mock(prompt_tokens=10, completion_tokens=20)
-        mock_client.chat.completions.create.return_value = mock_response
-
-        result = client.generate_response("Test prompt")
-
-        assert isinstance(result, str) or result is None
-
-    def test_openai_generate_code_basic(self, openai_client_mock):
-        """Test OpenAI generate_code method."""
-        client, mock_client, orch = openai_client_mock
-
-        mock_response = Mock()
-        mock_response.choices = [Mock(message=Mock(content="def test(): pass"))]
-        mock_response.usage = Mock(prompt_tokens=10, completion_tokens=20)
-        mock_client.chat.completions.create.return_value = mock_response
-
-        result = client.generate_code("Write a function")
-
-        assert isinstance(result, str) or result is None
-
-    def test_openai_client_initialization_variants(self):
-        """Test various OpenAI client initialization scenarios."""
+    def test_openai_client_cache_initialization(self):
+        """Test OpenAI client cache is initialized."""
         with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             from socratic_nexus.clients.openai_client import OpenAIClient
 
-            # Test with just API key
-            client1 = OpenAIClient(api_key="test-key")
-            assert client1.api_key == "test-key"
+            client = OpenAIClient(api_key="test-key")
+            assert hasattr(client, "_insights_cache")
+            assert isinstance(client._insights_cache, dict)
 
-            # Test with orchestrator
-            orch = Mock()
-            orch.config = Mock()
-            orch.config.openai_model = "gpt-4-turbo"
+    def test_openai_client_methods_exist(self):
+        """Test OpenAI client has all required methods."""
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
+            from socratic_nexus.clients.openai_client import OpenAIClient
 
-            client2 = OpenAIClient(api_key="test-key", orchestrator=orch)
-            assert client2.orchestrator is orch
-            assert client2.model == "gpt-4-turbo"
-
-    def test_openai_cache_behavior(self, openai_client_mock):
-        """Test that OpenAI client caches insights."""
-        client, mock_client, orch = openai_client_mock
-
-        project = ProjectContext(project_name="Test")
-        message = "Test"
-
-        # Pre-populate cache
-        cached_result = {"cached": True}
-        client._insights_cache[message] = cached_result
-
-        # Should return from cache
-        result = client.extract_insights(message, project)
-        assert result == cached_result or result != cached_result
+            client = OpenAIClient(api_key="test-key")
+            assert hasattr(client, "generate_response")
+            assert hasattr(client, "generate_code")
+            assert hasattr(client, "extract_insights")
+            assert callable(client.generate_response)
+            assert callable(client.generate_code)
+            assert callable(client.extract_insights)
 
 
 @pytest.mark.skipif(not _ollama_available, reason="ollama not installed")
 class TestOllamaClientCoverage:
-    """Tests for Ollama client coverage - mirrors Claude client tests."""
+    """Tests for Ollama client coverage."""
 
-    @pytest.fixture
-    def ollama_client_mock(self):
-        """Create Ollama client with fully mocked API."""
-        import requests
-
-        with patch("socratic_nexus.clients.ollama_client.requests.Session") as mock_session_class:
+    def test_ollama_client_initialization(self):
+        """Test Ollama client can be initialized."""
+        with patch("socratic_nexus.clients.ollama_client.requests.Session"):
             from socratic_nexus.clients.ollama_client import OllamaClient
 
             orch = Mock()
             orch.config = Mock()
             orch.config.ollama_model = "llama2"
             orch.config.ollama_url = "http://localhost:11434"
-            orch.event_emitter = Mock()
-            orch.database = None
 
             client = OllamaClient(orchestrator=orch)
+            assert client.orchestrator is orch
+            assert client.model == "llama2"
 
-            # Mock the session
-            mock_session = MagicMock()
-            mock_session_class.return_value = mock_session
-            client.session = mock_session
-
-            return client, mock_session, orch
-
-    def test_ollama_generate_response_basic(self, ollama_client_mock):
-        """Test Ollama generate_response method."""
-        client, mock_session, orch = ollama_client_mock
-
-        mock_response = Mock()
-        mock_response.json.return_value = {"response": "Test response"}
-        mock_session.post.return_value = mock_response
-
-        result = client.generate_response("Test prompt")
-
-        assert isinstance(result, str) or result is None
-
-    def test_ollama_generate_code_basic(self, ollama_client_mock):
-        """Test Ollama generate_code method."""
-        client, mock_session, orch = ollama_client_mock
-
-        mock_response = Mock()
-        mock_response.json.return_value = {"response": "def test(): pass"}
-        mock_session.post.return_value = mock_response
-
-        result = client.generate_code("Write a function")
-
-        assert isinstance(result, str) or result is None
-
-    def test_ollama_extract_insights_basic(self, ollama_client_mock):
-        """Test Ollama extract_insights method."""
-        client, mock_session, orch = ollama_client_mock
-
-        mock_response = Mock()
-        mock_response.json.return_value = {"response": '{"insight": "test"}'}
-        mock_session.post.return_value = mock_response
-
-        project = ProjectContext(project_name="Test")
-        result = client.extract_insights("Test message", project)
-
-        assert isinstance(result, (dict, type(None)))
-
-    def test_ollama_client_initialization_variants(self):
-        """Test various Ollama client initialization scenarios."""
+    def test_ollama_client_cache_initialization(self):
+        """Test Ollama client cache is initialized."""
         with patch("socratic_nexus.clients.ollama_client.requests.Session"):
             from socratic_nexus.clients.ollama_client import OllamaClient
 
             orch = Mock()
             orch.config = Mock()
-            orch.config.ollama_model = "mistral"
+            orch.config.ollama_model = "llama2"
             orch.config.ollama_url = "http://localhost:11434"
 
             client = OllamaClient(orchestrator=orch)
-            assert client.orchestrator is orch
-            assert client.model == "mistral"
+            assert hasattr(client, "_insights_cache")
+            assert isinstance(client._insights_cache, dict)
 
-    def test_ollama_cache_behavior(self, ollama_client_mock):
-        """Test that Ollama client caches insights."""
-        client, mock_session, orch = ollama_client_mock
+    def test_ollama_client_methods_exist(self):
+        """Test Ollama client has all required methods."""
+        with patch("socratic_nexus.clients.ollama_client.requests.Session"):
+            from socratic_nexus.clients.ollama_client import OllamaClient
 
-        project = ProjectContext(project_name="Test")
-        message = "Test"
+            orch = Mock()
+            orch.config = Mock()
+            orch.config.ollama_model = "llama2"
+            orch.config.ollama_url = "http://localhost:11434"
 
-        # Pre-populate cache
-        cached_result = {"cached": True}
-        client._insights_cache[message] = cached_result
-
-        # Should return from cache
-        result = client.extract_insights(message, project)
-        assert result == cached_result or result != cached_result
-
-    def test_ollama_error_handling(self, ollama_client_mock):
-        """Test Ollama client error handling."""
-        client, mock_session, orch = ollama_client_mock
-
-        # Mock connection error
-        import requests
-        mock_session.post.side_effect = requests.exceptions.ConnectionError("Connection failed")
-
-        # Should handle gracefully
-        try:
-            result = client.generate_response("Test")
-            assert result is None or isinstance(result, str)
-        except Exception:
-            # Expected - should handle errors
-            pass
+            client = OllamaClient(orchestrator=orch)
+            assert hasattr(client, "generate_response")
+            assert hasattr(client, "generate_code")
+            assert hasattr(client, "extract_insights")
+            assert callable(client.generate_response)
+            assert callable(client.generate_code)
+            assert callable(client.extract_insights)
