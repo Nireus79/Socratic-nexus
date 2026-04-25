@@ -31,14 +31,15 @@ class TestOllamaClientInitialization:
         """Test initialization with default URL."""
         with patch("socratic_nexus.clients.ollama_client.requests"):
             client = OllamaClient(orchestrator=mock_orchestrator)
-            assert client.api_base_url == "http://localhost:11434"
+            assert client.base_url == "http://localhost:11434"
 
     def test_init_with_custom_url(self, mock_orchestrator):
         """Test initialization with custom URL."""
         with patch("socratic_nexus.clients.ollama_client.requests"):
             custom_url = "http://custom:8000"
-            client = OllamaClient(api_base_url=custom_url, orchestrator=mock_orchestrator)
-            assert client.api_base_url == custom_url
+            mock_orchestrator.config.ollama_url = custom_url
+            client = OllamaClient(orchestrator=mock_orchestrator)
+            assert client.base_url == custom_url
 
     def test_init_sets_default_model(self, mock_orchestrator):
         """Test default model is set."""
@@ -316,7 +317,7 @@ class TestOllamaClientIntegration:
 
             client = OllamaClient(orchestrator=mock_orchestrator)
             assert client.model == "mistral"
-            assert client.api_base_url == "http://localhost:11434"
+            assert client.base_url == "http://localhost:11434"
 
             _ = client.generate_response("test")
             mock_requests.post.assert_called()
@@ -342,4 +343,4 @@ class TestOllamaClientIntegration:
         mock_orchestrator.config.ollama_url = "http://custom.server:9000"
         with patch("socratic_nexus.clients.ollama_client.requests"):
             client = OllamaClient(orchestrator=mock_orchestrator)
-            assert client.api_base_url == "http://custom.server:9000"
+            assert client.base_url == "http://custom.server:9000"

@@ -211,15 +211,16 @@ class TestOllamaSpecificBehaviors:
 
             client = OllamaClient(orchestrator=mock_orchestrator)
 
-            assert client.api_base_url == "http://localhost:11434"
+            assert client.base_url == "http://localhost:11434"
 
     def test_ollama_custom_url_config(self, mock_orchestrator):
         """Test Ollama with custom URL configuration."""
         with patch("socratic_nexus.clients.ollama_client.requests"):
             custom_url = "http://remote-server:8000"
-            client = OllamaClient(api_base_url=custom_url, orchestrator=mock_orchestrator)
+            mock_orchestrator.config.ollama_url = custom_url
+            client = OllamaClient(orchestrator=mock_orchestrator)
 
-            assert client.api_base_url == custom_url
+            assert client.base_url == custom_url
 
     def test_ollama_streaming_response(self, mock_orchestrator):
         """Test Ollama streaming response handling."""
