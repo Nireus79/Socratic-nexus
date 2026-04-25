@@ -74,7 +74,12 @@ class TestGoogleClientGeneration:
             mock_response.text = "Generated response text"
             mock_model.generate_content.return_value = mock_response
 
-            client = GoogleClient(api_key="test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
 
             # Should be able to call generate_response
             if hasattr(client, 'generate_response'):
@@ -93,7 +98,12 @@ class TestGoogleClientGeneration:
             mock_response.text = "def hello():\n    return 'world'"
             mock_model.generate_content.return_value = mock_response
 
-            client = GoogleClient(api_key="test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
 
             if hasattr(client, 'generate_code'):
                 result = client.generate_code("write a function")
@@ -112,7 +122,12 @@ class TestGoogleClientGeneration:
             mock_response.text = '{"insights": "extracted"}'
             mock_model.generate_content.return_value = mock_response
 
-            client = GoogleClient(api_key="test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
             if hasattr(client, 'extract_insights'):

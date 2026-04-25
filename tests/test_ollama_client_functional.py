@@ -75,7 +75,12 @@ class TestOllamaClientApiCalls:
             }
             mock_post.return_value = mock_response
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OllamaClient(orchestrator=orch)
 
             if hasattr(client, 'generate_response'):
                 result = client.generate_response("test prompt")
@@ -95,7 +100,12 @@ class TestOllamaClientApiCalls:
             }
             mock_post.return_value = mock_response
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OllamaClient(orchestrator=orch)
 
             if hasattr(client, 'generate_code'):
                 result = client.generate_code("write a function")
@@ -114,7 +124,12 @@ class TestOllamaClientApiCalls:
             }
             mock_post.return_value = mock_response
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OllamaClient(orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
             if hasattr(client, 'extract_insights'):

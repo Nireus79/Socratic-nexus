@@ -78,7 +78,12 @@ class TestOpenAIClientApiCalls:
             mock_response.usage = Mock(prompt_tokens=10, completion_tokens=20)
             mock_client.chat.completions.create.return_value = mock_response
 
-            client = OpenAIClient(api_key="sk-test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
             if hasattr(client, 'generate_response'):
                 result = client.generate_response("test prompt")
@@ -99,7 +104,12 @@ class TestOpenAIClientApiCalls:
             mock_response.usage = Mock(prompt_tokens=15, completion_tokens=10)
             mock_client.chat.completions.create.return_value = mock_response
 
-            client = OpenAIClient(api_key="sk-test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
             if hasattr(client, 'generate_code'):
                 result = client.generate_code("write a function")
@@ -120,7 +130,12 @@ class TestOpenAIClientApiCalls:
             mock_response.usage = Mock(prompt_tokens=20, completion_tokens=15)
             mock_client.chat.completions.create.return_value = mock_response
 
-            client = OpenAIClient(api_key="sk-test-key")
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
+
+            client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
             if hasattr(client, 'extract_insights'):
@@ -158,7 +173,8 @@ class TestOpenAIClientErrorScenarios:
         from socratic_nexus.clients.openai_client import OpenAIClient
 
         orch = Mock()
-        orch.config = Mock(spec=[])  # Create mock with no attributes
+        orch.config = Mock()
+        orch.config.openai_model = None  # Model not configured
 
         with patch("socratic_nexus.clients.openai_client.openai"):
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
