@@ -5,9 +5,7 @@ Tests common functionality across all client implementations.
 
 import importlib.util
 import pytest
-from unittest.mock import Mock, patch, MagicMock
-
-from socratic_nexus.models import ProjectContext
+from unittest.mock import Mock, patch
 
 # Check which clients are available
 _google_available = importlib.util.find_spec("google.generativeai") is not None
