@@ -161,12 +161,13 @@ class TestDecryptionErrorPaths:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Data that looks encrypted but is corrupted
-            corrupt_data = base64.urlsafe_b64encode(b"corrupted").decode()
+            # Data that is completely invalid - not valid Fernet and not valid base64
+            # This will fail all three decryption methods
+            corrupt_data = "!!!invalid-base64-and-not-fernet-encrypted-data!!!"
 
             result = client._decrypt_api_key_from_db(corrupt_data)
 
-            # Should gracefully return None
+            # Should gracefully return None when all methods fail
             assert result is None
 
 
