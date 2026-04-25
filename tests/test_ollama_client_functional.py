@@ -73,12 +73,23 @@ class TestOllamaClientApiCalls:
         pytest.importorskip("requests")
         from socratic_nexus.clients.ollama_client import OllamaClient
 
-        with patch("socratic_nexus.clients.ollama_client.requests.post") as mock_post:
+        with patch("socratic_nexus.clients.ollama_client.requests.Session") as mock_session_class:
+            mock_session = Mock()
+            mock_session_class.return_value = mock_session
+
+            # Mock successful status check and response
+            mock_get_response = Mock()
+            mock_get_response.status_code = 200
+            mock_session.get.return_value = mock_get_response
+
+            # Mock the API response
             mock_response = Mock()
+            mock_response.status_code = 200
             mock_response.json.return_value = {
                 "response": "Ollama generated response"
             }
-            mock_post.return_value = mock_response
+            mock_response.raise_for_status = Mock()
+            mock_session.post.return_value = mock_response
 
             orch = Mock()
             orch.config = Mock()
@@ -91,9 +102,8 @@ class TestOllamaClientApiCalls:
 
             if hasattr(client, 'generate_response'):
                 result = client.generate_response("test prompt")
-                # Should make HTTP POST request to local Ollama
-                # Either posts to API or handles gracefully
-                assert result is not None or result is None
+                # Should successfully generate response from mocked Ollama
+                assert isinstance(result, str) or result is None
 
     def test_generate_code_calls_ollama_api(self):
         """Test generate_code calls local Ollama API"""

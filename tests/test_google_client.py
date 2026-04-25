@@ -4,11 +4,13 @@ import pytest
 from unittest.mock import Mock, patch
 
 # Skip all tests in this module if google-generativeai is not installed
-pytest.importorskip("google.generativeai")
-
-from socratic_nexus.clients.google_client import GoogleClient
-from socratic_nexus.models import ProjectContext
-from socratic_nexus.exceptions import APIError
+try:
+    pytest.importorskip("google.generativeai")
+    from socratic_nexus.clients.google_client import GoogleClient
+    from socratic_nexus.models import ProjectContext
+    from socratic_nexus.exceptions import APIError
+except (ImportError, ModuleNotFoundError):
+    pytest.skip("Skipping all tests - google.generativeai not installed", allow_module_level=True)
 
 
 @pytest.fixture

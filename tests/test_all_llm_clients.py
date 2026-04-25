@@ -6,19 +6,26 @@ Designed to quickly increase coverage of Google, OpenAI, and Ollama clients.
 import pytest
 from unittest.mock import Mock, patch
 
+# Check if google.genai is available (newer API, required by GoogleClient)
+_google_available = False
+try:
+    import google.genai
+    _google_available = True
+except (ImportError, ModuleNotFoundError):
+    _google_available = False
 
+
+@pytest.mark.skipif(not _google_available, reason="google.genai not installed")
 class TestGoogleClientBasic:
     """Basic tests for Google client - skip if google not installed"""
 
     def test_google_client_import(self):
         """Test that Google client can be imported with google dependency"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
         assert GoogleClient is not None
 
     def test_google_client_init(self):
         """Test Google client initialization"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         with patch("socratic_nexus.clients.google_client.genai"):
@@ -27,7 +34,6 @@ class TestGoogleClientBasic:
 
     def test_google_client_with_orchestrator(self):
         """Test Google client initialization with orchestrator"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         orch = Mock()
@@ -40,7 +46,6 @@ class TestGoogleClientBasic:
 
     def test_google_client_placeholder_key(self):
         """Test Google client with placeholder key"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         with patch("socratic_nexus.clients.google_client.genai"):
@@ -49,7 +54,6 @@ class TestGoogleClientBasic:
 
     def test_google_client_has_generate_response(self):
         """Test Google client has generate_response method"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         with patch("socratic_nexus.clients.google_client.genai"):
@@ -58,7 +62,6 @@ class TestGoogleClientBasic:
 
     def test_google_client_has_extract_insights(self):
         """Test Google client has extract_insights method"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         with patch("socratic_nexus.clients.google_client.genai"):
@@ -67,7 +70,6 @@ class TestGoogleClientBasic:
 
     def test_google_client_has_generate_code(self):
         """Test Google client has generate_code method"""
-        pytest.importorskip("google")
         from socratic_nexus.clients.google_client import GoogleClient
 
         with patch("socratic_nexus.clients.google_client.genai"):
@@ -153,10 +155,10 @@ class TestClientInterfaces:
         available_clients = []
 
         try:
-            pytest.importorskip("google")
+            pytest.importorskip("google.genai")
             from socratic_nexus.clients.google_client import GoogleClient
             available_clients.append(("Google", GoogleClient))
-        except pytest.skip.Exception:
+        except (pytest.skip.Exception, ModuleNotFoundError):
             pass
 
         try:
