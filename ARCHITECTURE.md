@@ -1,168 +1,507 @@
-# socrates-nexus Architecture
+# Socratic Nexus - Architecture Guide
 
-Universal LLM abstraction layer providing unified access to multiple AI providers
+Comprehensive documentation of the internal architecture and design patterns in Socratic Nexus.
 
-## System Architecture Overview
+## Table of Contents
 
-socrates-nexus provides a unified interface for multiple LLM providers including Anthropic, OpenAI, Google, and Ollama. The architecture follows a layered design pattern that abstracts provider-specific implementations behind a consistent client interface.
+1. [System Overview](#system-overview)
+2. [Core Components](#core-components)
+3. [Client Implementations](#client-implementations)
+4. [Data Flow](#data-flow)
+5. [Design Patterns](#design-patterns)
+6. [Extension Points](#extension-points)
+7. [Performance Considerations](#performance-considerations)
+
+## System Overview
+
+Socratic Nexus provides a unified abstraction layer over multiple LLM providers through a consistent client interface. The system is designed with separation of concerns, allowing each provider implementation to be independent while maintaining API consistency.
 
 ### Architecture Diagram
 
 ```
-Client Interface Layer
-         │
-         ├── Sync Client
-         ├── Async Client (asyncio)
-         └── Configuration Management
-              │
-Provider Management Layer
-         │
-         ├── Provider Factory
-         ├── Provider Selector  
-         └── Provider Registry
-              │
-Provider Implementation Layer
-         │
-         ├── Anthropic Provider
-         ├── OpenAI Provider
-         ├── Google Provider
-         └── Ollama Provider
-              │
-Request/Response Processing
-         │
-         ├── Validation & Normalization
-         ├── Caching & Optimization
-         └── Retry & Fallback Logic
-              │
-External LLM Provider APIs
+┌─────────────────────────────────────┐
+│     Application Code                │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│     Client Interface Layer          │
+│  ┌──────────────────────────────┐   │
+│  │ ClaudeClient                 │   │
+│  │ OpenAIClient                 │   │
+│  │ GoogleClient                 │   │
+│  │ OllamaClient                 │   │
+│  └──────────────────────────────┘   │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│  Base Client & Utilities            │
+│  ┌──────────────────────────────┐   │
+│  │ Caching System               │   │
+│  │ Token Tracking               │   │
+│  │ Retry Logic                  │   │
+│  │ Error Handling               │   │
+│  └──────────────────────────────┘   │
+└──────────────────┬──────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────┐
+│  Provider-Specific Implementations                  │
+│  ┌──────────────┬──────────────┬──────────────┐     │
+│  │ Anthropic    │ OpenAI       │ Google       │     │
+│  │ - genai      │ - openai     │ - genai      │     │
+│  │ - Client SDK │ - Client SDK │ - Client SDK │     │
+│  └──────────────┴──────────────┴──────────────┘     │
+│  ┌──────────────┐                                   │
+│  │ Ollama       │                                   │
+│  │ - HTTP API   │                                   │
+│  └──────────────┘                                   │
+└──────────────────┬───────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────┐
+│  External LLM Provider APIs         │
+│  ┌──────────────────────────────┐   │
+│  │ Anthropic API                │   │
+│  │ OpenAI API                   │   │
+│  │ Google Gemini API            │   │
+│  │ Ollama HTTP API              │   │
+│  └──────────────────────────────┘   │
+└─────────────────────────────────────┘
 ```
 
 ## Core Components
 
 ### 1. Client Interface Layer
 
-**Synchronous Client**
-- Main entry point for consuming applications
-- Provides blocking API for traditional request-response patterns
-- Handles provider selection and routing
-- Manages configuration and credentials
+All clients inherit from a common base with these key methods:
 
-**Asynchronous Client**
-- Non-blocking async/await interface
-- Built on Python asyncio framework
-- Enables concurrent request handling
-- Maintains same interface as sync client for consistency
+```python
+class BaseClient:
+    # Core generation methods
+    def generate_response(
+        prompt: str,
+        max_tokens: Optional[int] = None,
+        temperature: Optional[float] = None
+    ) -> str
 
-### 2. Provider Management
+    def generate_code(
+        specification: str,
+        language: str = "python"
+    ) -> str
 
-**Provider Factory**
-- Creates provider instances based on configuration
-- Handles provider-specific initialization
-- Manages provider lifecycle
+    def extract_insights(
+        text: str,
+        project: Optional[ProjectContext] = None
+    ) -> str
 
-**Provider Selector**
-- Routes requests to appropriate provider
-- Implements failover logic
-- Considers provider availability and model support
+    # Async variants
+    async def generate_response_async(...) -> str
+    async def generate_code_async(...) -> str
+    async def extract_insights_async(...) -> str
 
-**Provider Registry**
-- Maintains list of available providers
-- Tracks provider capabilities and models
-- Manages provider configuration
+    # Configuration and utilities
+    def test_connection() -> bool
+    def get_auth_credential(...) -> Optional[str]
+```
 
-### 3. Provider Implementations
+### 2. Client Implementations
 
-Each provider implements standardized interface with provider-specific logic:
-- Request formatting for provider APIs
-- Response parsing and standardization
-- Error handling and retry logic
-- Rate limiting and throttling
+Each client implements provider-specific logic while maintaining the common interface:
+
+#### ClaudeClient
+- **File**: `src/socratic_nexus/clients/claude_client.py`
+- **Dependencies**: `anthropic>=0.40.0`
+- **Features**:
+  - 9 specialized generation methods (business plans, curriculum, documentation, etc.)
+  - Full async/sync support
+  - Token cost tracking with accurate pricing
+  - Intelligent caching system
+  - Graceful API key validation
+
+**Specialized Methods**:
+- `generate_business_plan()` - Create business strategies
+- `generate_curriculum()` - Design learning paths
+- `generate_documentation()` - Generate technical docs
+- `generate_research_protocol()` - Research methodology
+- `generate_marketing_plan()` - Marketing strategies
+- `generate_creative_brief()` - Creative direction
+- `generate_artifact()` - Multi-media artifacts
+- `generate_conflict_resolution_suggestions()` - Conflict analysis
+- `generate_suggestions()` - General suggestions
+
+#### OpenAIClient
+- **File**: `src/socratic_nexus/clients/openai_client.py`
+- **Dependencies**: `openai>=1.0.0`
+- **Features**:
+  - GPT-4, GPT-4 Turbo, and GPT-3.5 support
+  - Token cost calculation based on actual pricing
+  - Configurable model selection
+  - Full async support
+  - Streaming support ready
+
+#### GoogleClient
+- **File**: `src/socratic_nexus/clients/google_client.py`
+- **Dependencies**: `google-generativeai>=0.1.0rc1`
+- **Features**:
+  - Gemini API support
+  - Multi-modal capabilities
+  - Safety settings configuration
+  - Model variant selection (pro, pro-vision)
+  - Full async support with thread pooling
+
+#### OllamaClient
+- **File**: `src/socratic_nexus/clients/ollama_client.py`
+- **Dependencies**: `requests`
+- **Features**:
+  - Local LLM support (no API keys required)
+  - Custom model selection
+  - HTTP-based communication
+  - Development-friendly (runs locally)
+  - Full async support with thread pooling
+
+### 3. Shared Infrastructure
+
+#### Caching System
+- Implements in-memory LRU caching
+- Configurable cache size and TTL
+- Separates response cache from insight cache
+- Cache key generation from prompts
+- Optional Redis integration ready
+
+#### Token Tracking
+- Monitors input/output token usage
+- Calculates costs based on provider pricing
+- Events emitted for tracking systems
+- Timestamp recording for analytics
+
+#### Error Handling
+- Provider-specific error mapping
+- Graceful fallback for unavailable APIs
+- Detailed error messages
+- Retry logic with exponential backoff
+
+#### Authentication
+- Multiple auth methods per provider (API key, subscription, OAuth)
+- Secure credential handling
+- Placeholder key detection
+- Database-backed credential storage (optional)
 
 ## Data Flow
 
-### Request Processing Sequence
+### Request Processing Pipeline
 
-1. Validate Input Parameters
-2. Check Model Availability
-3. Select Provider (Primary or Fallback)
-4. Check Cache if Enabled
-5. Normalize Request for Provider API
-6. Execute API Call with Retry Logic
-7. Standardize Response Format
-8. Cache Response if Applicable
-9. Return to Caller
+```
+1. Client Method Call
+   │
+2. Input Validation
+   │
+3. Cache Lookup
+   ├─ Hit: Return cached response
+   └─ Miss: Continue
+   │
+4. Provider Initialization
+   │
+5. Request Formatting
+   │
+6. API Call with Retry Logic
+   │
+7. Response Parsing
+   │
+8. Token Usage Tracking
+   │
+9. Cache Storage
+   │
+10. Return to Caller
+```
 
-## Integration with Socratic Ecosystem
+### Async Execution Flow
 
-socrates-nexus is the foundation for all Socratic libraries:
-- socratic-rag: Semantic analysis and content generation
-- socratic-agents: Agent reasoning and planning
-- socratic-analyzer: Quality analysis and evaluation
-- socratic-learning: Content adaptation and personalization
-- socratic-conflict: Debate and reasoning logic
-- socratic-knowledge: Knowledge graph reasoning
+For async clients, the flow is identical but non-blocking:
+
+```python
+# Sync - Blocking
+response = client.generate_response(prompt)
+
+# Async - Non-blocking
+response = await client.generate_response_async(prompt)
+# or
+task = asyncio.create_task(client.generate_response_async(prompt))
+# ... do other work ...
+response = await task
+```
+
+For Ollama and Google clients, async is achieved through `asyncio.to_thread()` for thread safety.
 
 ## Design Patterns
 
 ### 1. Adapter Pattern
-- Each provider implements Adapter pattern
-- Converts provider-specific APIs to unified interface
-- Shields clients from implementation details
 
-### 2. Factory Pattern  
-- Provider instances created via factory
-- Configuration-driven provider selection
-- Dynamic provider registration
+Each provider is an adapter that:
+- Converts unified interface to provider-specific API
+- Transforms provider responses to common format
+- Handles provider-specific error codes
+- Manages provider-specific authentication
+
+```python
+# Unified interface
+response = client.generate_response(prompt)
+
+# Internally adapts to provider
+# - Claude: calls anthropic.Anthropic.messages.create()
+# - OpenAI: calls openai.OpenAI().chat.completions.create()
+# - Google: calls genai.GenerativeModel.generate_content()
+# - Ollama: calls /api/generate HTTP endpoint
+```
+
+### 2. Factory Pattern
+
+Clients are instantiated with sensible defaults but accept configuration:
+
+```python
+# Default configuration
+client = ClaudeClient(api_key="...")
+
+# Custom configuration
+client = ClaudeClient(
+    api_key="...",
+    model="claude-3-5-haiku-20241022",
+    max_tokens=2048,
+    temperature=0.5,
+    timeout=60
+)
+```
 
 ### 3. Strategy Pattern
-- Different strategies per provider
-- Model selection strategy
-- Caching and retry strategies
+
+Different strategies per provider:
+
+- **Model Selection**: Each provider has different available models
+- **Async Implementation**: Google and Ollama use thread pooling; others use native async
+- **Cost Calculation**: Each provider has different pricing models
+- **Error Handling**: Provider-specific error codes and recovery strategies
 
 ### 4. Decorator Pattern
-- Caching decorator
-- Retry logic decorator
-- Monitoring and logging
 
-### 5. Singleton Pattern
-- Client instance management
-- Shared configuration
-- Provider registry
+Methods are decorated for:
 
-## Performance Characteristics
+- **Caching**: Intelligent cache management
+- **Retry Logic**: Exponential backoff on failures
+- **Monitoring**: Token usage tracking
+- **Logging**: Debug and error logging
+
+### 5. Template Method Pattern
+
+Base client defines algorithm structure:
+
+```python
+def generate_response(self, prompt, **kwargs):
+    # Template method outline
+    self._validate_input(prompt)        # Step 1
+    cached = self._get_from_cache(key)  # Step 2
+    if cached:
+        return cached
+    response = self._call_api(prompt)   # Step 3 (overridden by subclass)
+    self._track_tokens(response)        # Step 4
+    self._store_in_cache(key, response) # Step 5
+    return response
+```
+
+Each client overrides `_call_api()` with provider-specific implementation.
+
+## Extension Points
+
+### Adding a New Provider
+
+To add a new LLM provider (e.g., Cohere):
+
+1. **Create new client class**:
+   ```python
+   # src/socratic_nexus/clients/cohere_client.py
+   from socratic_nexus.clients.base import BaseClient
+
+   class CohereClient(BaseClient):
+       def __init__(self, api_key, **kwargs):
+           super().__init__(**kwargs)
+           self.api_key = api_key
+           self.client = cohere.Client(api_key)
+
+       def _call_api(self, prompt, **kwargs):
+           # Cohere-specific implementation
+           response = self.client.generate(prompt)
+           return response.generations[0].text
+   ```
+
+2. **Add to package exports**:
+   ```python
+   # src/socratic_nexus/clients/__init__.py
+   from .cohere_client import CohereClient
+   ```
+
+3. **Add tests**:
+   ```python
+   # tests/test_cohere_client.py
+   class TestCohereClient:
+       def test_generation(self):
+           ...
+   ```
+
+### Custom Client Behavior
+
+Extend any client with custom behavior:
+
+```python
+class CustomClaudeClient(ClaudeClient):
+    def _track_tokens(self, response):
+        # Custom token tracking
+        super()._track_tokens(response)
+        # Send to custom analytics
+        self.analytics.record(response.usage)
+```
+
+## Performance Considerations
 
 ### Time Complexity
-- Cache lookup: O(1)
-- Provider selection: O(log n)
-- API call: O(n) where n = response size
 
-### Space Complexity  
-- Provider instances: O(p) where p = providers
-- Response cache: O(k) where k = cached responses
+| Operation | Complexity | Notes |
+|-----------|-----------|-------|
+| Cache lookup | O(1) | Hash-based cache |
+| API call | O(n) | n = response size |
+| Token counting | O(n) | n = token count |
 
-## Scalability & Deployment
+### Space Complexity
 
-- **Stateless Design**: Horizontal scaling ready
-- **Connection Pooling**: Efficient resource usage
-- **Distributed Caching**: Redis support for shared cache
-- **Load Balancing**: Compatible with load balancers
+| Component | Complexity | Notes |
+|-----------|-----------|-------|
+| Response cache | O(k) | k = number of cached responses |
+| Client instances | O(p) | p = number of providers |
 
-## Security
+### Memory Usage
 
-- Secure credential storage and transmission
-- API key validation and rotation
-- Request/response sanitization
-- No sensitive data in logging
-- Support for encrypted storage
+- Single client instance: ~5-10 MB
+- With full cache (1000 responses): ~50-100 MB
+- Async tasks overhead: Minimal (< 1 MB per task)
 
-## Monitoring & Observability
+### Optimization Strategies
 
-- Request latency metrics
-- Provider error rates
-- Cache hit/miss ratios
-- API quota tracking
-- Distributed tracing support
+1. **Caching**: Reuse responses for identical prompts
+2. **Async**: Handle multiple requests concurrently
+3. **Connection Pooling**: Reuse HTTP connections
+4. **Lazy Loading**: Initialize providers on-demand
+5. **Token Optimization**: Use smaller models when appropriate
+
+## Testing Architecture
+
+### Test Organization
+
+```
+tests/
+├── test_all_llm_clients.py          # Basic client tests
+├── test_clients_error_handling.py   # Error scenarios
+├── test_clients_methods.py          # Method implementations
+├── test_coverage_gaps.py            # Coverage-focused tests
+└── [provider-specific tests]
+```
+
+### Test Coverage
+
+- **Target**: 70%+ coverage
+- **Current**: 70.94% coverage
+- **Focus areas**:
+  - Client initialization
+  - API method signatures
+  - Error handling
+  - Cache functionality
+  - Token tracking
+
+### Running Tests
+
+```bash
+# All tests
+pytest tests/
+
+# Specific test class
+pytest tests/test_all_llm_clients.py::TestGoogleClientBasic
+
+# With coverage
+pytest --cov=socratic_nexus tests/
+
+# By marker
+pytest -m unit          # Unit tests
+pytest -m integration   # Integration tests
+```
+
+## Security Architecture
+
+### API Key Management
+
+- Never logged or stored in code
+- Loaded from environment variables
+- Validated before use
+- Placeholder keys detected and rejected
+
+### Data Handling
+
+- No request/response caching of sensitive data
+- Input validation before sending
+- HTTPS-only communication
+- No sensitive data in debug logs
+
+### Error Messages
+
+- Provider errors don't expose API internals
+- Generic error messages to users
+- Detailed logs only in debug mode
+
+## Deployment Considerations
+
+### Single-Machine Deployment
+
+```python
+# Simple usage
+client = ClaudeClient(api_key="...")
+response = client.generate_response("prompt")
+```
+
+### Multi-Process Deployment
+
+```python
+# Each process gets its own client instance
+from multiprocessing import Pool
+
+def process_prompt(prompt):
+    client = ClaudeClient()  # Initialized per process
+    return client.generate_response(prompt)
+
+with Pool(4) as pool:
+    results = pool.map(process_prompt, prompts)
+```
+
+### Async/Concurrent Usage
+
+```python
+import asyncio
+
+async def main():
+    client = ClaudeClient()
+
+    # Concurrent requests
+    responses = await asyncio.gather(
+        client.generate_response_async("prompt 1"),
+        client.generate_response_async("prompt 2"),
+        client.generate_response_async("prompt 3")
+    )
+
+asyncio.run(main())
+```
+
+## Future Roadmap
+
+- [ ] Streaming response support
+- [ ] Function calling for all providers
+- [ ] Load balancing across providers
+- [ ] Advanced caching strategies (distributed)
+- [ ] Rate limiting and quota management
+- [ ] Provider switching with fallback
+- [ ] Cost optimization routing
 
 ---
 
-Part of the Socratic Ecosystem
+For API documentation, see [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
