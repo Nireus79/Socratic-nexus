@@ -138,7 +138,7 @@ class TestGoogleClientGenerateCode:
             mock_model.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
-            _ = client.generate_code("write function", language="python")
+            _ = client.generate_code("write function")
 
             mock_model.generate_content.assert_called()
 

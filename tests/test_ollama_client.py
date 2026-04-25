@@ -145,7 +145,7 @@ class TestOllamaClientGenerateCode:
             mock_requests.post.return_value = mock_response
 
             client = OllamaClient(orchestrator=mock_orchestrator)
-            _ = client.generate_code("write function", language="python")
+            _ = client.generate_code("write function")
 
             mock_requests.post.assert_called()
 
