@@ -13,9 +13,21 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 try:
-    import google.generativeai as genai
+    # Try new google.genai package first (recommended)
+    import google.genai as genai
 except ImportError:
-    genai = None  # type: ignore[assignment]
+    try:
+        # Fall back to deprecated google.generativeai for backward compatibility
+        import google.generativeai as genai
+        import warnings
+        warnings.warn(
+            "The google.generativeai package is deprecated. "
+            "Please install google-genai instead: pip install google-genai",
+            FutureWarning,
+            stacklevel=2
+        )
+    except ImportError:
+        genai = None  # type: ignore[assignment]
 
 from cryptography.fernet import Fernet
 
@@ -51,8 +63,9 @@ class GoogleClient:
         """
         if genai is None:
             raise ImportError(
-                "google-generativeai package is required for GoogleClient. "
-                "Install it with: pip install google-generativeai"
+                "Google Generative AI package is required for GoogleClient. "
+                "Install it with: pip install google-genai (recommended) "
+                "or pip install google-generativeai (deprecated)"
             )
 
         self.api_key = api_key
