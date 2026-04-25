@@ -92,7 +92,7 @@ class TestOpenAIClientInitialization:
             from socratic_nexus.clients.openai_client import OpenAIClient
 
             client = OpenAIClient(api_key="test-key")
-            assert client.model == "gpt-4"
+            assert client.model == "gpt-4-turbo"
 
     def test_openai_cache_initialization(self):
         """Test OpenAI client initializes cache."""
