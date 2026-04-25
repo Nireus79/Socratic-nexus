@@ -29,38 +29,38 @@ class TestOpenAIClientInitialization:
 
     def test_init_with_valid_api_key(self, mock_orchestrator):
         """Test initialization with valid API key."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="sk-test-key", orchestrator=mock_orchestrator)
             assert client.api_key == "sk-test-key"
 
     def test_init_with_none_api_key(self, mock_orchestrator):
         """Test initialization with None API key."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key=None, orchestrator=mock_orchestrator)
             assert client.api_key is None
 
     def test_init_with_placeholder_key(self, mock_orchestrator):
         """Test initialization with placeholder key."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="placeholder_test", orchestrator=mock_orchestrator)
             assert client.client is None
 
     def test_init_sets_default_model(self, mock_orchestrator):
         """Test default model is set."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             assert client.model == "gpt-4-turbo"
 
     def test_init_uses_orchestrator_model(self, mock_orchestrator):
         """Test model from orchestrator is used."""
         mock_orchestrator.config.openai_model = "gpt-3.5-turbo"
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             assert client.model == "gpt-3.5-turbo"
 
     def test_init_initializes_caches(self, mock_orchestrator):
         """Test caches are initialized."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             assert hasattr(client, "_insights_cache")
             assert isinstance(client._insights_cache, dict)
@@ -71,7 +71,7 @@ class TestOpenAIClientGenerateResponse:
 
     def test_generate_response_basic(self, mock_orchestrator):
         """Test basic response generation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -86,7 +86,7 @@ class TestOpenAIClientGenerateResponse:
 
     def test_generate_response_with_max_tokens(self, mock_orchestrator):
         """Test response generation with max_tokens."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -101,7 +101,7 @@ class TestOpenAIClientGenerateResponse:
 
     def test_generate_response_with_temperature(self, mock_orchestrator):
         """Test response generation with temperature."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -120,7 +120,7 @@ class TestOpenAIClientGenerateCode:
 
     def test_generate_code_basic(self, mock_orchestrator):
         """Test basic code generation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -135,7 +135,7 @@ class TestOpenAIClientGenerateCode:
 
     def test_generate_code_with_language(self, mock_orchestrator):
         """Test code generation with language specification."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -154,7 +154,7 @@ class TestOpenAIClientExtractInsights:
 
     def test_extract_insights_basic(self, mock_orchestrator):
         """Test basic insights extraction."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -170,7 +170,7 @@ class TestOpenAIClientExtractInsights:
 
     def test_extract_insights_with_empty_response(self, mock_orchestrator):
         """Test insights extraction with empty response."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -186,7 +186,7 @@ class TestOpenAIClientExtractInsights:
 
     def test_extract_insights_with_project_context(self, mock_orchestrator):
         """Test insights extraction includes project context."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -206,7 +206,7 @@ class TestOpenAIClientSocraticQuestion:
 
     def test_generate_socratic_question_basic(self, mock_orchestrator):
         """Test basic socratic question generation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -221,7 +221,7 @@ class TestOpenAIClientSocraticQuestion:
 
     def test_generate_socratic_question_with_topic(self, mock_orchestrator):
         """Test socratic question generation with topic."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -240,7 +240,7 @@ class TestOpenAIClientCaching:
 
     def test_cache_key_generation(self, mock_orchestrator):
         """Test cache key generation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             key = client._get_cache_key("test message")
             assert isinstance(key, str)
@@ -248,7 +248,7 @@ class TestOpenAIClientCaching:
 
     def test_cache_hit(self, mock_orchestrator):
         """Test cache hit on repeated calls."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             message = "test"
             key = client._get_cache_key(message)
@@ -258,7 +258,7 @@ class TestOpenAIClientCaching:
 
     def test_different_messages_different_keys(self, mock_orchestrator):
         """Test different messages produce different cache keys."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="test-key", orchestrator=mock_orchestrator)
             key1 = client._get_cache_key("message 1")
             key2 = client._get_cache_key("message 2")
@@ -270,7 +270,7 @@ class TestOpenAIClientErrorHandling:
 
     def test_no_api_key_raises_error(self, mock_orchestrator):
         """Test APIError raised when no API key available."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             mock_orchestrator.database.get_api_key.return_value = None
             client = OpenAIClient(api_key=None, orchestrator=mock_orchestrator)
 
@@ -279,7 +279,7 @@ class TestOpenAIClientErrorHandling:
 
     def test_api_error_on_generation_failure(self, mock_orchestrator):
         """Test handling of API errors during generation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_client.chat.completions.create.side_effect = Exception("API Error")
@@ -296,14 +296,14 @@ class TestOpenAIClientAuthFlow:
 
     def test_get_auth_credential_api_key(self, mock_orchestrator):
         """Test getting auth credential."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="sk-my-key", orchestrator=mock_orchestrator)
             cred = client.get_auth_credential("api_key")
             assert cred == "sk-my-key"
 
     def test_get_user_api_key_fallback(self, mock_orchestrator):
         """Test fallback to environment key when user key not available."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             mock_orchestrator.database.get_api_key.return_value = None
             client = OpenAIClient(api_key="env-key", orchestrator=mock_orchestrator)
             key, is_user = client._get_user_api_key("user123")
@@ -316,7 +316,7 @@ class TestOpenAIClientIntegration:
 
     def test_client_initialization_and_use(self, mock_orchestrator):
         """Test full client initialization and usage."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()
@@ -333,7 +333,7 @@ class TestOpenAIClientIntegration:
 
     def test_multiple_api_calls(self, mock_orchestrator):
         """Test multiple API calls in sequence."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_response = Mock()

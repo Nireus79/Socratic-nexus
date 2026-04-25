@@ -48,7 +48,7 @@ class TestOpenAISpecificBehaviors:
 
     def test_openai_token_calculation(self, mock_orchestrator):
         """Test OpenAI's token calculation model."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
@@ -67,7 +67,7 @@ class TestOpenAISpecificBehaviors:
 
     def test_openai_model_selection(self, mock_orchestrator):
         """Test OpenAI model selection."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI"):
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             client = OpenAIClient(api_key="sk-test", orchestrator=mock_orchestrator)
 
             # Should use gpt-4-turbo from config
@@ -75,7 +75,7 @@ class TestOpenAISpecificBehaviors:
 
     def test_openai_rate_limit_retry(self, mock_orchestrator):
         """Test OpenAI rate limit handling."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
 
@@ -98,7 +98,7 @@ class TestOpenAISpecificBehaviors:
 
     def test_openai_response_format(self, mock_orchestrator):
         """Test OpenAI response format parsing."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
@@ -120,7 +120,7 @@ class TestOpenAISpecificBehaviors:
 
     def test_openai_function_calling_support(self, mock_orchestrator):
         """Test OpenAI function calling capability."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
@@ -299,7 +299,7 @@ class TestProviderTokenCostCalculation:
 
     def test_openai_token_pricing(self, mock_orchestrator):
         """Test OpenAI token cost calculation."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
@@ -338,7 +338,7 @@ class TestProviderErrorMessages:
 
     def test_openai_error_message_format(self, mock_orchestrator):
         """Test OpenAI error message format."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             mock_client.chat.completions.create.side_effect = Exception(
@@ -400,7 +400,7 @@ class TestProviderResponseVariations:
 
     def test_openai_response_with_multiple_choices(self, mock_orchestrator):
         """Test OpenAI handling multiple choice responses."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
@@ -456,7 +456,7 @@ class TestProviderCaching:
 
     def test_provider_specific_cache_behavior(self, mock_orchestrator):
         """Test provider-specific cache implementations."""
-        with patch("socratic_nexus.clients.openai_client.OpenAI") as mock_openai:
+        with patch("socratic_nexus.clients.openai_client.openai.OpenAI") as mock_openai:
             mock_client = Mock()
             mock_openai.return_value = mock_client
             response = Mock()
