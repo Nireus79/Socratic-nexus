@@ -1,7 +1,7 @@
 """Tests for Openclaw integration."""
 
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.clients.openai_client import OpenAIClient
@@ -117,7 +117,7 @@ class TestNexusLLMSkillQuery:
             client=mock_client,
             system_prompt="You are an expert.",
         )
-        response = skill.query("Question?")
+        skill.query("Question?")
 
         call_args = mock_client.generate_response.call_args[0][0]
         assert "You are an expert." in call_args

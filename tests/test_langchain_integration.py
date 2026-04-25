@@ -1,7 +1,7 @@
 """Tests for LangChain integration."""
 
 import pytest
-from unittest.mock import Mock, MagicMock, patch
+from unittest.mock import Mock
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.clients.openai_client import OpenAIClient

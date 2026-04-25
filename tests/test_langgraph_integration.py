@@ -1,7 +1,7 @@
 """Tests for LangGraph integration."""
 
 import pytest
-from unittest.mock import Mock, MagicMock
+from unittest.mock import Mock
 
 from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.integrations.langgraph import (
@@ -9,7 +9,6 @@ from socratic_nexus.integrations.langgraph import (
     create_nexus_agent,
     create_routing_node,
 )
-from socratic_nexus.models import ChatResponse, TokenUsage
 
 
 @pytest.fixture
@@ -57,7 +56,7 @@ class TestCreateNexusNode:
         )
 
         state = {"text": "Long text to summarize"}
-        result = node(state)
+        node(state)
 
         # Verify client was called with system prompt prepended
         mock_client.generate_response.assert_called_once()
