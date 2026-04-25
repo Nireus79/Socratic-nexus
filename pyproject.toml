@@ -55,6 +55,7 @@ huggingface = ["huggingface-hub>=0.17.0"]
 # Integrations
 openclaw = []
 langchain = ["langchain>=0.1.0"]
+langraph = ["langgraph>=0.0.1"]
 
 # All providers
 all = [
