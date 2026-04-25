@@ -21,8 +21,13 @@ class TestOllamaClientInitialization:
         pytest.importorskip("requests")
         from socratic_nexus.clients.ollama_client import OllamaClient
 
+        orch = Mock()
+        orch.config = Mock()
+        orch.config.ollama_model = "mistral"
+        orch.config.ollama_url = "http://localhost:11434"
+
         with patch("socratic_nexus.clients.ollama_client.requests"):
-            client = OllamaClient()
+            client = OllamaClient(orchestrator=orch)
 
             assert client is not None
             # Should have base_url set
@@ -77,6 +82,8 @@ class TestOllamaClientApiCalls:
 
             orch = Mock()
             orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
             orch.event_emitter = Mock()
             orch.system_monitor = Mock()
 
@@ -102,6 +109,8 @@ class TestOllamaClientApiCalls:
 
             orch = Mock()
             orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
             orch.event_emitter = Mock()
             orch.system_monitor = Mock()
 
@@ -126,6 +135,8 @@ class TestOllamaClientApiCalls:
 
             orch = Mock()
             orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
             orch.event_emitter = Mock()
             orch.system_monitor = Mock()
 
@@ -148,7 +159,12 @@ class TestOllamaClientNetworkHandling:
         with patch("socratic_nexus.clients.ollama_client.requests.post") as mock_post:
             mock_post.side_effect = Exception("Connection refused")
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
+
+            client = OllamaClient(orchestrator=orch)
 
             # Should initialize even if Ollama server is not running
             assert client is not None
@@ -163,7 +179,12 @@ class TestOllamaClientNetworkHandling:
             mock_response.json.side_effect = ValueError("Invalid JSON")
             mock_post.return_value = mock_response
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
+
+            client = OllamaClient(orchestrator=orch)
 
             # Should handle gracefully
             assert client is not None
@@ -174,10 +195,14 @@ class TestOllamaClientNetworkHandling:
         from socratic_nexus.clients.ollama_client import OllamaClient
 
         with patch("socratic_nexus.clients.ollama_client.requests.post") as mock_post:
-            import requests
-            mock_post.side_effect = requests.ConnectionError("Server offline")
+            mock_post.side_effect = Exception("Server offline")
 
-            client = OllamaClient()
+            orch = Mock()
+            orch.config = Mock()
+            orch.config.ollama_model = "mistral"
+            orch.config.ollama_url = "http://localhost:11434"
+
+            client = OllamaClient(orchestrator=orch)
             # Should not crash during initialization
             assert client is not None
 
@@ -211,6 +236,7 @@ class TestOllamaClientCustomization:
                 orch = Mock()
                 orch.config = Mock()
                 orch.config.ollama_model = model_name
+                orch.config.ollama_url = "http://localhost:11434"
 
                 client = OllamaClient(orchestrator=orch)
                 assert client is not None
