@@ -194,14 +194,21 @@ class TestGenerateAsyncMethods:
 
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text='{"recommendations": []}')], usage=Mock(input_tokens=10, output_tokens=20)
+                    content=[Mock(text='{"recommendations": []}')],
+                    usage=Mock(input_tokens=10, output_tokens=20),
                 )
             )
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-                client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator, subscription_token="sub-token")
+                client = ClaudeClient(
+                    api_key="test-key",
+                    orchestrator=mock_orchestrator,
+                    subscription_token="sub-token",
+                )
                 project = ProjectContext(project_name="Test")
-                result = await client.extract_tech_recommendations_async(project, "backend", user_auth_method="subscription")
+                result = await client.extract_tech_recommendations_async(
+                    project, "backend", user_auth_method="subscription"
+                )
                 assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio

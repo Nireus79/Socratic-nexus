@@ -58,7 +58,7 @@ class TestOpenAIClientInitialization:
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
             # Should have model attribute or use config
-            assert hasattr(client, 'model') or hasattr(client, 'orchestrator')
+            assert hasattr(client, "model") or hasattr(client, "orchestrator")
 
 
 class TestOpenAIClientApiCalls:
@@ -85,7 +85,7 @@ class TestOpenAIClientApiCalls:
 
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
-            if hasattr(client, 'generate_response'):
+            if hasattr(client, "generate_response"):
                 result = client.generate_response("test prompt")
                 # Should execute the method
                 assert result is not None or result is None
@@ -111,7 +111,7 @@ class TestOpenAIClientApiCalls:
 
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
-            if hasattr(client, 'generate_code'):
+            if hasattr(client, "generate_code"):
                 result = client.generate_code("write a function")
                 assert result is not None or result is None
 
@@ -138,7 +138,7 @@ class TestOpenAIClientApiCalls:
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
-            if hasattr(client, 'extract_insights'):
+            if hasattr(client, "extract_insights"):
                 result = client.extract_insights("user response", project)
                 assert result is not None or result is None
 
@@ -200,7 +200,7 @@ class TestOpenAIClientWithOrchestrator:
 
             client = OpenAIClient(api_key="sk-test-key", orchestrator=orch)
 
-            if hasattr(client, 'generate_response'):
+            if hasattr(client, "generate_response"):
                 # Token tracking should work if implemented
                 assert client.orchestrator is orch
 

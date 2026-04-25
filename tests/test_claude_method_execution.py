@@ -32,10 +32,7 @@ class TestMethodExecution:
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="sk-test", orchestrator=orch)
-            project = ProjectContext(
-                project_name="TestProject",
-                phase="design"
-            )
+            project = ProjectContext(project_name="TestProject", phase="design")
 
             # ACTUALLY CALL THE METHOD
             result = client.generate_socratic_question(project)
@@ -57,7 +54,7 @@ class TestMethodExecution:
         # Mock vector DB search
         orch.vector_db.search_similar.return_value = [
             {"content": "Sample knowledge result 1"},
-            {"content": "Sample knowledge result 2"}
+            {"content": "Sample knowledge result 2"},
         ]
         orch.context_analyzer.get_context_summary.return_value = "Project context summary"
 
@@ -76,8 +73,8 @@ class TestMethodExecution:
                 project_name="TestProject",
                 conversation_history=[
                     {"type": "user", "content": "How do I..."},
-                    {"type": "assistant", "content": "You could..."}
-                ]
+                    {"type": "assistant", "content": "You could..."},
+                ],
             )
 
             # ACTUALLY CALL THE METHOD
@@ -107,6 +104,7 @@ class TestMethodExecution:
 
             # Should raise APIError
             from socratic_nexus.exceptions import APIError
+
             with pytest.raises(APIError):
                 client.generate_socratic_question(project)
 
@@ -132,7 +130,7 @@ class TestMethodExecution:
             project = ProjectContext(project_name="Test")
 
             # ACTUALLY CALL THE METHOD
-            if hasattr(client, 'evaluate_quality_metrics'):
+            if hasattr(client, "evaluate_quality_metrics"):
                 client.evaluate_quality_metrics("Test artifact", project)
                 assert mock_client.messages.create.called
 
@@ -158,7 +156,7 @@ class TestMethodExecution:
             project = ProjectContext(project_name="Test")
 
             # ACTUALLY CALL THE METHOD
-            if hasattr(client, 'extract_tech_recommendations'):
+            if hasattr(client, "extract_tech_recommendations"):
                 client.extract_tech_recommendations(project, "backend")
                 assert mock_client.messages.create.called
 
@@ -184,10 +182,7 @@ class TestGenerateResponseExecution:
             client = ClaudeClient(api_key="sk-test", orchestrator=orch)
 
             # ACTUALLY CALL WITH PARAMETERS
-            client.generate_response(
-                "Test prompt",
-                temperature=0.5
-            )
+            client.generate_response("Test prompt", temperature=0.5)
 
             # Verify API was called
             assert mock_client.messages.create.called
@@ -217,7 +212,7 @@ class TestGenerateResponseExecution:
                 temperature=0.7,
                 max_tokens=500,
                 user_id="user123",
-                user_auth_method="api_key"
+                user_auth_method="api_key",
             )
 
             assert mock_client.messages.create.called
@@ -270,11 +265,7 @@ class TestGenerateCodeExecution:
             client = ClaudeClient(api_key="sk-test", orchestrator=orch)
 
             # ACTUALLY CALL WITH USER CONTEXT
-            client.generate_code(
-                "Write code",
-                user_id="user456",
-                user_auth_method="api_key"
-            )
+            client.generate_code("Write code", user_id="user456", user_auth_method="api_key")
 
             assert mock_client.messages.create.called
 
@@ -285,7 +276,9 @@ class TestInitializationPathsExecution:
     def test_client_lazy_initialization_api_key(self):
         """Test client creation executes initialization"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_client = Mock()
                 mock_async_client = Mock()
                 mock_anth.return_value = mock_client

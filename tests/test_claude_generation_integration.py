@@ -150,7 +150,7 @@ class TestJsonResponseParsing:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            result = client._parse_json_response('{}')
+            result = client._parse_json_response("{}")
 
             assert result == {}
 
@@ -159,7 +159,7 @@ class TestJsonResponseParsing:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            json_array = '[1, 2, 3, 4, 5]'
+            json_array = "[1, 2, 3, 4, 5]"
             result = client._parse_json_response(json_array)
 
             # Result may be dict or original array depending on implementation
@@ -242,7 +242,7 @@ class TestArtifactGeneration:
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
-            if hasattr(client, 'generate_artifact'):
+            if hasattr(client, "generate_artifact"):
                 result = client.generate_artifact("create an SVG logo", "svg_design")
                 assert result is not None or result is None
 
@@ -307,8 +307,7 @@ class TestMarketingPlanGeneration:
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(
-                project_name="SaaS Product",
-                description="Cloud-based analytics platform"
+                project_name="SaaS Product", description="Cloud-based analytics platform"
             )
 
             result = client.generate_marketing_plan(project)

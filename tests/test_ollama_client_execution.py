@@ -148,10 +148,8 @@ class TestOllamaClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OllamaClient(orchestrator=orch)
-            if hasattr(client, 'generate_business_plan'):
-                client.generate_business_plan(
-                    ProjectContext(project_name="Test")
-                )
+            if hasattr(client, "generate_business_plan"):
+                client.generate_business_plan(ProjectContext(project_name="Test"))
                 assert mock_session.post.called or True
 
     def test_ollama_generate_documentation(self):
@@ -177,10 +175,8 @@ class TestOllamaClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OllamaClient(orchestrator=orch)
-            if hasattr(client, 'generate_documentation'):
-                client.generate_documentation(
-                    ProjectContext(project_name="Test")
-                )
+            if hasattr(client, "generate_documentation"):
+                client.generate_documentation(ProjectContext(project_name="Test"))
                 assert mock_session.post.called or True
 
     def test_ollama_cache_operations(self):
@@ -201,7 +197,7 @@ class TestOllamaClientMethodExecution:
 
             client = OllamaClient(orchestrator=orch)
 
-            if hasattr(client, '_get_cache_key'):
+            if hasattr(client, "_get_cache_key"):
                 key = client._get_cache_key("test")
                 assert isinstance(key, str)
 

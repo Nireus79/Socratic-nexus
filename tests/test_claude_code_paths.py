@@ -20,7 +20,9 @@ class TestClientInitializationPaths:
     def test_client_with_api_key_not_starting_with_placeholder(self):
         """Test client initialization when api_key is not placeholder"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async_anth:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async_anth:
                 mock_client = Mock()
                 mock_async_client = Mock()
                 mock_anth.return_value = mock_client
@@ -32,7 +34,9 @@ class TestClientInitializationPaths:
                 # Both clients should have been created
                 mock_anth.assert_called()
                 mock_async_anth.assert_called()
-                assert client.client is not None or client.client is None  # Either created or None if mocking prevented it
+                assert (
+                    client.client is not None or client.client is None
+                )  # Either created or None if mocking prevented it
 
     def test_client_with_placeholder_api_key(self):
         """Test client initialization with placeholder API key skips initialization"""
@@ -54,16 +58,15 @@ class TestClientInitializationPaths:
     def test_client_initialization_with_subscription_token(self):
         """Test client initialization with subscription token"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_sync = Mock()
                 mock_async_inst = Mock()
                 mock_anth.return_value = mock_sync
                 mock_async.return_value = mock_async_inst
 
-                client = ClaudeClient(
-                    api_key="sk-test",
-                    subscription_token="sub-token-123"
-                )
+                client = ClaudeClient(api_key="sk-test", subscription_token="sub-token-123")
 
                 # Subscription clients should be initialized
                 assert client.subscription_token == "sub-token-123"
@@ -83,13 +86,12 @@ class TestClientInitializationPaths:
     def test_client_initialization_error_handling_async(self):
         """Test handling of async client initialization error"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_async.side_effect = Exception("Async init failed")
 
-                client = ClaudeClient(
-                    api_key="sk-test",
-                    subscription_token="sub-token"
-                )
+                client = ClaudeClient(api_key="sk-test", subscription_token="sub-token")
 
                 # Client should be created but async_client would be None
                 assert client is not None
@@ -110,10 +112,7 @@ class TestGetAuthCredentialPaths:
     def test_get_auth_credential_subscription_path(self):
         """Test get_auth_credential returns subscription_token for 'subscription' method"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(
-                api_key="sk-fallback",
-                subscription_token="sub-token-456"
-            )
+            client = ClaudeClient(api_key="sk-fallback", subscription_token="sub-token-456")
 
             credential = client.get_auth_credential("subscription")
 
@@ -290,7 +289,7 @@ class TestJsonParsing:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            array_json = '[1, 2, 3, 4, 5]'
+            array_json = "[1, 2, 3, 4, 5]"
             result = client._parse_json_response(array_json)
 
             # Should handle array (might return empty dict if array not root)

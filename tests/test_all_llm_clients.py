@@ -18,6 +18,7 @@ class TestGoogleClientBasic:
     def test_google_client_import(self):
         """Test that Google client can be imported with google dependency"""
         from socratic_nexus.clients.google_client import GoogleClient
+
         assert GoogleClient is not None
 
     def test_google_client_init(self):
@@ -80,6 +81,7 @@ class TestOllamaClientBasic:
         """Test that Ollama client can be imported"""
         pytest.importorskip("requests")
         from socratic_nexus.clients.ollama_client import OllamaClient
+
         assert OllamaClient is not None
 
     def test_ollama_client_init(self):
@@ -153,6 +155,7 @@ class TestClientInterfaces:
         try:
             pytest.importorskip("google.genai")
             from socratic_nexus.clients.google_client import GoogleClient
+
             available_clients.append(("Google", GoogleClient))
         except (pytest.skip.Exception, ModuleNotFoundError):
             pass
@@ -161,6 +164,7 @@ class TestClientInterfaces:
             pytest.importorskip("cryptography")
             pytest.importorskip("openai")
             from socratic_nexus.clients.openai_client import OpenAIClient
+
             available_clients.append(("OpenAI", OpenAIClient))
         except (pytest.skip.Exception, ModuleNotFoundError):
             pass
@@ -168,6 +172,7 @@ class TestClientInterfaces:
         try:
             pytest.importorskip("requests")
             from socratic_nexus.clients.ollama_client import OllamaClient
+
             available_clients.append(("Ollama", OllamaClient))
         except pytest.skip.Exception:
             pass

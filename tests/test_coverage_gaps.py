@@ -61,6 +61,7 @@ class TestGoogleClientGaps:
     def test_google_decrypt_api_key_with_valid_base64(self):
         """Test _decrypt_api_key_from_db with valid base64 fallback."""
         import base64
+
         with patch("socratic_nexus.clients.google_client.genai"):
             from socratic_nexus.clients.google_client import GoogleClient
 
@@ -116,6 +117,7 @@ class TestOpenAIClientGaps:
     def test_openai_decrypt_api_key_with_valid_base64(self):
         """Test _decrypt_api_key_from_db with valid base64."""
         import base64
+
         with patch("socratic_nexus.clients.openai_client.openai.OpenAI"):
             from socratic_nexus.clients.openai_client import OpenAIClient
 
@@ -175,6 +177,7 @@ class TestOllamaClientGaps:
     def test_ollama_decrypt_api_key_with_valid_base64(self):
         """Test _decrypt_api_key_from_db with valid base64."""
         import base64
+
         with patch("socratic_nexus.clients.ollama_client.requests.Session"):
             from socratic_nexus.clients.ollama_client import OllamaClient
 

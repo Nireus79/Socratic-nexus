@@ -55,7 +55,7 @@ class TestGoogleClientInitialization:
             client = GoogleClient(api_key="test-key", orchestrator=orch)
 
             # Should use orchestrator's model setting
-            if hasattr(client, 'model'):
+            if hasattr(client, "model"):
                 assert client.model == "gemini-pro-vision" or client.model is not None
 
 
@@ -82,7 +82,7 @@ class TestGoogleClientGeneration:
             client = GoogleClient(api_key="test-key", orchestrator=orch)
 
             # Should be able to call generate_response
-            if hasattr(client, 'generate_response'):
+            if hasattr(client, "generate_response"):
                 result = client.generate_response("test prompt")
                 assert result is not None or result is None
 
@@ -105,7 +105,7 @@ class TestGoogleClientGeneration:
 
             client = GoogleClient(api_key="test-key", orchestrator=orch)
 
-            if hasattr(client, 'generate_code'):
+            if hasattr(client, "generate_code"):
                 result = client.generate_code("write a function")
                 assert result is not None or result is None
 
@@ -130,7 +130,7 @@ class TestGoogleClientGeneration:
             client = GoogleClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
-            if hasattr(client, 'extract_insights'):
+            if hasattr(client, "extract_insights"):
                 result = client.extract_insights("test response", project)
                 assert result is not None or result is None
 

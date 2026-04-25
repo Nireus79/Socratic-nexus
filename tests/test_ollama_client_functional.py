@@ -31,7 +31,7 @@ class TestOllamaClientInitialization:
 
             assert client is not None
             # Should have base_url set
-            assert hasattr(client, 'base_url')
+            assert hasattr(client, "base_url")
 
     def test_ollama_client_init_with_custom_url(self):
         """Test OllamaClient initializes with custom URL"""
@@ -62,7 +62,7 @@ class TestOllamaClientInitialization:
 
             assert client.orchestrator is orch
             # Should have model configured
-            assert hasattr(client, 'model') or hasattr(client, 'orchestrator')
+            assert hasattr(client, "model") or hasattr(client, "orchestrator")
 
 
 class TestOllamaClientApiCalls:
@@ -85,9 +85,7 @@ class TestOllamaClientApiCalls:
             # Mock the API response
             mock_response = Mock()
             mock_response.status_code = 200
-            mock_response.json.return_value = {
-                "response": "Ollama generated response"
-            }
+            mock_response.json.return_value = {"response": "Ollama generated response"}
             mock_response.raise_for_status = Mock()
             mock_session.post.return_value = mock_response
 
@@ -100,7 +98,7 @@ class TestOllamaClientApiCalls:
 
             client = OllamaClient(orchestrator=orch)
 
-            if hasattr(client, 'generate_response'):
+            if hasattr(client, "generate_response"):
                 result = client.generate_response("test prompt")
                 # Should successfully generate response from mocked Ollama
                 assert isinstance(result, str) or result is None
@@ -112,9 +110,7 @@ class TestOllamaClientApiCalls:
 
         with patch("socratic_nexus.clients.ollama_client.requests.post") as mock_post:
             mock_response = Mock()
-            mock_response.json.return_value = {
-                "response": "def hello():\n    return 'world'"
-            }
+            mock_response.json.return_value = {"response": "def hello():\n    return 'world'"}
             mock_post.return_value = mock_response
 
             orch = Mock()
@@ -126,7 +122,7 @@ class TestOllamaClientApiCalls:
 
             client = OllamaClient(orchestrator=orch)
 
-            if hasattr(client, 'generate_code'):
+            if hasattr(client, "generate_code"):
                 result = client.generate_code("write a function")
                 assert result is not None or result is None
 
@@ -153,7 +149,7 @@ class TestOllamaClientApiCalls:
             client = OllamaClient(orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
-            if hasattr(client, 'extract_insights'):
+            if hasattr(client, "extract_insights"):
                 result = client.extract_insights("test response", project)
                 assert result is not None or result is None
 

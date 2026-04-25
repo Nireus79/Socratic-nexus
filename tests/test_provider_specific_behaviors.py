@@ -163,7 +163,9 @@ class TestGoogleSpecificBehaviors:
         """Test Google's token calculation model."""
         pytest.importorskip("google.generativeai")
 
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_generative_model:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_generative_model:
             mock_model = Mock()
             mock_response = Mock()
             mock_response.text = "response"

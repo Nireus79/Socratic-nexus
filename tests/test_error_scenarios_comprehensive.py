@@ -35,9 +35,7 @@ class TestAPIErrorHandling:
 
     def test_api_error_in_generate_response(self, mock_orchestrator):
         """Test handling of generic API errors."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception(
@@ -54,9 +52,7 @@ class TestAPIErrorHandling:
 
     def test_timeout_error(self, mock_orchestrator):
         """Test handling of timeout errors."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = TimeoutError(
@@ -73,14 +69,10 @@ class TestAPIErrorHandling:
 
     def test_connection_error(self, mock_orchestrator):
         """Test handling of connection errors."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.side_effect = ConnectionError(
-                "Failed to connect to API"
-            )
+            mock_client.messages.create.side_effect = ConnectionError("Failed to connect to API")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -92,14 +84,10 @@ class TestAPIErrorHandling:
 
     def test_authentication_error(self, mock_orchestrator):
         """Test handling of authentication errors."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.side_effect = Exception(
-                "401 Unauthorized: Invalid API key"
-            )
+            mock_client.messages.create.side_effect = Exception("401 Unauthorized: Invalid API key")
 
             client = ClaudeClient(api_key="invalid-key", orchestrator=mock_orchestrator)
 
@@ -111,9 +99,7 @@ class TestAPIErrorHandling:
 
     def test_rate_limit_error(self, mock_orchestrator):
         """Test handling of rate limit errors."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception(
@@ -134,9 +120,7 @@ class TestMalformedResponseHandling:
 
     def test_missing_content_field(self, mock_orchestrator):
         """Test handling when response lacks content."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -154,9 +138,7 @@ class TestMalformedResponseHandling:
 
     def test_invalid_json_response(self, mock_orchestrator):
         """Test handling of invalid JSON in structured responses."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -165,18 +147,14 @@ class TestMalformedResponseHandling:
             mock_client.messages.create.return_value = response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = client.extract_insights("response", ProjectContext(
-                project_name="Test"
-            ))
+            result = client.extract_insights("response", ProjectContext(project_name="Test"))
 
             # Should return dict (empty or with parsed data)
             assert isinstance(result, dict)
 
     def test_malformed_json_array_in_detect_conflicts(self, mock_orchestrator):
         """Test handling of malformed JSON arrays in async conflict detection."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -187,6 +165,7 @@ class TestMalformedResponseHandling:
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             # Use pytest.mark.asyncio or create an async test
             import asyncio
+
             result = asyncio.run(client.detect_conflicts_async([]))
 
             # Should handle gracefully
@@ -194,9 +173,7 @@ class TestMalformedResponseHandling:
 
     def test_empty_response_string(self, mock_orchestrator):
         """Test handling of empty response strings."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -216,9 +193,7 @@ class TestInputValidationErrors:
 
     def test_none_prompt(self, mock_orchestrator):
         """Test handling of None prompt."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -238,9 +213,7 @@ class TestInputValidationErrors:
 
     def test_extremely_long_prompt(self, mock_orchestrator):
         """Test handling of very long prompts."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -258,9 +231,7 @@ class TestInputValidationErrors:
 
     def test_special_characters_in_prompt(self, mock_orchestrator):
         """Test handling of special characters."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -277,9 +248,7 @@ class TestInputValidationErrors:
 
     def test_unicode_characters_in_prompt(self, mock_orchestrator):
         """Test handling of Unicode characters."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -296,9 +265,7 @@ class TestInputValidationErrors:
 
     def test_null_byte_in_prompt(self, mock_orchestrator):
         """Test handling of null bytes."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -319,9 +286,7 @@ class TestAuthenticationErrors:
 
     def test_missing_api_key(self, mock_orchestrator):
         """Test behavior with missing API key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_anth.return_value = None
 
             # Client initialization with None API key
@@ -336,14 +301,10 @@ class TestAuthenticationErrors:
 
     def test_invalid_api_key_format(self, mock_orchestrator):
         """Test with invalid API key format."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.side_effect = Exception(
-                "Invalid API key format"
-            )
+            mock_client.messages.create.side_effect = Exception("Invalid API key format")
 
             client = ClaudeClient(api_key="not-a-real-key", orchestrator=mock_orchestrator)
 
@@ -355,14 +316,10 @@ class TestAuthenticationErrors:
 
     def test_expired_api_key(self, mock_orchestrator):
         """Test with expired API key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.side_effect = Exception(
-                "401 Unauthorized: API key expired"
-            )
+            mock_client.messages.create.side_effect = Exception("401 Unauthorized: API key expired")
 
             client = ClaudeClient(api_key="expired-key", orchestrator=mock_orchestrator)
 
@@ -378,9 +335,7 @@ class TestParameterValidationErrors:
 
     def test_invalid_max_tokens(self, mock_orchestrator):
         """Test handling of invalid max_tokens."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -404,9 +359,7 @@ class TestParameterValidationErrors:
 
     def test_invalid_temperature(self, mock_orchestrator):
         """Test handling of invalid temperature."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -430,9 +383,7 @@ class TestCacheErrorHandling:
 
     def test_cache_with_large_response(self, mock_orchestrator):
         """Test caching with very large responses."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
 
@@ -445,14 +396,10 @@ class TestCacheErrorHandling:
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
             # First call - caches result
-            result1 = client.extract_insights("test", ProjectContext(
-                project_name="Test"
-            ))
+            result1 = client.extract_insights("test", ProjectContext(project_name="Test"))
 
             # Second call - uses cache
-            result2 = client.extract_insights("test", ProjectContext(
-                project_name="Test"
-            ))
+            result2 = client.extract_insights("test", ProjectContext(project_name="Test"))
 
             # Should work without memory issues
             assert isinstance(result1, dict)
@@ -460,9 +407,7 @@ class TestCacheErrorHandling:
 
     def test_cache_collision_handling(self, mock_orchestrator):
         """Test handling of potential cache key collisions."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -474,9 +419,7 @@ class TestCacheErrorHandling:
 
             # Make many similar requests
             for i in range(100):
-                result = client.extract_insights(f"prompt {i}", ProjectContext(
-                    project_name="Test"
-                ))
+                result = client.extract_insights(f"prompt {i}", ProjectContext(project_name="Test"))
                 assert isinstance(result, dict)
 
 
@@ -486,9 +429,7 @@ class TestAsyncErrorHandling:
     @pytest.mark.asyncio
     async def test_async_api_error(self, mock_orchestrator):
         """Test async method error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -502,17 +443,13 @@ class TestAsyncErrorHandling:
     @pytest.mark.asyncio
     async def test_async_timeout_error(self, mock_orchestrator):
         """Test async timeout handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = asyncio.TimeoutError()
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = await client.analyze_context_async(ProjectContext(
-                project_name="Test"
-            ))
+            result = await client.analyze_context_async(ProjectContext(project_name="Test"))
 
             # Should return empty string on error
             assert result == "" or result is None
@@ -520,22 +457,20 @@ class TestAsyncErrorHandling:
     @pytest.mark.asyncio
     async def test_concurrent_async_errors(self, mock_orchestrator):
         """Test handling of errors in concurrent async calls."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
 
             # Half fail, half succeed
             responses = [
                 Exception("Error"),
-                Mock(content=[Mock(text="response")], usage=Mock(
-                    input_tokens=10, output_tokens=20
-                )),
+                Mock(
+                    content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
+                ),
                 Exception("Error"),
-                Mock(content=[Mock(text="response")], usage=Mock(
-                    input_tokens=10, output_tokens=20
-                )),
+                Mock(
+                    content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
+                ),
             ]
             mock_client.messages.create.side_effect = responses
 
@@ -557,9 +492,7 @@ class TestBoundaryConditions:
 
     def test_minimum_valid_response(self, mock_orchestrator):
         """Test with minimum valid API response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -574,9 +507,7 @@ class TestBoundaryConditions:
 
     def test_maximum_valid_response(self, mock_orchestrator):
         """Test with maximum valid API response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -591,9 +522,7 @@ class TestBoundaryConditions:
 
     def test_zero_token_response(self, mock_orchestrator):
         """Test with zero tokens in response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -608,9 +537,7 @@ class TestBoundaryConditions:
 
     def test_float_token_values(self, mock_orchestrator):
         """Test with float token values."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()

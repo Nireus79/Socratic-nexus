@@ -27,9 +27,7 @@ def mock_orchestrator():
     return orch
 
 
-def create_mock_async_response(
-    text="response", input_tokens=10, output_tokens=20
-):
+def create_mock_async_response(text="response", input_tokens=10, output_tokens=20):
     """Helper to create mock async API response."""
     response = Mock()
     response.content = [Mock(text=text)]
@@ -43,14 +41,10 @@ class TestDetectConflictsAsync:
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_basic(self, mock_orchestrator):
         """Test basic conflict detection."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             requirements = [
@@ -64,9 +58,7 @@ class TestDetectConflictsAsync:
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_with_conflicts(self, mock_orchestrator):
         """Test conflict detection with actual conflicts."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response_text = """[
@@ -77,9 +69,7 @@ class TestDetectConflictsAsync:
                     "description": "High performance conflicts with low resource usage"
                 }
             ]"""
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             requirements = [
@@ -93,14 +83,10 @@ class TestDetectConflictsAsync:
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_empty_requirements(self, mock_orchestrator):
         """Test with empty requirements list."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = await client.detect_conflicts_async([])
@@ -110,9 +96,7 @@ class TestDetectConflictsAsync:
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_error_handling(self, mock_orchestrator):
         """Test error handling in conflict detection."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -126,33 +110,23 @@ class TestDetectConflictsAsync:
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_with_api_key_auth(self, mock_orchestrator):
         """Test with api_key authentication method."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            result = await client.detect_conflicts_async(
-                ["req1"], user_auth_method="api_key"
-            )
+            result = await client.detect_conflicts_async(["req1"], user_auth_method="api_key")
 
             assert isinstance(result, list)
 
     @pytest.mark.asyncio
     async def test_detect_conflicts_async_complex_requirements(self, mock_orchestrator):
         """Test with complex requirement objects."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             requirements = [
@@ -170,14 +144,10 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_basic(self, mock_orchestrator):
         """Test basic context analysis."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Analysis text")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("Analysis text")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="TestProject")
@@ -189,13 +159,11 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_full_context(self, mock_orchestrator):
         """Test with fully populated ProjectContext."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Comprehensive analysis")
+            mock_client.messages.create.return_value = create_mock_async_response(
+                "Comprehensive analysis"
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -215,14 +183,10 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_minimal_context(self, mock_orchestrator):
         """Test with minimal ProjectContext."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Analysis")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("Analysis")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Minimal")
@@ -233,9 +197,7 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_error_handling(self, mock_orchestrator):
         """Test error handling in context analysis."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -250,15 +212,11 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_with_long_response(self, mock_orchestrator):
         """Test with long response text."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             long_text = "Analysis " * 100
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(long_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(long_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -270,14 +228,10 @@ class TestAnalyzeContextAsync:
     @pytest.mark.asyncio
     async def test_analyze_context_async_various_phases(self, mock_orchestrator):
         """Test with different project phases."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Analysis")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("Analysis")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -294,34 +248,22 @@ class TestExtractTechRecommendationsAsync:
     @pytest.mark.asyncio
     async def test_extract_tech_recommendations_async_basic(self, mock_orchestrator):
         """Test basic tech recommendations extraction."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response_text = '{"recommendations": [{"tech": "Python", "score": 9}]}'
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(
-                project_name="Test", tech_stack=["JavaScript"]
-            )
-            result = await client.extract_tech_recommendations_async(
-                project, "database"
-            )
+            project = ProjectContext(project_name="Test", tech_stack=["JavaScript"])
+            result = await client.extract_tech_recommendations_async(project, "database")
 
             assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_for_database(
-        self, mock_orchestrator
-    ):
+    async def test_extract_tech_recommendations_async_for_database(self, mock_orchestrator):
         """Test tech recommendations for database query."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response_text = """{
@@ -330,9 +272,7 @@ class TestExtractTechRecommendationsAsync:
                     {"technology": "MongoDB", "pros": ["Scalability"], "cons": ["transactions"]}
                 ]
             }"""
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="DataApp")
@@ -341,38 +281,24 @@ class TestExtractTechRecommendationsAsync:
             assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_for_framework(
-        self, mock_orchestrator
-    ):
+    async def test_extract_tech_recommendations_async_for_framework(self, mock_orchestrator):
         """Test tech recommendations for framework query."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            response_text = (
-                '{"recommendations": [{"framework": "FastAPI", "rating": 9}]}'
-            )
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            response_text = '{"recommendations": [{"framework": "FastAPI", "rating": 9}]}'
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="API")
-            result = await client.extract_tech_recommendations_async(
-                project, "web framework"
-            )
+            result = await client.extract_tech_recommendations_async(project, "web framework")
 
             assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_error_handling(
-        self, mock_orchestrator
-    ):
+    async def test_extract_tech_recommendations_async_error_handling(self, mock_orchestrator):
         """Test error handling in tech recommendations."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -385,18 +311,12 @@ class TestExtractTechRecommendationsAsync:
             assert result == {}
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_invalid_json(
-        self, mock_orchestrator
-    ):
+    async def test_extract_tech_recommendations_async_invalid_json(self, mock_orchestrator):
         """Test handling of invalid JSON response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("not valid json")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("not valid json")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -405,17 +325,13 @@ class TestExtractTechRecommendationsAsync:
             assert isinstance(result, (dict, list, type(None)))
 
     @pytest.mark.asyncio
-    async def test_extract_tech_recommendations_async_with_tech_stack(
-        self, mock_orchestrator
-    ):
+    async def test_extract_tech_recommendations_async_with_tech_stack(self, mock_orchestrator):
         """Test tech recommendations with project tech stack."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"recommendations": []}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"recommendations": []}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -423,22 +339,18 @@ class TestExtractTechRecommendationsAsync:
                 project_name="Test",
                 tech_stack=["Python", "FastAPI"],
             )
-            result = await client.extract_tech_recommendations_async(
-                project, "backend"
-            )
+            result = await client.extract_tech_recommendations_async(project, "backend")
 
             assert isinstance(result, (dict, list))
 
     @pytest.mark.asyncio
     async def test_extract_tech_recommendations_async_empty_query(self, mock_orchestrator):
         """Test with empty query string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"recommendations": []}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"recommendations": []}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -454,15 +366,11 @@ class TestEvaluateQualityAsync:
     @pytest.mark.asyncio
     async def test_evaluate_quality_async_basic(self, mock_orchestrator):
         """Test basic quality evaluation."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response_text = '{"score": 8, "feedback": "Good code"}'
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             code = "def hello():\n    print('hello')"
@@ -473,9 +381,7 @@ class TestEvaluateQualityAsync:
     @pytest.mark.asyncio
     async def test_evaluate_quality_async_code_content(self, mock_orchestrator):
         """Test quality evaluation for code."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             response_text = """{
@@ -484,9 +390,7 @@ class TestEvaluateQualityAsync:
                 "feedback": "Well structured",
                 "improvements": ["Add docstrings", "Add type hints"]
             }"""
-            mock_client.messages.create.return_value = (
-                create_mock_async_response(response_text)
-            )
+            mock_client.messages.create.return_value = create_mock_async_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             code = "def add(a, b):\n    return a + b"
@@ -495,33 +399,25 @@ class TestEvaluateQualityAsync:
             assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async def test_evaluate_quality_async_documentation_content(
-        self, mock_orchestrator
-    ):
+    async def test_evaluate_quality_async_documentation_content(self, mock_orchestrator):
         """Test quality evaluation for documentation."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"score": 9, "feedback": "Excellent docs"}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"score": 9, "feedback": "Excellent docs"}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             docs = "# API Documentation\n\nThis API provides..."
-            result = await client.evaluate_quality_async(
-                docs, content_type="documentation"
-            )
+            result = await client.evaluate_quality_async(docs, content_type="documentation")
 
             assert isinstance(result, dict)
 
     @pytest.mark.asyncio
     async def test_evaluate_quality_async_error_handling(self, mock_orchestrator):
         """Test error handling in quality evaluation."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -535,13 +431,11 @@ class TestEvaluateQualityAsync:
     @pytest.mark.asyncio
     async def test_evaluate_quality_async_empty_content(self, mock_orchestrator):
         """Test with empty content."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"score": 0, "feedback": "Empty content"}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"score": 0, "feedback": "Empty content"}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -552,13 +446,11 @@ class TestEvaluateQualityAsync:
     @pytest.mark.asyncio
     async def test_evaluate_quality_async_large_content(self, mock_orchestrator):
         """Test with large content."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"score": 7, "feedback": "Long code"}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"score": 7, "feedback": "Long code"}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -568,18 +460,12 @@ class TestEvaluateQualityAsync:
             assert isinstance(result, dict)
 
     @pytest.mark.asyncio
-    async def test_evaluate_quality_async_invalid_json_response(
-        self, mock_orchestrator
-    ):
+    async def test_evaluate_quality_async_invalid_json_response(self, mock_orchestrator):
         """Test handling of invalid JSON in response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("not valid json")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("not valid json")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = await client.evaluate_quality_async("code")
@@ -587,18 +473,12 @@ class TestEvaluateQualityAsync:
             assert isinstance(result, (dict, type(None)))
 
     @pytest.mark.asyncio
-    async def test_evaluate_quality_async_various_content_types(
-        self, mock_orchestrator
-    ):
+    async def test_evaluate_quality_async_various_content_types(self, mock_orchestrator):
         """Test with various content types."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"score": 8}')
-            )
+            mock_client.messages.create.return_value = create_mock_async_response('{"score": 8}')
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -616,37 +496,27 @@ class TestAsyncMethodAuthFlow:
     @pytest.mark.asyncio
     async def test_detect_conflicts_with_subscription_auth(self, mock_orchestrator):
         """Test conflict detection with subscription auth."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(
                 api_key="test-key",
                 orchestrator=mock_orchestrator,
                 subscription_token="sub-token",
             )
-            result = await client.detect_conflicts_async(
-                ["req1"], user_auth_method="subscription"
-            )
+            result = await client.detect_conflicts_async(["req1"], user_auth_method="subscription")
 
             assert isinstance(result, list)
 
     @pytest.mark.asyncio
     async def test_analyze_context_with_fallback_auth(self, mock_orchestrator):
         """Test context analysis with auth fallback."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Analysis")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("Analysis")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -661,14 +531,10 @@ class TestAsyncMethodConcurrency:
     @pytest.mark.asyncio
     async def test_concurrent_conflict_detection(self, mock_orchestrator):
         """Test concurrent conflict detection calls."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("[]")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("[]")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -685,14 +551,10 @@ class TestAsyncMethodConcurrency:
     @pytest.mark.asyncio
     async def test_concurrent_context_analysis(self, mock_orchestrator):
         """Test concurrent context analysis calls."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response("Analysis")
-            )
+            mock_client.messages.create.return_value = create_mock_async_response("Analysis")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -702,9 +564,7 @@ class TestAsyncMethodConcurrency:
                 ProjectContext(project_name="Project3"),
             ]
 
-            tasks = [
-                client.analyze_context_async(p) for p in projects
-            ]
+            tasks = [client.analyze_context_async(p) for p in projects]
             results = await asyncio.gather(*tasks)
 
             assert len(results) == 3
@@ -713,13 +573,11 @@ class TestAsyncMethodConcurrency:
     @pytest.mark.asyncio
     async def test_mixed_async_method_calls(self, mock_orchestrator):
         """Test concurrent calls to different async methods."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_anth:
             mock_client = AsyncMock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = (
-                create_mock_async_response('{"test": "data"}')
+            mock_client.messages.create.return_value = create_mock_async_response(
+                '{"test": "data"}'
             )
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)

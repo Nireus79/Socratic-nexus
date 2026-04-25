@@ -105,10 +105,7 @@ class TestClaudeClientDocstringAndAttributes:
     def test_client_has_subscription_token_attribute(self):
         """Test client has subscription_token attribute"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(
-                api_key="test-key",
-                subscription_token="sub-token"
-            )
+            client = ClaudeClient(api_key="test-key", subscription_token="sub-token")
             assert hasattr(client, "subscription_token")
             assert client.subscription_token == "sub-token"
 
@@ -182,7 +179,7 @@ class TestClaudeClientEdgeCases:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            response = '[1, 2, 3, 4, 5]'
+            response = "[1, 2, 3, 4, 5]"
             result = client._parse_json_response(response)
 
             # Should handle array JSON (might return empty dict if not parsed)
@@ -193,7 +190,7 @@ class TestClaudeClientEdgeCases:
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            response = 'null'
+            response = "null"
             result = client._parse_json_response(response)
 
             assert result is not None or result is None

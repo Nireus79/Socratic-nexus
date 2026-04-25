@@ -128,10 +128,8 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            if hasattr(client, 'generate_business_plan'):
-                client.generate_business_plan(
-                    ProjectContext(project_name="Test")
-                )
+            if hasattr(client, "generate_business_plan"):
+                client.generate_business_plan(ProjectContext(project_name="Test"))
                 assert mock_client.chat.completions.create.called
 
     def test_openai_generate_documentation(self):
@@ -153,10 +151,8 @@ class TestOpenAIClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
-            if hasattr(client, 'generate_documentation'):
-                client.generate_documentation(
-                    ProjectContext(project_name="Test")
-                )
+            if hasattr(client, "generate_documentation"):
+                client.generate_documentation(ProjectContext(project_name="Test"))
                 assert mock_client.chat.completions.create.called
 
     def test_openai_with_temperature(self):
@@ -192,7 +188,7 @@ class TestOpenAIClientMethodExecution:
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
 
-            if hasattr(client, '_get_cache_key'):
+            if hasattr(client, "_get_cache_key"):
                 key = client._get_cache_key("test")
                 assert isinstance(key, str)
 
@@ -228,7 +224,7 @@ class TestOpenAIClientMethodExecution:
 
             client = OpenAIClient(api_key="sk-test", orchestrator=orch)
 
-            if hasattr(client, '_parse_json_response'):
+            if hasattr(client, "_parse_json_response"):
                 result = client._parse_json_response('{"key": "value"}')
                 assert isinstance(result, (dict, type(None)))
 

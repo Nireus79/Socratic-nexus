@@ -16,7 +16,9 @@ class TestGoogleClientMethodExecution:
 
     def test_google_generate_response_execution(self):
         """Test generate_response executes with mocked genai."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
 
             mock_model = Mock()
@@ -37,7 +39,9 @@ class TestGoogleClientMethodExecution:
 
     def test_google_generate_code_execution(self):
         """Test generate_code executes."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
 
             mock_model = Mock()
@@ -58,7 +62,9 @@ class TestGoogleClientMethodExecution:
 
     def test_google_extract_insights_execution(self):
         """Test extract_insights executes."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
 
             mock_model = Mock()
@@ -80,7 +86,9 @@ class TestGoogleClientMethodExecution:
 
     def test_google_generate_response_with_params(self):
         """Test generate_response with parameters."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
 
             mock_model = Mock()
@@ -95,17 +103,15 @@ class TestGoogleClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = GoogleClient(api_key="test-key", orchestrator=orch)
-            client.generate_response(
-                "Prompt",
-                temperature=0.7,
-                max_tokens=500
-            )
+            client.generate_response("Prompt", temperature=0.7, max_tokens=500)
 
             assert mock_model.generate_content.called
 
     def test_google_generate_artifact(self):
         """Test generate_artifact execution."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
 
             mock_model = Mock()
@@ -120,16 +126,15 @@ class TestGoogleClientMethodExecution:
             orch.system_monitor = Mock()
 
             client = GoogleClient(api_key="test-key", orchestrator=orch)
-            if hasattr(client, 'generate_artifact'):
-                client.generate_artifact(
-                    project_type="document",
-                    artifact_type="markdown"
-                )
+            if hasattr(client, "generate_artifact"):
+                client.generate_artifact(project_type="document", artifact_type="markdown")
                 assert mock_model.generate_content.called
 
     def test_google_client_error_handling(self):
         """Test error handling in generate_response."""
-        with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+        with patch(
+            "socratic_nexus.clients.google_client.genai.GenerativeModel"
+        ) as mock_model_class:
             from socratic_nexus.clients.google_client import GoogleClient
             from socratic_nexus.exceptions import APIError
 
@@ -159,7 +164,7 @@ class TestGoogleClientMethodExecution:
 
             client = GoogleClient(api_key="test-key", orchestrator=orch)
 
-            if hasattr(client, '_get_cache_key'):
+            if hasattr(client, "_get_cache_key"):
                 key1 = client._get_cache_key("message")
                 key2 = client._get_cache_key("message")
                 assert key1 == key2
@@ -172,7 +177,7 @@ class TestGoogleClientMethodExecution:
 
             client = GoogleClient(api_key="test-key")
 
-            if hasattr(client, 'get_auth_credential'):
+            if hasattr(client, "get_auth_credential"):
                 cred = client.get_auth_credential("api_key")
                 assert cred == "test-key" or cred is None
 

@@ -134,11 +134,7 @@ class TestGenerateResponseFunctional:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             # Call with temperature parameter
-            client.generate_response(
-                "test prompt",
-                temperature=0.7,
-                max_tokens=100
-            )
+            client.generate_response("test prompt", temperature=0.7, max_tokens=100)
 
             # Verify API was called
             assert mock_client.messages.create.called
@@ -165,10 +161,7 @@ class TestGenerateResponseFunctional:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             # Call with user_id
-            client.generate_response(
-                "test",
-                user_id="user123"
-            )
+            client.generate_response("test", user_id="user123")
 
             # Should execute successfully
             assert mock_client.messages.create.called
@@ -277,11 +270,7 @@ class TestGenerateCodeFunctional:
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
-            client.generate_code(
-                "write fibonacci",
-                user_id="user123",
-                user_auth_method="api_key"
-            )
+            client.generate_code("write fibonacci", user_id="user123", user_auth_method="api_key")
 
             # Should execute successfully
             assert mock_client.messages.create.called
@@ -306,8 +295,7 @@ class TestGenerateBusinessPlanFunctional:
 
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(
-                project_name="TechStartup",
-                description="AI-powered analytics platform"
+                project_name="TechStartup", description="AI-powered analytics platform"
             )
 
             result = client.generate_business_plan(project)
@@ -329,7 +317,9 @@ class TestAsyncClientFunctional:
         orch.database.get_api_key.return_value = None
 
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_async_client = Mock()
                 mock_async.return_value = mock_async_client
 
@@ -363,8 +353,11 @@ class TestTokenTracking:
             client._track_token_usage(usage, "test_operation")
 
             # Should have called system_monitor.process or event_emitter
-            assert (orch.system_monitor.process.called or
-                    orch.event_emitter.emit.called if hasattr(orch, 'event_emitter') else True)
+            assert (
+                orch.system_monitor.process.called or orch.event_emitter.emit.called
+                if hasattr(orch, "event_emitter")
+                else True
+            )
 
     def test_track_token_usage_with_orchestrator_present(self):
         """Test _track_token_usage with orchestrator present"""
@@ -404,8 +397,7 @@ class TestConflictResolutionFunctional:
             client = ClaudeClient(api_key="test-key", orchestrator=orch)
 
             conflict = ConflictInfo(
-                description="Conflicting implementations",
-                file_path="src/main.py"
+                description="Conflicting implementations", file_path="src/main.py"
             )
             project = ProjectContext(project_name="Test")
 
@@ -486,9 +478,7 @@ class TestSubscriptionTokenHandling:
             mock_anth.return_value = mock_client
 
             client = ClaudeClient(
-                api_key="sk-fallback-key",
-                orchestrator=orch,
-                subscription_token="sub-token"
+                api_key="sk-fallback-key", orchestrator=orch, subscription_token="sub-token"
             )
 
             # Request with subscription method should fallback to api_key

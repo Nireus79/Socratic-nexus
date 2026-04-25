@@ -64,9 +64,7 @@ class TestCodeGeneration:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_code(
-                "write a function",
-                user_id="user123",
-                user_auth_method="api_key"
+                "write a function", user_id="user123", user_auth_method="api_key"
             )
 
             assert isinstance(result, (str, type(None)))
@@ -137,10 +135,7 @@ class TestBusinessPlanGeneration:
             mock_client.messages.create.return_value = mock_response
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
-            project = ProjectContext(
-                project_name="MyStartup",
-                description="A tech startup"
-            )
+            project = ProjectContext(project_name="MyStartup", description="A tech startup")
             result = client.generate_business_plan(project)
 
             assert isinstance(result, (str, type(None)))
@@ -255,7 +250,6 @@ class TestAnalysisMethods:
             assert isinstance(result, (dict, str, type(None)))
 
 
-
 class TestConflictResolution:
     """Tests for conflict resolution"""
 
@@ -271,10 +265,7 @@ class TestConflictResolution:
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            conflict = ConflictInfo(
-                description="file conflict",
-                file_path="test.py"
-            )
+            conflict = ConflictInfo(description="file conflict", file_path="test.py")
             result = client.generate_conflict_resolution_suggestions(conflict, project)
 
             assert isinstance(result, (str, type(None)))
@@ -291,8 +282,7 @@ class TestAsyncSpecializedMethods:
             mock_async.return_value = mock_client
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="plan")],
-                    usage=Mock(input_tokens=100, output_tokens=500)
+                    content=[Mock(text="plan")], usage=Mock(input_tokens=100, output_tokens=500)
                 )
             )
 
@@ -311,8 +301,7 @@ class TestAsyncSpecializedMethods:
             mock_async.return_value = mock_client
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
-                    content=[Mock(text="code")],
-                    usage=Mock(input_tokens=50, output_tokens=100)
+                    content=[Mock(text="code")], usage=Mock(input_tokens=50, output_tokens=100)
                 )
             )
 
@@ -331,7 +320,7 @@ class TestAsyncSpecializedMethods:
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
                     content=[Mock(text='{"insights": []}')],
-                    usage=Mock(input_tokens=60, output_tokens=100)
+                    usage=Mock(input_tokens=60, output_tokens=100),
                 )
             )
 
@@ -351,17 +340,14 @@ class TestAsyncSpecializedMethods:
             mock_client.messages.create = AsyncMock(
                 return_value=Mock(
                     content=[Mock(text='{"recommendations": []}')],
-                    usage=Mock(input_tokens=80, output_tokens=150)
+                    usage=Mock(input_tokens=80, output_tokens=150),
                 )
             )
 
             with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
                 client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
                 project = ProjectContext(project_name="Test")
-                result = await client.extract_tech_recommendations_async(
-                    project,
-                    "backend"
-                )
+                result = await client.extract_tech_recommendations_async(project, "backend")
 
                 assert isinstance(result, (dict, list, type(None)))
 
@@ -382,11 +368,7 @@ class TestErrorHandlingSpecialized:
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
             # Call with valid parameters despite potentially invalid ones
-            result = client.generate_response(
-                "test",
-                temperature=0.5,
-                max_tokens=100
-            )
+            result = client.generate_response("test", temperature=0.5, max_tokens=100)
 
             assert isinstance(result, (str, type(None)))
 

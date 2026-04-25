@@ -18,13 +18,12 @@ class TestGoogleClientMethodExecution:
         pytest.importorskip("google")
 
         # Patch google.generativeai before importing GoogleClient
-        with patch.dict(
-            'sys.modules',
-            {'google.generativeai': Mock()}
-        ):
+        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
             from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+            with patch(
+                "socratic_nexus.clients.google_client.genai.GenerativeModel"
+            ) as mock_model_class:
                 mock_model = Mock()
                 mock_model_class.return_value = mock_model
 
@@ -51,13 +50,12 @@ class TestGoogleClientMethodExecution:
         """Test GoogleClient.generate_code actually executes"""
         pytest.importorskip("google")
 
-        with patch.dict(
-            'sys.modules',
-            {'google.generativeai': Mock()}
-        ):
+        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
             from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+            with patch(
+                "socratic_nexus.clients.google_client.genai.GenerativeModel"
+            ) as mock_model_class:
                 mock_model = Mock()
                 mock_model_class.return_value = mock_model
 
@@ -78,13 +76,12 @@ class TestGoogleClientMethodExecution:
         """Test GoogleClient.extract_insights actually executes"""
         pytest.importorskip("google")
 
-        with patch.dict(
-            'sys.modules',
-            {'google.generativeai': Mock()}
-        ):
+        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
             from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch("socratic_nexus.clients.google_client.genai.GenerativeModel") as mock_model_class:
+            with patch(
+                "socratic_nexus.clients.google_client.genai.GenerativeModel"
+            ) as mock_model_class:
                 mock_model = Mock()
                 mock_model_class.return_value = mock_model
 
@@ -128,9 +125,7 @@ class TestOllamaClientMethodExecution:
             check_response.json.return_value = {"models": []}
             post_response = Mock()
             post_response.status_code = 200
-            post_response.json.return_value = {
-                "response": "Generated response from Ollama"
-            }
+            post_response.json.return_value = {"response": "Generated response from Ollama"}
             mock_session.get.return_value = check_response
             mock_session.post.return_value = post_response
 
@@ -160,9 +155,7 @@ class TestOllamaClientMethodExecution:
             check_response = Mock()
             check_response.json.return_value = {"models": []}
             post_response = Mock()
-            post_response.json.return_value = {
-                "response": "def test():\\n    return True"
-            }
+            post_response.json.return_value = {"response": "def test():\\n    return True"}
             mock_session.get.return_value = check_response
             mock_session.post.return_value = post_response
 
@@ -192,9 +185,7 @@ class TestOllamaClientMethodExecution:
             check_response = Mock()
             check_response.json.return_value = {"models": []}
             post_response = Mock()
-            post_response.json.return_value = {
-                "response": '{"insights": ["key1", "key2"]}'
-            }
+            post_response.json.return_value = {"response": '{"insights": ["key1", "key2"]}'}
             mock_session.get.return_value = check_response
             mock_session.post.return_value = post_response
 

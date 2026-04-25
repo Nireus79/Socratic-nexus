@@ -91,9 +91,7 @@ class TestDatabaseKeyRetrieval:
     def test_get_user_api_key_from_database(self, mock_orchestrator_with_key):
         """Test retrieving user API key from database."""
         # Mock the decryption to return the stored key as plaintext
-        with patch.object(
-            ClaudeClient, "_decrypt_api_key_from_db", return_value="db-stored-key"
-        ):
+        with patch.object(ClaudeClient, "_decrypt_api_key_from_db", return_value="db-stored-key"):
             client = ClaudeClient(api_key=None, orchestrator=mock_orchestrator_with_key)
             key, is_user = client._get_user_api_key("user123")
 
@@ -111,9 +109,7 @@ class TestDatabaseKeyRetrieval:
 
     def test_get_user_api_key_database_error(self, mock_orchestrator):
         """Test handling of database errors during key retrieval."""
-        mock_orchestrator.database.get_api_key.side_effect = Exception(
-            "Database connection failed"
-        )
+        mock_orchestrator.database.get_api_key.side_effect = Exception("Database connection failed")
         client = ClaudeClient(api_key="env-key", orchestrator=mock_orchestrator)
 
         try:
@@ -136,9 +132,7 @@ class TestDatabaseKeyRetrieval:
             orchestrator=mock_orchestrator_with_key,
         )
 
-        with patch.object(
-            client, "_decrypt_api_key_from_db"
-        ) as mock_decrypt:
+        with patch.object(client, "_decrypt_api_key_from_db") as mock_decrypt:
             mock_decrypt.side_effect = ["user1-key", "user2-key", "user3-key"]
 
             key1, _ = client._get_user_api_key("user1")
@@ -245,9 +239,7 @@ class TestAuthMethodSelection:
 
     def test_api_call_with_api_key_auth(self, mock_orchestrator):
         """Test API call using API key authentication."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -263,9 +255,7 @@ class TestAuthMethodSelection:
 
     def test_api_call_with_subscription_auth(self, mock_orchestrator):
         """Test API call using subscription authentication."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -278,17 +268,13 @@ class TestAuthMethodSelection:
                 subscription_token="sub-token",
                 orchestrator=mock_orchestrator,
             )
-            result = client.generate_response(
-                "test", user_auth_method="subscription"
-            )
+            result = client.generate_response("test", user_auth_method="subscription")
 
             assert isinstance(result, (str, type(None)))
 
     def test_api_call_auth_method_fallback(self, mock_orchestrator):
         """Test fallback when requested auth method is unavailable."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -301,9 +287,7 @@ class TestAuthMethodSelection:
 
             # Should fallback or error gracefully
             try:
-                result = client.generate_response(
-                    "test", user_auth_method="subscription"
-                )
+                result = client.generate_response("test", user_auth_method="subscription")
                 assert isinstance(result, (str, type(None)))
             except Exception:
                 # APIError is acceptable
@@ -315,9 +299,7 @@ class TestMultiAuthScenarios:
 
     def test_switching_auth_methods_mid_session(self, mock_orchestrator):
         """Test switching between auth methods in same session."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -335,18 +317,14 @@ class TestMultiAuthScenarios:
             result1 = client.generate_response("prompt1", user_auth_method="api_key")
 
             # Call 2 with subscription
-            result2 = client.generate_response(
-                "prompt2", user_auth_method="subscription"
-            )
+            result2 = client.generate_response("prompt2", user_auth_method="subscription")
 
             assert isinstance(result1, (str, type(None)))
             assert isinstance(result2, (str, type(None)))
 
     def test_auth_method_persistence(self, mock_orchestrator):
         """Test that auth method selection is request-specific."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response = Mock()
@@ -379,10 +357,12 @@ class TestAuthWithDifferentUserIDs:
         )
 
         with patch.object(
-            client, "_get_user_api_key", side_effect=[
+            client,
+            "_get_user_api_key",
+            side_effect=[
                 ("user1-key", True),
                 ("user2-key", True),
-            ]
+            ],
         ):
             key1, _ = client._get_user_api_key("user1")
             key2, _ = client._get_user_api_key("user2")
@@ -412,15 +392,14 @@ class TestAuthErrorRecovery:
 
     def test_recover_from_invalid_key(self, mock_orchestrator):
         """Test recovery after using invalid key."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = [
                 Exception("Invalid API key"),
-                Mock(content=[Mock(text="response")],
-                     usage=Mock(input_tokens=10, output_tokens=20)),
+                Mock(
+                    content=[Mock(text="response")], usage=Mock(input_tokens=10, output_tokens=20)
+                ),
             ]
 
             client = ClaudeClient(
@@ -442,16 +421,12 @@ class TestAuthErrorRecovery:
             response.usage = Mock(input_tokens=10, output_tokens=20)
             mock_client.messages.create.return_value = response
 
-            result = client.generate_response(
-                "prompt2", user_auth_method="subscription"
-            )
+            result = client.generate_response("prompt2", user_auth_method="subscription")
             assert isinstance(result, (str, type(None)))
 
     def test_auth_retry_mechanism(self, mock_orchestrator):
         """Test retry mechanism with authentication."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
 
@@ -459,8 +434,7 @@ class TestAuthErrorRecovery:
             mock_client.messages.create.side_effect = [
                 Exception("Auth failed"),
                 Exception("Auth failed"),
-                Mock(content=[Mock(text="success")],
-                     usage=Mock(input_tokens=10, output_tokens=20)),
+                Mock(content=[Mock(text="success")], usage=Mock(input_tokens=10, output_tokens=20)),
             ]
 
             _ = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)

@@ -25,14 +25,13 @@ class TestClaudeClientInitializationErrors:
     def test_subscription_client_initialization_error(self):
         """Test handling of errors during subscription client initialization"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            with patch("socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic") as mock_async:
+            with patch(
+                "socratic_nexus.clients.claude_client.anthropic.AsyncAnthropic"
+            ) as mock_async:
                 mock_async.side_effect = Exception("Async init failed")
 
                 # Should not raise, but log warning
-                client = ClaudeClient(
-                    api_key="test-key",
-                    subscription_token="sub-token"
-                )
+                client = ClaudeClient(api_key="test-key", subscription_token="sub-token")
                 assert client is not None
 
     def test_client_with_none_api_key_and_no_orchestrator(self):
@@ -124,10 +123,7 @@ class TestClaudeClientCredentialHandling:
     def test_get_auth_credential_subscription(self):
         """Test retrieving subscription credential"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(
-                api_key="test-key",
-                subscription_token="sub-token-123"
-            )
+            client = ClaudeClient(api_key="test-key", subscription_token="sub-token-123")
 
             credential = client.get_auth_credential("subscription")
             assert credential == "sub-token-123"

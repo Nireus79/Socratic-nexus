@@ -44,17 +44,11 @@ class TestGenerateArtifactComprehensive:
 
     def test_generate_artifact_returns_string(self, mock_orchestrator):
         """Test generate_artifact returns string response."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            artifact_content = (
-                "Artifact content with structure and details"
-            )
-            mock_client.messages.create.return_value = create_mock_response(
-                artifact_content
-            )
+            artifact_content = "Artifact content with structure and details"
+            mock_client.messages.create.return_value = create_mock_response(artifact_content)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_artifact("design_doc", "Project documentation")
@@ -65,20 +59,15 @@ class TestGenerateArtifactComprehensive:
 
     def test_generate_artifact_with_detailed_context(self, mock_orchestrator):
         """Test generate_artifact with detailed context."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             response_text = "## Design Document\n\n### Overview\n\n### Components\n"
-            mock_client.messages.create.return_value = create_mock_response(
-                response_text
-            )
+            mock_client.messages.create.return_value = create_mock_response(response_text)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             detailed_context = (
-                "Web application for e-commerce platform "
-                "with microservices architecture"
+                "Web application for e-commerce platform " "with microservices architecture"
             )
             result = client.generate_artifact("design_doc", detailed_context)
 
@@ -87,14 +76,10 @@ class TestGenerateArtifactComprehensive:
 
     def test_generate_artifact_different_types(self, mock_orchestrator):
         """Test generate_artifact with different artifact types."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response(
-                "Generated artifact"
-            )
+            mock_client.messages.create.return_value = create_mock_response("Generated artifact")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -108,13 +93,9 @@ class TestGenerateArtifactComprehensive:
                 result = client.generate_artifact(artifact_type, "context")
                 assert isinstance(result, str)
 
-    def test_generate_artifact_error_handling_returns_string(
-        self, mock_orchestrator
-    ):
+    def test_generate_artifact_error_handling_returns_string(self, mock_orchestrator):
         """Test generate_artifact error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -126,9 +107,7 @@ class TestGenerateArtifactComprehensive:
 
     def test_generate_artifact_caching_behavior(self, mock_orchestrator):
         """Test that generate_artifact calls API for each request."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = create_mock_response("artifact")
@@ -149,17 +128,11 @@ class TestGenerateBusinessPlanComprehensive:
 
     def test_generate_business_plan_returns_string(self, mock_orchestrator):
         """Test generate_business_plan returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            plan_content = (
-                "## Business Plan\n\n### Executive Summary\n### Market Analysis\n"
-            )
-            mock_client.messages.create.return_value = create_mock_response(
-                plan_content
-            )
+            plan_content = "## Business Plan\n\n### Executive Summary\n### Market Analysis\n"
+            mock_client.messages.create.return_value = create_mock_response(plan_content)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_business_plan("startup context")
@@ -170,9 +143,7 @@ class TestGenerateBusinessPlanComprehensive:
 
     def test_generate_business_plan_contains_sections(self, mock_orchestrator):
         """Test business plan contains key sections."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             plan_text = (
@@ -198,14 +169,10 @@ class TestGenerateBusinessPlanComprehensive:
 
     def test_generate_business_plan_with_detailed_context(self, mock_orchestrator):
         """Test with detailed startup context."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            mock_client.messages.create.return_value = create_mock_response(
-                "Business plan content"
-            )
+            mock_client.messages.create.return_value = create_mock_response("Business plan content")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             detailed_context = (
@@ -219,9 +186,7 @@ class TestGenerateBusinessPlanComprehensive:
 
     def test_generate_business_plan_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -237,42 +202,26 @@ class TestGenerateResearchProtocolComprehensive:
 
     def test_generate_research_protocol_returns_string(self, mock_orchestrator):
         """Test generate_research_protocol returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            protocol_content = (
-                "## Research Protocol\n\n### Objectives\n### Methodology\n"
-            )
-            mock_client.messages.create.return_value = create_mock_response(
-                protocol_content
-            )
+            protocol_content = "## Research Protocol\n\n### Objectives\n### Methodology\n"
+            mock_client.messages.create.return_value = create_mock_response(protocol_content)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_research_protocol("research topic")
 
             assert isinstance(result, str)
             assert len(result) > 0
-            assert (
-                "Research" in result
-                or "Protocol" in result
-                or "Objectives" in result
-            )
+            assert "Research" in result or "Protocol" in result or "Objectives" in result
 
     def test_generate_research_protocol_structure(self, mock_orchestrator):
         """Test research protocol has expected structure."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             protocol = (
-                "Objectives:\n"
-                "Methodology:\n"
-                "Timeline:\n"
-                "Resources:\n"
-                "Success Metrics:\n"
+                "Objectives:\n" "Methodology:\n" "Timeline:\n" "Resources:\n" "Success Metrics:\n"
             )
             mock_client.messages.create.return_value = create_mock_response(protocol)
 
@@ -286,9 +235,7 @@ class TestGenerateResearchProtocolComprehensive:
 
     def test_generate_research_protocol_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -304,15 +251,11 @@ class TestGenerateCreativeBriefComprehensive:
 
     def test_generate_creative_brief_returns_string(self, mock_orchestrator):
         """Test generate_creative_brief returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             brief_content = "## Creative Brief\n\n### Objective\n### Key Messages\n"
-            mock_client.messages.create.return_value = create_mock_response(
-                brief_content
-            )
+            mock_client.messages.create.return_value = create_mock_response(brief_content)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_creative_brief("marketing campaign context")
@@ -323,9 +266,7 @@ class TestGenerateCreativeBriefComprehensive:
 
     def test_generate_creative_brief_contains_key_sections(self, mock_orchestrator):
         """Test brief contains expected creative sections."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             brief = (
@@ -347,9 +288,7 @@ class TestGenerateCreativeBriefComprehensive:
 
     def test_generate_creative_brief_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -365,32 +304,22 @@ class TestGenerateMarketingPlanComprehensive:
 
     def test_generate_marketing_plan_returns_string(self, mock_orchestrator):
         """Test generate_marketing_plan returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             plan_content = "## Marketing Plan\n\n### Strategy\n### Tactics\n"
-            mock_client.messages.create.return_value = create_mock_response(
-                plan_content
-            )
+            mock_client.messages.create.return_value = create_mock_response(plan_content)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_marketing_plan("product marketing context")
 
             assert isinstance(result, str)
             assert len(result) > 0
-            assert (
-                "Marketing" in result
-                or "Strategy" in result
-                or "Plan" in result
-            )
+            assert "Marketing" in result or "Strategy" in result or "Plan" in result
 
     def test_generate_marketing_plan_structure(self, mock_orchestrator):
         """Test marketing plan has expected structure."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             plan = (
@@ -412,9 +341,7 @@ class TestGenerateMarketingPlanComprehensive:
 
     def test_generate_marketing_plan_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -430,32 +357,22 @@ class TestGenerateCurriculumComprehensive:
 
     def test_generate_curriculum_returns_string(self, mock_orchestrator):
         """Test generate_curriculum returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             curriculum = "## Curriculum\n\n### Module 1\n### Module 2\n"
-            mock_client.messages.create.return_value = create_mock_response(
-                curriculum
-            )
+            mock_client.messages.create.return_value = create_mock_response(curriculum)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_curriculum("Python programming course")
 
             assert isinstance(result, str)
             assert len(result) > 0
-            assert (
-                "Curriculum" in result
-                or "Module" in result
-                or "Course" in result
-            )
+            assert "Curriculum" in result or "Module" in result or "Course" in result
 
     def test_generate_curriculum_structure(self, mock_orchestrator):
         """Test curriculum has expected structure."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             curriculum = (
@@ -464,9 +381,7 @@ class TestGenerateCurriculumComprehensive:
                 "Module 3: Advanced\n"
                 "Assessments\n"
             )
-            mock_client.messages.create.return_value = create_mock_response(
-                curriculum
-            )
+            mock_client.messages.create.return_value = create_mock_response(curriculum)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_curriculum("Data Science bootcamp")
@@ -478,9 +393,7 @@ class TestGenerateCurriculumComprehensive:
 
     def test_generate_curriculum_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -496,9 +409,7 @@ class TestGenerateDocumentationComprehensive:
 
     def test_generate_documentation_returns_string(self, mock_orchestrator):
         """Test generate_documentation returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             docs = "# API Documentation\n\n## Endpoints\n## Examples\n"
@@ -510,25 +421,14 @@ class TestGenerateDocumentationComprehensive:
 
             assert isinstance(result, str)
             assert len(result) > 0
-            assert (
-                "Documentation" in result
-                or "API" in result
-                or "Endpoints" in result
-            )
+            assert "Documentation" in result or "API" in result or "Endpoints" in result
 
     def test_generate_documentation_includes_project_info(self, mock_orchestrator):
         """Test documentation includes project information."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            docs = (
-                "# MyAPI Documentation\n"
-                "## Overview\n"
-                "## Installation\n"
-                "## Usage\n"
-            )
+            docs = "# MyAPI Documentation\n" "## Overview\n" "## Installation\n" "## Usage\n"
             mock_client.messages.create.return_value = create_mock_response(docs)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
@@ -545,9 +445,7 @@ class TestGenerateDocumentationComprehensive:
 
     def test_generate_documentation_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
@@ -564,17 +462,11 @@ class TestGenerateConflictResolutionComprehensive:
 
     def test_generate_conflict_resolution_returns_string(self, mock_orchestrator):
         """Test conflict resolution returns string."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
-            resolution = (
-                "## Conflict Resolution\n\n### Option 1\n### Option 2\n"
-            )
-            mock_client.messages.create.return_value = create_mock_response(
-                resolution
-            )
+            resolution = "## Conflict Resolution\n\n### Option 1\n### Option 2\n"
+            mock_client.messages.create.return_value = create_mock_response(resolution)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="TestProject")
@@ -586,17 +478,11 @@ class TestGenerateConflictResolutionComprehensive:
 
             assert isinstance(result, str)
             assert len(result) > 0
-            assert (
-                "Resolution" in result
-                or "Option" in result
-                or "Conflict" in result
-            )
+            assert "Resolution" in result or "Option" in result or "Conflict" in result
 
     def test_generate_conflict_resolution_structure(self, mock_orchestrator):
         """Test resolution suggestions have expected structure."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             resolution = (
@@ -607,9 +493,7 @@ class TestGenerateConflictResolutionComprehensive:
                 "Pros: Flexible\n"
                 "Cons: Overhead\n"
             )
-            mock_client.messages.create.return_value = create_mock_response(
-                resolution
-            )
+            mock_client.messages.create.return_value = create_mock_response(resolution)
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -624,13 +508,9 @@ class TestGenerateConflictResolutionComprehensive:
             elements = ["Option", "Pros", "Cons"]
             assert any(element in result for element in elements)
 
-    def test_generate_conflict_resolution_with_detailed_conflict(
-        self, mock_orchestrator
-    ):
+    def test_generate_conflict_resolution_with_detailed_conflict(self, mock_orchestrator):
         """Test with detailed conflict information."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.return_value = create_mock_response(
@@ -658,18 +538,14 @@ class TestGenerateConflictResolutionComprehensive:
 
     def test_generate_conflict_resolution_error_handling(self, mock_orchestrator):
         """Test error handling."""
-        with patch(
-            "socratic_nexus.clients.claude_client.anthropic.Anthropic"
-        ) as mock_anth:
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic") as mock_anth:
             mock_client = Mock()
             mock_anth.return_value = mock_client
             mock_client.messages.create.side_effect = Exception("API Error")
 
             client = ClaudeClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
-            conflict = ConflictInfo(
-                description="Test conflict", file_path="test.py"
-            )
+            conflict = ConflictInfo(description="Test conflict", file_path="test.py")
             result = client.generate_conflict_resolution_suggestions(conflict, project)
 
             assert isinstance(result, (str, type(None)))

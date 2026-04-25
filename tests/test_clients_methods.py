@@ -66,9 +66,7 @@ class TestGoogleClientMethods:
         with patch("socratic_nexus.clients.google_client.genai"):
             from socratic_nexus.clients.google_client import GoogleClient
 
-            client = GoogleClient(
-                api_key="test-key", subscription_token="subscription-token"
-            )
+            client = GoogleClient(api_key="test-key", subscription_token="subscription-token")
 
             # Test subscription auth method
             try:
