@@ -13,7 +13,6 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 import openai
-from openai import OpenAI, AsyncOpenAI
 from cryptography.fernet import Fernet
 
 from socratic_nexus.events import EventType
