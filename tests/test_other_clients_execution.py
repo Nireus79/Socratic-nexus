@@ -17,93 +17,91 @@ class TestGoogleClientMethodExecution:
         """Test GoogleClient.generate_response actually executes"""
         pytest.importorskip("google")
 
-        # Patch google.generativeai before importing GoogleClient
-        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
-            from socratic_nexus.clients.google_client import GoogleClient
+        from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch(
-                "socratic_nexus.clients.google_client.genai.GenerativeModel"
-            ) as mock_model_class:
-                mock_model = Mock()
-                mock_model_class.return_value = mock_model
+        with patch("socratic_nexus.clients.google_client.genai.Client") as mock_client_class:
+            # Create mock client instance
+            mock_client = Mock()
+            mock_client_class.return_value = mock_client
 
-                # Mock response
-                mock_response = Mock()
-                mock_response.text = "Generated response"
-                mock_model.generate_content.return_value = mock_response
+            # Mock the models.generate_content method
+            mock_response = Mock()
+            mock_response.text = "Generated response"
+            mock_client.models.generate_content.return_value = mock_response
 
-                # Create mock orchestrator with required attributes
-                orch = Mock()
-                orch.config = Mock()
-                orch.event_emitter = Mock()
-                orch.system_monitor = Mock()
+            # Create mock orchestrator with required attributes
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
 
-                client = GoogleClient(api_key="test-key", orchestrator=orch)
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
 
-                # ACTUALLY CALL THE METHOD
-                client.generate_response("Test prompt")
+            # ACTUALLY CALL THE METHOD
+            client.generate_response("Test prompt")
 
-                # Verify execution
-                assert mock_model.generate_content.called
+            # Verify execution
+            assert mock_client.models.generate_content.called
 
     def test_google_generate_code_execution(self):
         """Test GoogleClient.generate_code actually executes"""
         pytest.importorskip("google")
 
-        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
-            from socratic_nexus.clients.google_client import GoogleClient
+        from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch(
-                "socratic_nexus.clients.google_client.genai.GenerativeModel"
-            ) as mock_model_class:
-                mock_model = Mock()
-                mock_model_class.return_value = mock_model
+        with patch("socratic_nexus.clients.google_client.genai.Client") as mock_client_class:
+            # Create mock client instance
+            mock_client = Mock()
+            mock_client_class.return_value = mock_client
 
-                # Mock code response
-                mock_response = Mock()
-                mock_response.text = "def test():\\n    pass"
-                mock_model.generate_content.return_value = mock_response
+            # Mock code response
+            mock_response = Mock()
+            mock_response.text = "def test():\n    pass"
+            mock_client.models.generate_content.return_value = mock_response
 
-                client = GoogleClient(api_key="test-key")
+            # Create mock orchestrator
+            orch = Mock()
+            orch.config = Mock()
+            orch.system_monitor = Mock()
 
-                # ACTUALLY CALL THE METHOD
-                client.generate_code("Write a function")
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
 
-                # Verify execution
-                assert mock_model.generate_content.called
+            # ACTUALLY CALL THE METHOD
+            client.generate_code("Write a function")
+
+            # Verify execution
+            assert mock_client.models.generate_content.called
 
     def test_google_extract_insights_execution(self):
         """Test GoogleClient.extract_insights actually executes"""
         pytest.importorskip("google")
 
-        with patch.dict("sys.modules", {"google.generativeai": Mock()}):
-            from socratic_nexus.clients.google_client import GoogleClient
+        from socratic_nexus.clients.google_client import GoogleClient
 
-            with patch(
-                "socratic_nexus.clients.google_client.genai.GenerativeModel"
-            ) as mock_model_class:
-                mock_model = Mock()
-                mock_model_class.return_value = mock_model
+        with patch("socratic_nexus.clients.google_client.genai.Client") as mock_client_class:
+            # Create mock client instance
+            mock_client = Mock()
+            mock_client_class.return_value = mock_client
 
-                # Mock insights response
-                mock_response = Mock()
-                mock_response.text = '{"insights": ["insight1", "insight2"]}'
-                mock_model.generate_content.return_value = mock_response
+            # Mock insights response
+            mock_response = Mock()
+            mock_response.text = '{"insights": ["insight1", "insight2"]}'
+            mock_client.models.generate_content.return_value = mock_response
 
-                # Create mock orchestrator with required attributes
-                orch = Mock()
-                orch.config = Mock()
-                orch.event_emitter = Mock()
-                orch.system_monitor = Mock()
+            # Create mock orchestrator with required attributes
+            orch = Mock()
+            orch.config = Mock()
+            orch.event_emitter = Mock()
+            orch.system_monitor = Mock()
 
-                client = GoogleClient(api_key="test-key", orchestrator=orch)
-                project = ProjectContext(project_name="Test")
+            client = GoogleClient(api_key="test-key", orchestrator=orch)
+            project = ProjectContext(project_name="Test")
 
                 # ACTUALLY CALL THE METHOD
                 client.extract_insights("user response", project)
 
                 # Verify execution
-                assert mock_model.generate_content.called
+                assert mock_client.models.generate_content.called
 
 
 class TestOllamaClientMethodExecution:
