@@ -97,11 +97,11 @@ class TestGoogleClientMethodExecution:
             client = GoogleClient(api_key="test-key", orchestrator=orch)
             project = ProjectContext(project_name="Test")
 
-                # ACTUALLY CALL THE METHOD
-                client.extract_insights("user response", project)
+            # ACTUALLY CALL THE METHOD
+            client.extract_insights("user response", project)
 
-                # Verify execution
-                assert mock_client.models.generate_content.called
+            # Verify execution
+            assert mock_client.models.generate_content.called
 
 
 class TestOllamaClientMethodExecution:

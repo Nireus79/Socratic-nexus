@@ -521,7 +521,10 @@ OUTPUT FORMAT - CRITICAL:
 
         try:
             client = self._get_client(user_auth_method, user_id)
-            response = client.generate_content(prompt)
+            response = client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+            )
 
             # Track token usage
             self.orchestrator.system_monitor.process(
@@ -655,13 +658,11 @@ OUTPUT FORMAT - CRITICAL:
             # Get the appropriate client based on user's auth method and user-specific API key
             client = self._get_client(user_auth_method, user_id)
 
-            # Configure generation settings
-            generation_config = {
-                "max_output_tokens": max_tokens,
-                "temperature": temperature,
-            }
-
-            response = client.generate_content(prompt, generation_config=generation_config)
+            # Call the new google-genai API with model specification
+            response = client.models.generate_content(
+                model=self.model,
+                contents=prompt,
+            )
 
             # Track token usage
             self._track_token_usage_google(len(prompt), len(response.text), "generate_response")
@@ -703,15 +704,10 @@ OUTPUT FORMAT - CRITICAL:
             # Get the appropriate async client based on user's auth method and user-specific API key
             async_client = self._get_async_client(user_auth_method, user_id)
 
-            # Configure generation settings
-            generation_config = {
-                "max_output_tokens": max_tokens,
-                "temperature": temperature,
-            }
-
-            # Google API doesn't support true async, use thread pool
-            response = await asyncio.to_thread(
-                async_client.generate_content, prompt, generation_config=generation_config
+            # Call the new google-genai async API with model specification
+            response = await async_client.aio.models.generate_content(
+                model=self.model,
+                contents=prompt,
             )
 
             # Track token usage
@@ -729,7 +725,7 @@ OUTPUT FORMAT - CRITICAL:
         """Test connection to Google Generative AI API"""
         try:
             client = self._get_client(user_auth_method)
-            client.generate_content("Test")
+            client.models.generate_content(model=self.model, contents="Test")
             self.logger.info("Google Generative AI connection test successful")
             return True
         except APIError:

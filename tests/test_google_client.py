@@ -3,14 +3,14 @@
 import pytest
 from unittest.mock import Mock, patch
 
-# Skip all tests in this module if google-generativeai is not installed
+# Skip all tests in this module if google-genai is not installed
 try:
-    pytest.importorskip("google.generativeai")
+    pytest.importorskip("google.genai")
     from socratic_nexus.clients.google_client import GoogleClient
     from socratic_nexus.models import ProjectContext
     from socratic_nexus.exceptions import APIError
 except (ImportError, ModuleNotFoundError):
-    pytest.skip("Skipping all tests - google.generativeai not installed", allow_module_level=True)
+    pytest.skip("Skipping all tests - google-genai not installed", allow_module_level=True)
 
 
 @pytest.fixture
@@ -73,11 +73,11 @@ class TestGoogleClientGenerateResponse:
     def test_generate_response_basic(self, mock_orchestrator):
         """Test basic response generation."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "test response"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_response("test prompt")
@@ -87,30 +87,30 @@ class TestGoogleClientGenerateResponse:
     def test_generate_response_with_max_tokens(self, mock_orchestrator):
         """Test response generation with max_tokens."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "response"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_response("prompt", max_tokens=100)
 
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
     def test_generate_response_with_temperature(self, mock_orchestrator):
         """Test response generation with temperature."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "response"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_response("prompt", temperature=0.5)
 
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
 
 class TestGoogleClientGenerateCode:
@@ -119,11 +119,11 @@ class TestGoogleClientGenerateCode:
     def test_generate_code_basic(self, mock_orchestrator):
         """Test basic code generation."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "def hello():\n    pass"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_code("write hello function")
@@ -133,16 +133,16 @@ class TestGoogleClientGenerateCode:
     def test_generate_code_with_language(self, mock_orchestrator):
         """Test code generation with language specification."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "code"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_code("write function")
 
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
 
 class TestGoogleClientExtractInsights:
@@ -151,11 +151,11 @@ class TestGoogleClientExtractInsights:
     def test_extract_insights_basic(self, mock_orchestrator):
         """Test basic insights extraction."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = '{"insights": "test"}'
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -166,11 +166,11 @@ class TestGoogleClientExtractInsights:
     def test_extract_insights_with_empty_response(self, mock_orchestrator):
         """Test insights extraction with empty response."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = ""
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="Test")
@@ -181,17 +181,17 @@ class TestGoogleClientExtractInsights:
     def test_extract_insights_with_project_context(self, mock_orchestrator):
         """Test insights extraction includes project context."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = '{"test": "data"}'
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             project = ProjectContext(project_name="TestProject", phase="design")
             _ = client.extract_insights("response", project)
 
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
 
 class TestGoogleClientSocraticQuestion:
@@ -200,11 +200,11 @@ class TestGoogleClientSocraticQuestion:
     def test_generate_socratic_question_basic(self, mock_orchestrator):
         """Test basic socratic question generation."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "What would you do next?"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             result = client.generate_socratic_question("explain loops")
@@ -214,16 +214,16 @@ class TestGoogleClientSocraticQuestion:
     def test_generate_socratic_question_with_topic(self, mock_orchestrator):
         """Test socratic question generation with topic."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "question"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             _ = client.generate_socratic_question("recursion")
 
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
 
 class TestGoogleClientCaching:
@@ -272,9 +272,9 @@ class TestGoogleClientErrorHandling:
     def test_api_error_on_generation_failure(self, mock_orchestrator):
         """Test handling of API errors during generation."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
-            mock_model.generate_content.side_effect = Exception("API Error")
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
+            mock_client.models.generate_content.side_effect = Exception("API Error")
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             try:
@@ -309,27 +309,27 @@ class TestGoogleClientIntegration:
     def test_client_initialization_and_use(self, mock_orchestrator):
         """Test full client initialization and usage."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "test response"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
             assert client.api_key == "test-key"
             assert client.model == "gemini-pro"
 
             _ = client.generate_response("test")
-            mock_model.generate_content.assert_called()
+            mock_client.models.generate_content.assert_called()
 
     def test_multiple_api_calls(self, mock_orchestrator):
         """Test multiple API calls in sequence."""
         with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
-            mock_model = Mock()
-            mock_genai.GenerativeModel.return_value = mock_model
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
             mock_response = Mock()
             mock_response.text = "response"
-            mock_model.generate_content.return_value = mock_response
+            mock_client.models.generate_content.return_value = mock_response
 
             client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
 
@@ -337,4 +337,4 @@ class TestGoogleClientIntegration:
             _ = client.generate_code("code prompt")
             _ = client.generate_socratic_question("topic")
 
-            assert mock_model.generate_content.call_count >= 3
+            assert mock_client.models.generate_content.call_count >= 3
