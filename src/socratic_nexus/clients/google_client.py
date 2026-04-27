@@ -13,16 +13,7 @@ import logging
 from typing import TYPE_CHECKING, Any, Dict, Optional
 
 try:
-    import warnings
-
-    # Suppress the google.generativeai deprecation warning
-    with warnings.catch_warnings():
-        warnings.filterwarnings(
-            "ignore",
-            category=FutureWarning,
-            message=".*google.generativeai.*",
-        )
-        import google.generativeai as genai
+    import google.genai as genai
 except ImportError:
     genai = None  # type: ignore[assignment]
 
@@ -60,40 +51,20 @@ class GoogleClient:
         """
         if genai is None:
             raise ImportError(
-                "google-generativeai package is required for GoogleClient. "
-                "Install it with: pip install google-generativeai"
+                "google-genai package is required for GoogleClient. "
+                "Install it with: pip install google-genai"
             )
 
         self.api_key = api_key
         self.subscription_token = subscription_token
         self.orchestrator = orchestrator
-        self.model = orchestrator.config.google_model if orchestrator else "gemini-pro"
+        self.model = orchestrator.config.google_model if orchestrator else "gemini-2.0-flash"
         self.logger = logging.getLogger("socrates.clients.google")
 
-        # Initialize clients for both authentication methods
-        # Lazy initialization - only create if api_key is valid
+        # With the new google.genai API, clients are created on-demand with specific API keys
+        # No need to pre-create them during initialization
         self.client = None
         self.async_client = None
-
-        # Initialize default clients only if we have a non-placeholder API key
-        if api_key and not api_key.startswith("placeholder"):
-            try:
-                genai.configure(api_key=api_key)
-                self.client = genai.GenerativeModel(self.model)
-                self.async_client = genai.GenerativeModel(self.model)
-                self.logger.info("Default API key clients initialized")
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize default API key clients: {e}")
-
-        # Subscription token based clients (if available)
-        if subscription_token:
-            try:
-                genai.configure(api_key=subscription_token)
-                self.subscription_client = genai.GenerativeModel(self.model)
-                self.subscription_async_client = genai.GenerativeModel(self.model)
-                self.logger.info("Subscription-based clients initialized")
-            except Exception as e:
-                self.logger.warning(f"Failed to initialize subscription clients: {e}")
 
         # Cache for insights extraction to avoid redundant Google API calls
         # Maps message hash -> extracted insights
@@ -243,7 +214,7 @@ class GoogleClient:
             user_id: Optional user ID to fetch user-specific API key
 
         Returns:
-            Google GenerativeModel client instance
+            Google genai.Client instance
 
         Raises:
             APIError: If no valid API key is available
@@ -257,11 +228,10 @@ class GoogleClient:
         try:
             api_key, is_user_specific = self._get_user_api_key(user_id)
             if api_key and not api_key.startswith("placeholder"):
-                # Create a new client with the API key
+                # Create a new client with the API key using new google.genai API
                 key_source = "user-specific" if is_user_specific else "default"
                 self.logger.debug(f"Creating client with {key_source} API key")
-                genai.configure(api_key=api_key)
-                return genai.GenerativeModel(self.model)
+                return genai.Client(api_key=api_key)
             else:
                 # No valid key found
                 raise APIError(
@@ -291,7 +261,7 @@ class GoogleClient:
             user_id: Optional user ID to fetch user-specific API key
 
         Returns:
-            Google GenerativeModel async client instance
+            Google genai.Client instance (with aio async support)
 
         Raises:
             APIError: If no valid API key is available
@@ -305,11 +275,10 @@ class GoogleClient:
         try:
             api_key, is_user_specific = self._get_user_api_key(user_id)
             if api_key and not api_key.startswith("placeholder"):
-                # Create a new async client with the API key
+                # Create a new client with the API key using new google.genai API
                 key_source = "user-specific" if is_user_specific else "default"
                 self.logger.debug(f"Creating async client with {key_source} API key")
-                genai.configure(api_key=api_key)
-                return genai.GenerativeModel(self.model)
+                return genai.Client(api_key=api_key)
             else:
                 # No valid key found
                 raise APIError(
@@ -393,7 +362,7 @@ class GoogleClient:
         try:
             # Get the appropriate client based on user's auth method and user-specific API key
             client = self._get_client(user_auth_method, user_id)
-            response = client.generate_content(prompt)
+            response = client.models.generate_content(model=self.model, contents=prompt)
 
             # Track token usage (Google doesn't always provide token counts, use estimate)
             self._track_token_usage_google(len(prompt), len(response.text), "extract_insights")
@@ -470,8 +439,8 @@ class GoogleClient:
         try:
             # Get the appropriate async client based on user's auth method
             async_client = self._get_async_client(user_auth_method, user_id=None)
-            # Google API doesn't support true async, use thread pool
-            response = await asyncio.to_thread(async_client.generate_content, prompt)
+            # Use the new google.genai async API
+            response = await async_client.aio.models.generate_content(model=self.model, contents=prompt)
 
             # Track token usage asynchronously
             await self._track_token_usage_async(
@@ -598,7 +567,7 @@ OUTPUT FORMAT - CRITICAL:
         try:
             # Get the appropriate client based on user's auth method and user-specific API key
             client = self._get_client(user_auth_method, user_id)
-            response = client.generate_content(prompt)
+            response = client.models.generate_content(model=self.model, contents=prompt)
 
             # Track token usage
             self._track_token_usage_google(
@@ -645,8 +614,8 @@ OUTPUT FORMAT - CRITICAL:
         try:
             # Get the appropriate async client based on user's auth method and user-specific API key
             async_client = self._get_async_client(user_auth_method, user_id)
-            # Google API doesn't support true async, use thread pool
-            response = await asyncio.to_thread(async_client.generate_content, prompt)
+            # Use the new google.genai async API
+            response = await async_client.aio.models.generate_content(model=self.model, contents=prompt)
 
             await self._track_token_usage_async(
                 len(prompt), len(response.text), "generate_socratic_question_async"
