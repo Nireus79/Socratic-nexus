@@ -338,3 +338,125 @@ class TestGoogleClientIntegration:
             _ = client.generate_socratic_question("topic")
 
             assert mock_client.models.generate_content.call_count >= 3
+
+
+class TestGoogleClientAsyncMethods:
+    """Tests for async methods."""
+
+    @pytest.mark.asyncio
+    async def test_generate_response_async(self, mock_orchestrator):
+        """Test async response generation."""
+        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
+            mock_response = Mock()
+            mock_response.text = "async response"
+            # Mock the async method
+            async def async_generate(*args, **kwargs):
+                return mock_response
+            mock_client.aio.models.generate_content = async_generate
+
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            result = await client.generate_response_async("test prompt")
+            assert result == "async response"
+
+    @pytest.mark.asyncio
+    async def test_extract_insights_async(self, mock_orchestrator):
+        """Test async insights extraction."""
+        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
+            mock_response = Mock()
+            mock_response.text = '{"test": "data"}'
+            # Mock the async method
+            async def async_generate(*args, **kwargs):
+                return mock_response
+            mock_client.aio.models.generate_content = async_generate
+
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            project = ProjectContext(project_name="Test")
+            result = await client.extract_insights_async("response", project)
+            assert isinstance(result, dict)
+
+    @pytest.mark.asyncio
+    async def test_generate_socratic_question_async(self, mock_orchestrator):
+        """Test async socratic question generation."""
+        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
+            mock_response = Mock()
+            mock_response.text = "What would you do?"
+            # Mock the async method
+            async def async_generate(*args, **kwargs):
+                return mock_response
+            mock_client.aio.models.generate_content = async_generate
+
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            result = await client.generate_socratic_question_async("topic")
+            assert result == "What would you do?"
+
+
+class TestGoogleClientEdgeCases:
+    """Tests for edge cases and error paths."""
+
+    def test_get_cache_key(self, mock_orchestrator):
+        """Test cache key generation."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            key1 = client._get_cache_key("test message")
+            key2 = client._get_cache_key("test message")
+            assert key1 == key2  # Same message should produce same key
+
+            key3 = client._get_cache_key("different message")
+            assert key1 != key3  # Different messages should have different keys
+
+    def test_parse_json_response_valid(self, mock_orchestrator):
+        """Test JSON response parsing with valid JSON."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            result = client._parse_json_response('{"key": "value"}')
+            assert result == {"key": "value"}
+
+    def test_parse_json_response_invalid(self, mock_orchestrator):
+        """Test JSON response parsing with invalid JSON."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            result = client._parse_json_response("not json")
+            assert result == {} or isinstance(result, dict)
+
+    def test_test_connection_success(self, mock_orchestrator):
+        """Test successful connection test."""
+        with patch("socratic_nexus.clients.google_client.genai") as mock_genai:
+            mock_client = Mock()
+            mock_genai.Client.return_value = mock_client
+            mock_response = Mock()
+            mock_response.text = "ok"
+            mock_client.models.generate_content.return_value = mock_response
+
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            result = client.test_connection()
+            assert result is True
+
+    def test_test_connection_no_api_key(self, mock_orchestrator):
+        """Test connection test with no API key."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            mock_orchestrator.database.get_api_key.return_value = None
+            client = GoogleClient(api_key=None, orchestrator=mock_orchestrator)
+            result = client.test_connection()
+            assert result is False
+
+    def test_get_user_api_key_fallback_to_env(self, mock_orchestrator):
+        """Test getting API key falls back to environment key."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            mock_orchestrator.database.get_api_key.return_value = None
+            client = GoogleClient(api_key="env-key", orchestrator=mock_orchestrator)
+            key, is_user = client._get_user_api_key("user123")
+            assert key == "env-key"
+            assert is_user is False
+
+    def test_calculate_cost_google(self, mock_orchestrator):
+        """Test cost calculation for Google."""
+        with patch("socratic_nexus.clients.google_client.genai"):
+            client = GoogleClient(api_key="test-key", orchestrator=mock_orchestrator)
+            cost = client._calculate_cost_google(100, 50)
+            assert cost >= 0  # Cost should be non-negative
