@@ -12,6 +12,7 @@ Advanced patterns and techniques for production use of Socrates Nexus.
 - [Cost Monitoring](#cost-monitoring)
 - [Streaming Best Practices](#streaming-best-practices)
 - [Concurrency Patterns](#concurrency-patterns)
+- [Encryption & Security](./ENCRYPTION.md)
 
 ---
 
