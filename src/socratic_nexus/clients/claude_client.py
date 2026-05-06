@@ -189,35 +189,44 @@ class ClaudeClient:
             return None
 
         try:
-            # Extract salt and encrypted data (format: salt_b64:encrypted_b64)
-            if ":" not in encrypted_key:
-                self.logger.error(
-                    "Invalid encrypted API key format: missing salt. "
-                    "Expected format: salt_b64:encrypted_b64"
-                )
-                return None
+            # Try new format first: salt_b64:encrypted_b64
+            if ":" in encrypted_key:
+                try:
+                    salt_b64, encrypted_b64 = encrypted_key.split(":", 1)
+                    salt = base64.urlsafe_b64decode(salt_b64)
 
-            salt_b64, encrypted_b64 = encrypted_key.split(":", 1)
-            salt = base64.urlsafe_b64decode(salt_b64)
+                    # Derive key using PBKDF2 with same parameters as encryption
+                    kdf = PBKDF2HMAC(
+                        algorithm=hashes.SHA256(),
+                        length=32,
+                        salt=salt,
+                        iterations=100000,
+                        backend=default_backend(),
+                    )
+                    derived_key = base64.urlsafe_b64encode(kdf.derive(encryption_key.encode()))
 
-            # Derive key using PBKDF2 with same parameters as encryption
-            kdf = PBKDF2HMAC(
-                algorithm=hashes.SHA256(),
-                length=32,
-                salt=salt,
-                iterations=100000,
-                backend=default_backend(),
-            )
-            derived_key = base64.urlsafe_b64encode(kdf.derive(encryption_key.encode()))
+                    # Decrypt with Fernet
+                    cipher = Fernet(derived_key)
+                    decrypted = cipher.decrypt(encrypted_b64.encode())
+                    self.logger.info("API key decrypted successfully (new format)")
+                    return decrypted.decode()
+                except Exception as e:
+                    self.logger.debug(f"New format decryption failed, trying old format: {e}")
+                    # Fall through to old format attempt
 
-            # Decrypt with Fernet
-            cipher = Fernet(derived_key)
-            decrypted = cipher.decrypt(encrypted_b64.encode())
-            self.logger.info("API key decrypted successfully")
-            return decrypted.decode()
+            # Fall back to old format: just encrypted data without salt
+            # This handles API keys stored before the PBKDF2 salt was introduced
+            try:
+                cipher = Fernet(base64.urlsafe_b64encode(encryption_key.encode()[:32]))
+                decrypted = cipher.decrypt(encrypted_key.encode())
+                self.logger.info("API key decrypted successfully (old format)")
+                return decrypted.decode()
+            except Exception as e:
+                self.logger.debug(f"Old format decryption also failed: {e}")
+                raise
 
         except Exception as e:
-            self.logger.error(f"Failed to decrypt API key: {e}")
+            self.logger.error(f"Failed to decrypt API key with all methods: {e}")
             return None
 
     def _get_client(self, user_auth_method: str = "api_key", user_id: Optional[str] = None):
