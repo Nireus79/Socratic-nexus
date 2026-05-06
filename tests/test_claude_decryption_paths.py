@@ -1,8 +1,8 @@
 """
 Tests for uncovered decryption and key management code paths in ClaudeClient.
 
-Targets the complex decryption logic (lines 161-248) and key retrieval (lines 119-159)
-with multiple encryption method fallbacks and error handling.
+Targets the unified PBKDF2-Fernet encryption logic (lines 161-217) with random salts
+and key retrieval (lines 119-159) with error handling.
 """
 
 import pytest
@@ -17,25 +17,50 @@ from socratic_nexus.clients.claude_client import ClaudeClient
 from socratic_nexus.exceptions import APIError
 
 
-class TestDecryptionPathsSHA256:
-    """Tests for SHA256-Fernet decryption path"""
+def encrypt_api_key(api_key: str, encryption_key: str) -> str:
+    """Helper function to encrypt API key using unified PBKDF2-Fernet with random salt."""
+    from cryptography.fernet import Fernet
+    from cryptography.hazmat.backends import default_backend
+    from cryptography.hazmat.primitives import hashes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-    def test_decrypt_api_key_sha256_success(self):
-        """Test successful SHA256-Fernet decryption"""
+    # Generate random salt
+    salt = os.urandom(16)
+
+    # Derive key using PBKDF2
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,
+        salt=salt,
+        iterations=100000,
+        backend=default_backend(),
+    )
+    derived_key = base64.urlsafe_b64encode(kdf.derive(encryption_key.encode()))
+
+    # Encrypt with Fernet
+    cipher = Fernet(derived_key)
+    encrypted = cipher.encrypt(api_key.encode())
+
+    # Format: salt_b64:encrypted_b64
+    salt_b64 = base64.urlsafe_b64encode(salt).decode()
+    encrypted_b64 = encrypted.decode()
+
+    return f"{salt_b64}:{encrypted_b64}"
+
+
+class TestDecryptionPathsPBKDF2Random:
+    """Tests for PBKDF2-Fernet decryption with random salts"""
+
+    def test_decrypt_api_key_success(self):
+        """Test successful PBKDF2-Fernet decryption with random salt"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Create a properly encrypted key with SHA256
-            import hashlib
-            from cryptography.fernet import Fernet
-
             encryption_key = "test-encryption-key"
-            key_bytes = hashlib.sha256(encryption_key.encode()).digest()
-            derived_key = base64.urlsafe_b64encode(key_bytes)
-            cipher = Fernet(derived_key)
-
             api_key = "sk-actual-api-key"
-            encrypted_key = cipher.encrypt(api_key.encode()).decode()
+
+            # Encrypt using new unified method
+            encrypted_key = encrypt_api_key(api_key, encryption_key)
 
             # Mock the environment
             with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key}):
@@ -43,132 +68,101 @@ class TestDecryptionPathsSHA256:
 
                 assert result == api_key
 
-    def test_decrypt_api_key_with_default_key(self):
-        """Test decryption with default insecure key"""
+    def test_decrypt_api_key_requires_encryption_key(self):
+        """Test decryption fails gracefully without SOCRATES_ENCRYPTION_KEY"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Create encrypted key with default encryption key
-            import hashlib
-            from cryptography.fernet import Fernet
-
-            default_key = "default-insecure-key-change-in-production"
-            key_bytes = hashlib.sha256(default_key.encode()).digest()
-            derived_key = base64.urlsafe_b64encode(key_bytes)
-            cipher = Fernet(derived_key)
-
+            encryption_key = "test-encryption-key"
             api_key = "sk-decrypted-key"
-            encrypted_key = cipher.encrypt(api_key.encode()).decode()
 
-            # Ensure env var is not set (use default)
+            # Encrypt using new unified method
+            encrypted_key = encrypt_api_key(api_key, encryption_key)
+
+            # Ensure env var is not set
             with patch.dict(os.environ, {}, clear=True):
                 result = client._decrypt_api_key_from_db(encrypted_key)
 
-                assert result == api_key
-
-
-class TestDecryptionPathsPBKDF2:
-    """Tests for PBKDF2-Fernet decryption fallback"""
-
-    def test_decrypt_api_key_pbkdf2_fallback(self):
-        """Test PBKDF2-Fernet decryption fallback when SHA256 fails"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(api_key="test-key")
-
-            try:
-                from cryptography.fernet import Fernet
-                from cryptography.hazmat.backends import default_backend
-                from cryptography.hazmat.primitives import hashes
-                from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
-                encryption_key = "pbkdf2-encryption-key"
-                salt = b"socrates-salt"
-                kdf = PBKDF2HMAC(
-                    algorithm=hashes.SHA256(),
-                    length=32,
-                    salt=salt,
-                    iterations=100000,
-                    backend=default_backend(),
-                )
-                derived_key = base64.urlsafe_b64encode(kdf.derive(encryption_key.encode()))
-                cipher = Fernet(derived_key)
-
-                api_key = "sk-pbkdf2-decrypted"
-                encrypted_key = cipher.encrypt(api_key.encode()).decode()
-
-                # Provide encryption key to use PBKDF2
-                with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key}):
-                    result = client._decrypt_api_key_from_db(encrypted_key)
-
-                    # Should decrypt successfully
-                    assert result is not None
-            except ImportError:
-                pytest.skip("cryptography.hazmat not available")
-
-    def test_decrypt_api_key_pbkdf2_import_error(self):
-        """Test PBKDF2 decryption handles ImportError gracefully"""
-        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
-            client = ClaudeClient(api_key="test-key")
-
-            # Create invalid encrypted string to force fallback
-            encrypted_key = "invalid-encrypted-data"
-
-            with patch("socratic_nexus.clients.claude_client.hashlib"):
-                result = client._decrypt_api_key_from_db(encrypted_key)
-
-                # Should return None if all decryption methods fail
+                # Should return None without encryption key
                 assert result is None
 
-
-class TestDecryptionPathsBase64:
-    """Tests for Base64 decoding fallback"""
-
-    def test_decrypt_api_key_base64_fallback(self):
-        """Test Base64 decoding fallback when both Fernet methods fail"""
+    def test_decrypt_multiple_keys_with_different_salts(self):
+        """Test that same plaintext encrypted multiple times has different ciphertexts (due to random salt)"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Create base64-encoded key
-            api_key = "sk-base64-encoded-key"
-            encoded_key = base64.b64encode(api_key.encode()).decode()
+            encryption_key = "test-encryption-key"
+            api_key = "sk-same-api-key"
 
-            # Provide invalid encryption key to skip SHA256/PBKDF2
-            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": ""}):
-                result = client._decrypt_api_key_from_db(encoded_key)
+            # Encrypt same key multiple times
+            encrypted_key1 = encrypt_api_key(api_key, encryption_key)
+            encrypted_key2 = encrypt_api_key(api_key, encryption_key)
 
-                # Should decode successfully with base64
-                assert result is not None
+            # Should be different due to random salts
+            assert encrypted_key1 != encrypted_key2
+
+            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key}):
+                # But should both decrypt to same value
+                result1 = client._decrypt_api_key_from_db(encrypted_key1)
+                result2 = client._decrypt_api_key_from_db(encrypted_key2)
+
+                assert result1 == api_key
+                assert result2 == api_key
 
 
 class TestDecryptionErrorPaths:
     """Tests for error conditions in decryption"""
 
-    def test_decrypt_api_key_all_methods_fail(self):
-        """Test decryption returns None when all methods fail"""
+    def test_decrypt_api_key_invalid_format(self):
+        """Test decryption returns None when encrypted data format is invalid"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Completely invalid encrypted data
-            invalid_data = "completely-invalid-and-undecodable-garbage-data!!!"
+            encryption_key = "test-encryption-key"
 
-            result = client._decrypt_api_key_from_db(invalid_data)
+            # Data without salt:encrypted format
+            invalid_data = "completely-invalid-no-salt-separator"
 
-            # Should return None when all decryption methods fail
-            assert result is None
+            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key}):
+                result = client._decrypt_api_key_from_db(invalid_data)
+
+                # Should return None when format is invalid (missing salt)
+                assert result is None
 
     def test_decrypt_api_key_with_corrupt_data(self):
         """Test decryption handles corrupted encrypted data"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Data that is completely invalid - not valid Fernet and not valid base64
-            # This will fail all three decryption methods
-            corrupt_data = "!!!invalid-base64-and-not-fernet-encrypted-data!!!"
+            encryption_key = "test-encryption-key"
 
-            result = client._decrypt_api_key_from_db(corrupt_data)
+            # Data with correct format but corrupted encrypted part
+            corrupt_data = "dGVzdHNhbHQ=:!!!invalid-fernet-ciphertext!!!"
 
-            # Should gracefully return None when all methods fail
-            assert result is None
+            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key}):
+                result = client._decrypt_api_key_from_db(corrupt_data)
+
+                # Should gracefully return None when decryption fails
+                assert result is None
+
+    def test_decrypt_api_key_with_wrong_encryption_key(self):
+        """Test decryption fails with wrong encryption key"""
+        with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
+            client = ClaudeClient(api_key="test-key")
+
+            encryption_key1 = "encryption-key-1"
+            encryption_key2 = "encryption-key-2"
+            api_key = "sk-test-api-key"
+
+            # Encrypt with key1
+            encrypted_key = encrypt_api_key(api_key, encryption_key1)
+
+            # Try to decrypt with key2
+            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": encryption_key2}):
+                result = client._decrypt_api_key_from_db(encrypted_key)
+
+                # Should fail because keys don't match
+                assert result is None
 
 
 class TestGetUserApiKeyRetrieval:
@@ -327,42 +321,32 @@ class TestDecryptionWithEnvironmentVariables:
             client = ClaudeClient(api_key="test-key")
 
             custom_key = "my-custom-secure-key"
-
-            import hashlib
-            from cryptography.fernet import Fernet
-
-            key_bytes = hashlib.sha256(custom_key.encode()).digest()
-            derived_key = base64.urlsafe_b64encode(key_bytes)
-            cipher = Fernet(derived_key)
-
             api_key = "sk-encrypted-with-custom-key"
-            encrypted = cipher.encrypt(api_key.encode()).decode()
+
+            # Encrypt using new unified method with custom key
+            encrypted = encrypt_api_key(api_key, custom_key)
 
             with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": custom_key}):
                 result = client._decrypt_api_key_from_db(encrypted)
 
                 assert result == api_key
 
-    def test_decrypt_logs_security_warning(self):
-        """Test decryption logs warning when using default insecure key"""
+    def test_decrypt_logs_errors_appropriately(self):
+        """Test decryption logs errors when decryption fails"""
         with patch("socratic_nexus.clients.claude_client.anthropic.Anthropic"):
             client = ClaudeClient(api_key="test-key")
 
-            # Create encrypted data with default key
-            import hashlib
-            from cryptography.fernet import Fernet
+            # Create encrypted data with one key
+            encryption_key = "test-key-123"
+            api_key = "sk-test-api-key"
+            encrypted = encrypt_api_key(api_key, encryption_key)
 
-            default_key = "default-insecure-key-change-in-production"
-            key_bytes = hashlib.sha256(default_key.encode()).digest()
-            derived_key = base64.urlsafe_b64encode(key_bytes)
-            cipher = Fernet(derived_key)
+            # Try to decrypt with wrong key
+            with patch.dict(os.environ, {"SOCRATES_ENCRYPTION_KEY": "wrong-key"}):
+                result = client._decrypt_api_key_from_db(encrypted)
 
-            encrypted = cipher.encrypt(b"test-key").decode()
-
-            with patch.dict(os.environ, {}, clear=True):
-                client._decrypt_api_key_from_db(encrypted)
-
-                # Should have logger available
+                # Should return None and have logged error
+                assert result is None
                 assert client.logger is not None
 
 
