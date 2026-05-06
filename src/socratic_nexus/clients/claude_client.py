@@ -214,15 +214,25 @@ class ClaudeClient:
                     self.logger.debug(f"New format decryption failed, trying old format: {e}")
                     # Fall through to old format attempt
 
-            # Fall back to old format: just encrypted data without salt
-            # This handles API keys stored before the PBKDF2 salt was introduced
+            # Fall back to old format: PBKDF2 with hardcoded salt
+            # This handles API keys stored by MultiLLMAgent with fixed salt
             try:
-                cipher = Fernet(base64.urlsafe_b64encode(encryption_key.encode()[:32]))
+                # Use the same hardcoded salt that MultiLLMAgent uses
+                salt = b"socrates-salt"
+                kdf = PBKDF2HMAC(
+                    algorithm=hashes.SHA256(),
+                    length=32,
+                    salt=salt,
+                    iterations=100000,
+                    backend=default_backend(),
+                )
+                derived_key = base64.urlsafe_b64encode(kdf.derive(encryption_key.encode()))
+                cipher = Fernet(derived_key)
                 decrypted = cipher.decrypt(encrypted_key.encode())
-                self.logger.info("API key decrypted successfully (old format)")
+                self.logger.info("API key decrypted successfully (legacy PBKDF2 format)")
                 return decrypted.decode()
             except Exception as e:
-                self.logger.debug(f"Old format decryption also failed: {e}")
+                self.logger.debug(f"Legacy PBKDF2 decryption also failed: {e}")
                 raise
 
         except Exception as e:
