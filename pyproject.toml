@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "socratic-nexus"
-version = "0.4.3"
-description = "Universal LLM client for production - works with Claude, GPT-4, Gemini, Llama, and any LLM. Built-in integrations with Openclaw, LangChain, and LangGraph."
+version = "0.4.4"
+description = "One client interface for Claude, OpenAI, Google and Ollama"
 readme = "README.md"
 license = "MIT"
 authors = [
@@ -122,6 +122,9 @@ target-version = ['py38']
 [tool.ruff]
 line-length = 100
 target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
