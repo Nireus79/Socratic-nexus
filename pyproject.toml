@@ -9,7 +9,7 @@ description = "Universal LLM client for production - works with Claude, GPT-4, G
 readme = "README.md"
 license = "MIT"
 authors = [
-    {name = "Socrates Nexus Contributors"}
+    {name = "Efthimios Angelopoulos", email = "Hermes_creative@proton.me"}
 ]
 keywords = [
     "llm",
