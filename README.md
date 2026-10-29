@@ -11,7 +11,6 @@ A universal LLM client library providing unified access to multiple AI providers
 - **Multi-Provider Support**: Works with Anthropic (Claude), OpenAI (GPT-4), Google (Gemini), Ollama, and HuggingFace
 - **Unified Interface**: Consistent API across all providers
 - **Async/Sync Support**: Full async/await support with optional synchronous API
-- **Production Ready**: 70%+ test coverage, comprehensive error handling
 - **Token Tracking**: Built-in token usage monitoring and cost estimation
 - **Caching**: Intelligent response caching with optional Redis support
 - **Type Safe**: Full type hints with mypy support
@@ -393,9 +392,9 @@ Made with ❤️ for the AI community
 
 ---
 
-## Part of Socrates AI Ecosystem
+## Origin
 
-This package is a component of [**Socrates AI**](https://github.com/Nireus79/Socrates), a production-ready platform for building intelligent multi-agent systems with constitutional governance.
+This package comes from the [Socrates](https://github.com/Nireus79/Socrates) research prototype, which is not maintained as a product. Status: alpha. Written by Efthimios Angelopoulos with AI coding assistants (Claude Code); I design, review and test it. Contact: Hermes_creative@proton.me.
 
 ### Use This Package Standalone:
 ```bash
