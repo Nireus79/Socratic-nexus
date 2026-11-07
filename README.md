@@ -9,12 +9,11 @@ A universal LLM client library providing unified access to multiple AI providers
 
 ## Features
 
-- **Multi-Provider Support**: Works with Anthropic (Claude), OpenAI (GPT-4), Google (Gemini), Ollama, and HuggingFace
+- **Multi-Provider Support**: Works with Anthropic (Claude), OpenAI (GPT-4), Google (Gemini), and Ollama
 - **Unified Interface**: Consistent API across all providers
 - **Async/Sync Support**: Full async/await support with optional synchronous API
-- **Token Tracking**: Built-in token usage monitoring and cost estimation
-- **Caching**: Intelligent response caching with optional Redis support
-- **Type Safe**: Full type hints with mypy support
+- **Token Tracking**: token usage is recorded per call and emitted as an event when an orchestrator is attached
+- **Caching**: in-memory caching of insight extraction
 - **No Lock-in**: Easy to switch between providers without code changes
 
 ## Installation
@@ -76,10 +75,12 @@ code = client.generate_code(
 )
 print(code)
 
-# Extract insights
+# Extract insights (needs a ProjectContext; returns a dict)
+from socratic_nexus.models import ProjectContext
+
 insights = client.extract_insights(
     "Why is photosynthesis important for Earth's ecosystem?",
-    project_name="biology_study"
+    ProjectContext(project_name="biology_study"),
 )
 print(insights)
 ```
@@ -115,8 +116,9 @@ print(response)
 ```python
 from socratic_nexus.clients import OllamaClient
 
-# Ollama runs locally, no API key needed
-client = OllamaClient(base_url="http://localhost:11434")
+# Ollama runs locally, no API key needed. Without an orchestrator it uses
+# the model "mistral" at http://localhost:11434.
+client = OllamaClient()
 
 response = client.generate_response(
     "What is the capital of France?"
@@ -204,30 +206,17 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for detailed architecture documentation.
 All clients implement these core methods:
 
 ```python
-# Generate a response to a prompt
-response = client.generate_response(
-    prompt: str,
-    max_tokens: int = 1024,
-    temperature: float = 0.7
-) -> str
-
-# Generate code from specifications
-code = client.generate_code(
-    specification: str,
-    language: str = "python"
-) -> str
-
-# Extract key insights from text
-insights = client.extract_insights(
-    text: str,
-    project: Optional[ProjectContext] = None
-) -> str
+client.generate_response(prompt: str, max_tokens: int = 2000, temperature: float = 0.7) -> str
+client.generate_code(context: str) -> str
+client.extract_insights(user_response: str, project: ProjectContext) -> dict
 
 # Async variants
-response = await client.generate_response_async(...)
-code = await client.generate_code_async(...)
-insights = await client.extract_insights_async(...)
+await client.generate_response_async(...)
+await client.extract_insights_async(...)
+await client.generate_code_async(...)   # ClaudeClient only
 ```
+
+All four clients also take `user_auth_method` and `user_id`; the extra generators (`generate_documentation`, `generate_business_plan` and others) are on `ClaudeClient`.
 
 ### Token Usage Tracking
 
@@ -238,36 +227,18 @@ insights = await client.extract_insights_async(...)
 
 ### Environment Variables
 
-Set provider API keys via environment variables:
-
-```bash
-export ANTHROPIC_API_KEY="sk-ant-..."
-export OPENAI_API_KEY="sk-..."
-export GOOGLE_API_KEY="..."
-```
-
-Then initialize clients without explicit keys:
+The clients take the key as an argument and do not read it from the environment themselves. Read it yourself:
 
 ```python
+import os
 from socratic_nexus.clients import ClaudeClient
 
-# Reads from ANTHROPIC_API_KEY
-client = ClaudeClient()
+client = ClaudeClient(api_key=os.environ["ANTHROPIC_API_KEY"])
 ```
 
 ### Client Configuration
 
-```python
-from socratic_nexus.clients import ClaudeClient
-
-client = ClaudeClient(
-    api_key="sk-ant-...",
-    model="claude-3-5-sonnet-20241022",
-    max_tokens=1024,
-    temperature=0.7,
-    timeout=30
-)
-```
+The constructors take only `api_key`, `orchestrator` and `subscription_token`. Without an orchestrator the Claude client uses the model `claude-haiku-4-5-20251001` and the Ollama client uses `mistral` at `http://localhost:11434`; with an orchestrator the model comes from its config (`claude_model`, `ollama_model`, `ollama_url`). `max_tokens` and `temperature` are arguments of `generate_response`.
 
 ## Error Handling
 
@@ -308,27 +279,9 @@ pytest -m unit
 pytest -m integration
 ```
 
-## Performance
-
-- **Response Caching**: Configurable in-memory caching
-- **Async Support**: Non-blocking API calls for high concurrency
-- **Connection Pooling**: Efficient HTTP connection management
-- **Retry Logic**: Automatic retry with exponential backoff
-
-Typical response times (with caching disabled):
-- Claude: 1-5s per request
-- GPT-4: 1-3s per request
-- Gemini: 500ms-2s per request
-- Ollama (local): 100ms-1s per request
-
 ## Security
 
-- **API Key Protection**: Never logged or cached
-- **HTTPS Only**: All communication encrypted
-- **No Request Logging**: Sensitive data not persisted
-- **Input Validation**: All requests validated before sending
-
-For security issues, please see [SECURITY.md](SECURITY.md).
+For security issues, see [SECURITY.md](SECURITY.md).
 
 ## Contributing
 
@@ -391,9 +344,6 @@ pip install socratic-nexus
 ```bash
 pip install socrates-ai  # the earlier research prototype that uses this package
 ```
-
-### Integration Example:
-
 
 ### More Information:
 - 📖 [Full Socrates Documentation](https://github.com/Nireus79/Socrates/tree/main/docs)
