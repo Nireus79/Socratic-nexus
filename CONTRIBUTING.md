@@ -55,7 +55,7 @@ Every feature should have corresponding tests:
 pytest tests/ -v
 
 # With coverage
-pytest tests/ --cov=socrates_nexus
+pytest tests/ --cov=socratic_nexus
 ```
 
 ### 4. Format Your Code
@@ -68,7 +68,7 @@ black src/ tests/
 ruff check src/ tests/
 
 # Type checking
-mypy src/socrates_nexus
+mypy src/socratic_nexus
 ```
 
 ### 5. Commit Your Changes
@@ -150,7 +150,7 @@ def calculate_cost(
 def test_feature_behavior():
     """Clear description of what is being tested."""
     # Arrange
-    client = LLMClient(provider="anthropic", ...)
+    client = ClaudeClient(api_key="test-key")
 
     # Act
     response = client.chat("Hello")
@@ -161,7 +161,7 @@ def test_feature_behavior():
 
 ## Adding a New Provider
 
-1. **Create provider file**: `src/socrates_nexus/providers/new_provider.py`
+1. **Create provider file**: `src/socratic_nexus/providers/new_provider.py`
 2. **Implement BaseProvider interface**
 3. **Add pricing data** to `PROVIDER_PRICING` in `models.py`
 4. **Add provider to factory** in `client.py` and `async_client.py`

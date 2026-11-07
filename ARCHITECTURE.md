@@ -637,4 +637,3 @@ asyncio.run(main())
 
 ---
 
-For API documentation, see [docs/API_REFERENCE.md](docs/API_REFERENCE.md)

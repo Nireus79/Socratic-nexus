@@ -439,4 +439,4 @@ These parameters were chosen to:
 
 ---
 
-For questions or issues, see [TROUBLESHOOTING.md](./TROUBLESHOOTING.md) or open an issue on GitHub.
+For questions or issues, open an issue on GitHub.

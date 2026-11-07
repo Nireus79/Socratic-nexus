@@ -231,21 +231,8 @@ insights = await client.extract_insights_async(...)
 
 ### Token Usage Tracking
 
-Each response includes token usage information:
+`generate_response` returns the reply text as a string. Token usage is not part of the return value; the client records it and, when an orchestrator with an event emitter is attached, emits a `TOKEN_USAGE` event (`socratic_nexus.EventType.TOKEN_USAGE`) after each call.
 
-```python
-from socratic_nexus.clients import ClaudeClient
-
-client = ClaudeClient(api_key="sk-ant-...")
-response = client.generate_response("Your prompt here")
-
-# Token information available in response metadata
-print(f"Input tokens: {response.metadata.input_tokens}")
-print(f"Output tokens: {response.metadata.output_tokens}")
-print(f"Estimated cost: ${response.metadata.cost_usd}")
-```
-
-See [docs/API_REFERENCE.md](docs/API_REFERENCE.md) for complete API documentation.
 
 ## Configuration
 
@@ -362,8 +349,6 @@ MIT License - See [LICENSE](LICENSE) file for details.
 ## Support
 
 - **Documentation**: [docs/](docs/)
-- **API Reference**: [docs/API_REFERENCE.md](docs/API_REFERENCE.md)
-- **Quickstart Guide**: [docs/quickstart.md](docs/quickstart.md)
 - **GitHub Issues**: [Report bugs](https://github.com/Nireus79/Socratic-nexus/issues)
 - **Discussions**: [Ask questions](https://github.com/Nireus79/Socratic-nexus/discussions)
 
