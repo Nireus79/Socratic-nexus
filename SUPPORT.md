@@ -209,8 +209,8 @@ config = LLMConfig(..., cache_responses=False)
 
 ## Getting More Help
 
-### Professional Support
-For enterprise support:
+### Contact
+For questions:
 - Contact: [Nireus79@github.com](mailto:Nireus79@github.com)
 - Organization support available
 

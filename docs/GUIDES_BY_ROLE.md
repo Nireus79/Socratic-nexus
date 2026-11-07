@@ -289,7 +289,5 @@ print(f"This support reply cost: ${response.usage.cost_usd}")
 ```
 
 **Results**:
-- ✅ 30% cost savings (caching + optimization)
-- ✅ 99.9% uptime (automatic fallbacks)
 - ✅ Better user experience (streaming)
 - ✅ Full cost visibility

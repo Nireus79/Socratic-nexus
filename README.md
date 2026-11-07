@@ -4,7 +4,6 @@
 
 A universal LLM client library providing unified access to multiple AI providers with a consistent interface.
 
-[![Tests](https://img.shields.io/badge/coverage-70.94%25-brightgreen)](https://github.com/Nireus79/Socratic-nexus)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue)](https://www.python.org/downloads/)
 
@@ -405,19 +404,14 @@ pip install socratic-nexus
 
 ### Or As Part of Socrates Platform:
 ```bash
-pip install socrates-ai  # Includes 37+ modules + all 11 packages
+pip install socrates-ai  # the earlier research prototype that uses this package
 ```
 
 ### Integration Example:
 
-See the [**Socrates ECOSYSTEM.md**](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md#layer-2-specialized-libraries) for detailed integration examples showing how to use socratic-nexus with other Socratic packages.
-
-**Related packages you might use together:**
-- See [Complete Package Map](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
 
 ### More Information:
 - 📖 [Full Socrates Documentation](https://github.com/Nireus79/Socrates/tree/main/docs)
-- 🏗️ [Complete Architecture Guide](https://github.com/Nireus79/Socrates/blob/main/ECOSYSTEM.md)
 - 💬 [Socrates Discussions](https://github.com/Nireus79/Socrates/discussions)
 
 ---

@@ -537,8 +537,6 @@ tests/
 
 ### Test Coverage
 
-- **Target**: 70%+ coverage
-- **Current**: 70.94% coverage
 - **Focus areas**:
   - Client initialization
   - API method signatures
